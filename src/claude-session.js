@@ -13,7 +13,16 @@ function resolveEnvironment() {
   let claudePath = null;
 
   if (process.platform === 'win32') {
-    return { env, claudePath: 'claude' };
+    // GUI apps on Windows get the user's PATH; the native installer puts claude.exe in ~/.local/bin, npm puts claude.cmd in %APPDATA%\npm.
+    const dirs = String(env.Path || env.PATH || '').split(path.delimiter).filter(Boolean);
+    dirs.push(path.join(os.homedir(), '.local', 'bin'), path.join(process.env.APPDATA || '', 'npm'));
+    for (const name of ['claude.exe', 'claude.cmd']) {
+      for (const dir of dirs) {
+        const p = path.join(dir, name);
+        if (fs.existsSync(p)) return { env, claudePath: p };
+      }
+    }
+    return { env, claudePath: null };
   }
 
   const shell = process.env.SHELL || '/bin/zsh';
@@ -44,6 +53,29 @@ function resolveEnvironment() {
     if (!claudePath && fs.existsSync(c)) claudePath = c;
   }
   return { env, claudePath };
+}
+
+// Windows can only start .cmd/.bat files through cmd.exe. Arguments are quoted for cmd here;
+// none of ours contain characters cmd would still expand (% ! ^ & | < >), only spaces at most.
+function spawnCli(file, args, opts) {
+  if (process.platform === 'win32' && /\.(cmd|bat)$/i.test(file)) {
+    const q = (a) => (/[\s"]/.test(a) ? `"${a.replace(/"/g, '""')}"` : a);
+    const line = [file, ...args].map(q).join(' ');
+    return spawn(process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', `"${line}"`], { ...opts, windowsHide: true, windowsVerbatimArguments: true });
+  }
+  return spawn(file, args, { ...opts, windowsHide: true });
+}
+
+// On Windows a process started through cmd.exe keeps running when only cmd.exe is killed.
+function killTree(proc) {
+  if (!proc || proc.exitCode !== null) return;
+  if (process.platform === 'win32' && proc.pid) {
+    try {
+      spawn('taskkill', ['/pid', String(proc.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' }).on('error', () => proc.kill());
+      return;
+    } catch { /* fall through */ }
+  }
+  proc.kill();
 }
 
 const short = (s, n = 80) => {
@@ -127,12 +159,7 @@ class ClaudeSession extends EventEmitter {
     if (this.effort) args.push('--effort', this.effort);
     if (this.sessionId) args.push('--resume', this.sessionId);
 
-    const proc = spawn(this.env.claudePath, args, {
-      cwd: this.cwd,
-      env: this.env.env,
-      shell: process.platform === 'win32',
-      windowsHide: true,
-    });
+    const proc = spawnCli(this.env.claudePath, args, { cwd: this.cwd, env: this.env.env });
     this.proc = proc;
     this.stderr = '';
 
@@ -192,7 +219,7 @@ class ClaudeSession extends EventEmitter {
     this.busy = false;
     if (p) {
       try { p.stdin.end(); } catch {}
-      p.kill();
+      killTree(p);
     }
   }
 
@@ -277,4 +304,4 @@ class ClaudeSession extends EventEmitter {
   }
 }
 
-module.exports = { ClaudeSession, resolveEnvironment, describeTool };
+module.exports = { ClaudeSession, resolveEnvironment, describeTool, spawnCli, killTree };

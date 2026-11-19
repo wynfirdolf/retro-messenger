@@ -1,22 +1,28 @@
 // ChatGPT chats run OpenAI's Codex CLI (the copy bundled with the ChatGPT app, or one on PATH).
-// It uses the ChatGPT sign-in already on this Mac (~/.codex); the app never asks for a login.
+// It uses the ChatGPT sign-in already on this computer (~/.codex); the app never asks for a login.
 // Each message is one `codex exec --json` run; later messages resume the same thread.
-const { spawn } = require('child_process');
 const { EventEmitter } = require('events');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const readline = require('readline');
+const { spawnCli, killTree } = require('./claude-session');
 
-const BUNDLED = [
-  '/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex',
-  '/Applications/Codex.app/Contents/Resources/codex-cli/bin/codex',
-];
+const isWin = process.platform === 'win32';
+const BUNDLED = isWin
+  ? [path.join(process.env.APPDATA || '', 'npm', 'codex.cmd')]
+  : [
+    '/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex',
+    '/Applications/Codex.app/Contents/Resources/codex-cli/bin/codex',
+  ];
 
 function findCodex(env) {
-  for (const dir of String(env.PATH || '').split(path.delimiter)) {
-    const p = path.join(dir, process.platform === 'win32' ? 'codex.cmd' : 'codex');
-    if (dir && fs.existsSync(p)) return p;
+  const dirs = String(env.Path || env.PATH || '').split(path.delimiter).filter(Boolean);
+  for (const name of isWin ? ['codex.exe', 'codex.cmd'] : ['codex']) {
+    for (const dir of dirs) {
+      const p = path.join(dir, name);
+      if (fs.existsSync(p)) return p;
+    }
   }
   return BUNDLED.find((p) => fs.existsSync(p)) || null;
 }
@@ -48,10 +54,13 @@ const short = (s, n = 80) => {
   return s.length > n ? s.slice(0, n - 1) + '…' : s;
 };
 
-// "/bin/zsh -lc \"npm test\"" -> "npm test"
+// "/bin/zsh -lc \"npm test\"" -> "npm test"; on Windows: "...\powershell.exe" -Command "npm test" -> "npm test"
 function plainCommand(cmd) {
-  const m = String(cmd || '').match(/^\S*sh\s+-l?c\s+(["'])([\s\S]*)\1$/);
-  return m ? m[2].replace(/\\"/g, '"') : String(cmd || '');
+  const s = String(cmd || '');
+  const m = s.match(/^\S*sh\s+-l?c\s+(["'])([\s\S]*)\1$/)
+    || s.match(/^"?[^"]*(?:powershell|pwsh)(?:\.exe)?"?\s+(?:-\S+\s+)*-Command\s+(["'])([\s\S]*)\1$/i)
+    || s.match(/^"?[^"]*cmd(?:\.exe)?"?\s+\/[cC]\s+(["']?)([\s\S]*)\1$/);
+  return m ? m[2].replace(/\\"/g, '"') : s;
 }
 
 class CodexSession extends EventEmitter {
@@ -86,13 +95,14 @@ class CodexSession extends EventEmitter {
     const { prompt, images } = this.flatten(content);
     const args = ['exec'];
     if (this.threadId) args.push('resume', this.threadId);
-    args.push('--json', '--skip-git-repo-check', '-c', `sandbox_mode="${this.sandbox}"`, '-c', 'approval_policy="never"');
+    // -c values that are not valid TOML are taken as plain strings, so no quotes are needed (and none reach cmd.exe).
+    args.push('--json', '--skip-git-repo-check', '-c', `sandbox_mode=${this.sandbox}`, '-c', 'approval_policy=never');
     if (this.model) args.push('-m', this.model);
-    if (this.effort) args.push('-c', `model_reasoning_effort="${this.effort}"`);
+    if (this.effort) args.push('-c', `model_reasoning_effort=${this.effort}`);
     for (const img of images) args.push('-i', img);
     args.push('-'); // the prompt comes on stdin
 
-    const proc = spawn(this.codexPath, args, { cwd: this.cwd, env: this.env.env, windowsHide: true });
+    const proc = spawnCli(this.codexPath, args, { cwd: this.cwd, env: this.env.env });
     this.proc = proc;
     this.busy = true;
     this.finished = false;
@@ -137,7 +147,7 @@ class CodexSession extends EventEmitter {
     const p = this.proc;
     this.proc = null;
     this.busy = false;
-    if (p) p.kill();
+    if (p) killTree(p);
   }
 
   onLine(line) {

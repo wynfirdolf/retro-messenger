@@ -51,7 +51,7 @@
       'sandbox.read-only': 'Read only',
       'sandbox.workspace-write': 'Can edit the project folder',
       'sandbox.danger-full-access': 'Full access (no sandbox)',
-      'chat.welcomeCodex': 'This chat is a ChatGPT (Codex) session running in {cwd}. It uses the ChatGPT account already signed in on this Mac.',
+      'chat.welcomeCodex': 'This chat is a ChatGPT (Codex) session running in {cwd}. It uses the ChatGPT account already signed in on this computer.',
       'chat.startHintCodex': 'Type a message to start talking to ChatGPT.',
       'err.noCodex': 'Codex was not found. Install the ChatGPT app (it includes Codex) or the Codex CLI, and sign in once.',
       'err.spawnCodex': 'Could not start Codex: {msg}',
@@ -177,6 +177,7 @@
       'sys.nudged': 'You have just sent a nudge.',
       'sys.newSession': "Started a new Claude Code session. Claude won't remember the earlier conversation.",
       'sys.replyReady': 'Reply ready.',
+      'badge.unread': '{n} unread',
       nudgePrompt: '[The user sent you an old-school "nudge" that shook the screen; they want your attention. Reply briefly and cheerfully. If you have unfinished work, say in one sentence where it stands.]',
 
       'err.noClaude': 'Claude Code was not found. Install Claude Code and run `claude` once in the terminal.',
@@ -248,7 +249,7 @@
       'sandbox.read-only': 'Yalnızca okuma',
       'sandbox.workspace-write': 'Proje klasörünü düzenleyebilir',
       'sandbox.danger-full-access': 'Tam yetki (korumasız)',
-      'chat.welcomeCodex': 'Bu sohbet {cwd} klasöründe çalışan bir ChatGPT (Codex) oturumudur. Bu Mac\'te zaten giriş yapılmış ChatGPT hesabını kullanır.',
+      'chat.welcomeCodex': 'Bu sohbet {cwd} klasöründe çalışan bir ChatGPT (Codex) oturumudur. Bu bilgisayarda zaten giriş yapılmış ChatGPT hesabını kullanır.',
       'chat.startHintCodex': 'ChatGPT ile konuşmaya başlamak için bir ileti yazın.',
       'err.noCodex': 'Codex bulunamadı. ChatGPT uygulamasını (Codex içinde gelir) ya da Codex CLI\'ı kurun ve bir kez giriş yapın.',
       'err.spawnCodex': 'Codex başlatılamadı: {msg}',
@@ -374,6 +375,7 @@
       'sys.nudged': 'Bir titreşim gönderdiniz.',
       'sys.newSession': 'Yeni bir Claude Code oturumu başlatıldı. Claude önceki konuşmayı hatırlamayacak.',
       'sys.replyReady': 'Yanıt hazır.',
+      'badge.unread': '{n} okunmamış',
       nudgePrompt: '[Kullanıcı sana eski usul bir "titreşim" (nudge) gönderdi; ekran salladı, dikkatini çekmek istiyor. Buna kısa ve neşeli bir cevap ver; yarım kalan bir işin varsa ne durumda olduğunu bir cümleyle söyle.]',
 
       'err.noClaude': "Claude Code bulunamadı. Önce Claude Code'u kurup terminalde bir kez `claude` çalıştırın.",

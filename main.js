@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen, nativeTheme } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen, nativeTheme, nativeImage } = require('electron');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -130,9 +130,33 @@ function sendToChat(id, channel, payload) {
   if (alive(w)) w.webContents.send(channel, payload);
 }
 
+// A 16x16 red dot for the Windows taskbar, drawn pixel by pixel (BGRA) so no image file is needed.
+let unreadDot = null;
+function redDot() {
+  if (unreadDot) return unreadDot;
+  const size = 16;
+  const buf = Buffer.alloc(size * size * 4);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const d = Math.hypot(x + 0.5 - size / 2, y + 0.5 - size / 2);
+      const i = (y * size + x) * 4;
+      const inner = d <= 6.2;
+      const alpha = Math.max(0, Math.min(1, 7.5 - d));
+      buf[i] = inner ? 0x2b : 0xff; // B
+      buf[i + 1] = inner ? 0x2b : 0xff; // G
+      buf[i + 2] = inner ? 0xd9 : 0xff; // R
+      buf[i + 3] = Math.round(alpha * 255);
+    }
+  }
+  unreadDot = nativeImage.createFromBitmap(buf, { width: size, height: size });
+  return unreadDot;
+}
+
 function updateBadge() {
   if (isMac && app.dock) app.dock.setBadge(unread.size ? String(unread.size) : '');
-  else app.setBadgeCount(unread.size);
+  else if (process.platform === 'win32') {
+    if (alive(listWin)) listWin.setOverlayIcon(unread.size ? redDot() : null, unread.size ? t('badge.unread', { n: unread.size }) : '');
+  } else app.setBadgeCount(unread.size);
 }
 
 function markRead(id) {
@@ -636,6 +660,8 @@ ipcMain.on('toast:click', (_e, id) => {
 // ---------- Uygulama ----------
 
 app.setName('Retro Messenger');
+// Windows groups taskbar buttons and notifications by this id; it matches build.appId.
+if (process.platform === 'win32') app.setAppUserModelId('com.wynfirdolf.retromessenger');
 
 app.whenReady().then(() => {
   store.load(app.getPath('userData'));
