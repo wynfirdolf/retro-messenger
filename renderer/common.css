@@ -1,0 +1,173 @@
+/* Retro Messenger — 2000'lerin masaüstü havası: Luna mavisi başlıklar, parlak düğmeler, Tahoma. */
+:root {
+  --title-1: #0a5fe0;
+  --title-2: #3b8cf7;
+  --title-3: #0846b8;
+  --line: #7f9db9;
+  --panel: #eef3fb;
+  --panel-2: #d9e6f7;
+  --ink: #000;
+  --muted: #6d6d6d;
+  --link: #0b4bb5;
+  --face: #ece9d8;
+  --ui-font: Tahoma, Verdana, "Segoe UI", sans-serif;
+  --chat-font: "Segoe UI", Tahoma, Verdana, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font: 11px/1.35 var(--ui-font);
+  color: var(--ink);
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body { display: flex; flex-direction: column; border: 1px solid #0831a0; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* ---------- Başlık çubuğu ---------- */
+.titlebar {
+  flex: none;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 0 8px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 0 #0a246a;
+  background: linear-gradient(180deg, #4a96ff 0%, var(--title-1) 12%, var(--title-2) 50%, var(--title-1) 88%, var(--title-3) 100%);
+  -webkit-app-region: drag;
+}
+.titlebar .tb-icon { width: 16px; height: 16px; flex: none; }
+.titlebar .tb-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.titlebar .tb-btns { display: flex; gap: 2px; -webkit-app-region: no-drag; }
+.titlebar .tb-btns button {
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  color: #fff;
+  font: bold 12px/1 Tahoma, sans-serif;
+  background: linear-gradient(180deg, #5f9cff, #2463e0);
+  box-shadow: inset 0 0 2px #0a246a;
+  cursor: default;
+}
+.titlebar .tb-btns button:hover { filter: brightness(1.15); }
+.titlebar .tb-btns button[data-win="close"] { background: linear-gradient(180deg, #f08a6e, #d1401c); }
+
+/* ---------- Düğmeler ve alanlar ---------- */
+.xp-btn {
+  min-width: 70px;
+  padding: 4px 12px;
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ffffff 0%, #f1efe5 60%, #dcd8c6 100%);
+  box-shadow: inset 0 -1px 0 #c9c4ad;
+  cursor: default;
+}
+.xp-btn:hover:not(:disabled) { box-shadow: inset 0 0 0 2px #f9c552; }
+.xp-btn:active:not(:disabled) { background: linear-gradient(180deg, #dcd8c6, #f1efe5); }
+.xp-btn:disabled { color: #a4a29a; border-color: #b9b7aa; }
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  cursor: default;
+}
+.tool-btn:hover:not(:disabled) { border-color: #9fb9e0; background: linear-gradient(180deg, #fff, #dfeafa); }
+.tool-btn:disabled { opacity: 0.45; }
+.tool-btn .ico { font-size: 15px; line-height: 1; }
+
+input[type="text"], select, textarea {
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 3px 4px;
+  outline: none;
+}
+input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
+
+.link { color: var(--link); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+
+/* ---------- Görünen resim ---------- */
+.dp {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  padding: 3px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #ffffff, #c9d9ef);
+  border: 1px solid #7d98c2;
+  box-shadow: 0 1px 2px #0003;
+}
+.dp > span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  font-size: 26px;
+  overflow: hidden;
+}
+.dp.s { width: 36px; height: 36px; }
+.dp.s > span { font-size: 19px; }
+.dp.l { width: 64px; height: 64px; }
+.dp.l > span { font-size: 36px; }
+.dp.xl { width: 104px; height: 104px; padding: 4px; border-radius: 9px; }
+.dp.xl > span { font-size: 60px; }
+.dp.busy-ring { border-color: #e2a200; box-shadow: 0 0 0 2px #ffd34d88; }
+
+/* ---------- Durum simgesi ---------- */
+.buddy { width: 16px; height: 16px; flex: none; }
+.blink { animation: blink 0.9s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+.pulse { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+
+/* ---------- Açılır pencereler ---------- */
+.popover {
+  position: fixed;
+  z-index: 50;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #7d98c2;
+  box-shadow: 2px 3px 8px #0004;
+}
+.popover h4 { margin: 0 0 6px; font-size: 11px; color: #1d3f84; }
+.grid { display: grid; gap: 2px; }
+.grid button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  background: none;
+  font-size: 19px;
+  line-height: 1;
+  padding: 0;
+  cursor: default;
+}
+.grid button:hover { border-color: #316ac5; background: #e3ecfa; }
+
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-track { background: #f4f3ee; }
+::-webkit-scrollbar-thumb {
+  border: 1px solid #94b0e0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #c9d9fb, #b4cbf7);
+}

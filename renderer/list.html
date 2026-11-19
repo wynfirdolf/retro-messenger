@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<title>Retro Messenger</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { background: linear-gradient(180deg, #dbe8f8 0, #fff 150px); }
+
+  /* Oturum açma */
+  #signin { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 26px 26px 14px; gap: 7px; overflow: auto; }
+  #signin .brand { display: flex; align-items: center; gap: 8px; font: bold 20px/1 Tahoma, sans-serif; color: #1d3f84; letter-spacing: -0.5px; margin-bottom: 10px; }
+  #signin .brand small { display: block; font: 11px Tahoma, sans-serif; color: var(--muted); letter-spacing: 0; margin-top: 4px; }
+  #signin .field { width: 100%; max-width: 230px; display: flex; flex-direction: column; gap: 3px; }
+  #signin .field label { color: #333; }
+  #signin .xp-btn { margin-top: 10px; min-width: 110px; font-weight: bold; }
+  #si-progress { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 14px; color: #1d3f84; }
+  #si-progress .ring { width: 54px; height: 54px; animation: spin 1.1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .si-note { margin-top: auto; padding-top: 18px; color: var(--muted); text-align: center; word-break: break-all; }
+  .si-note.bad { color: #b3261e; }
+
+  /* Ana liste */
+  #main { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  .me { display: flex; gap: 9px; padding: 10px 10px 8px; align-items: center; }
+  .me .dp { cursor: pointer; }
+  .me .who { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .me .name-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
+  #me-name { font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #111; }
+  #me-status { border: 0; background: none; padding: 0 2px; color: #333; cursor: pointer; appearance: none; -webkit-appearance: none; field-sizing: content; }
+  .name-row .caret { color: #555; font-size: 9px; pointer-events: none; }
+  #me-personal { border: 1px solid transparent; background: transparent; color: #555; font-style: italic; width: 100%; padding: 2px 3px; }
+  #me-personal:hover, #me-personal:focus { border-color: var(--line); background: #fff; font-style: normal; }
+
+  .usage { margin: 0 10px 6px; display: none; align-items: center; gap: 6px; color: #3d4d6a; }
+  .usage .bar { flex: 1; height: 11px; border: 1px solid #7f9db9; background: #fff; padding: 1px; border-radius: 2px; }
+  .usage .fill { height: 100%; background: repeating-linear-gradient(90deg, #37b532 0 7px, transparent 7px 9px); }
+
+  .searchbar { display: flex; gap: 4px; padding: 5px 8px; background: linear-gradient(180deg, #eef4fc, #dce8f8); border-top: 1px solid #b8cbe8; border-bottom: 1px solid #b8cbe8; }
+  #search { flex: 1; min-width: 0; }
+  #add { min-width: 0; padding: 2px 8px; font-weight: bold; }
+
+  #groups { flex: 1; overflow-y: auto; padding: 4px 0 8px; background: #fff; }
+  .group-head { display: flex; align-items: center; gap: 5px; padding: 4px 8px; font-weight: bold; color: #1d3f84; cursor: pointer; }
+  .group-head .tri { width: 0; height: 0; border: 4px solid transparent; border-top: 5px solid #1d3f84; margin-top: 4px; transition: transform 0.1s; }
+  .group.closed .tri { transform: rotate(-90deg); margin-top: 0; }
+  .group.closed .contact { display: none; }
+  .contact { display: flex; align-items: center; gap: 6px; padding: 3px 8px 3px 20px; cursor: default; border: 1px solid transparent; }
+  .contact:hover { background: #eef4fd; border-color: #c5d8f4; }
+  .contact.sel { background: #cfe0fb; border-color: #8fb1e6; }
+  .contact .cn { white-space: nowrap; color: #111; }
+  .contact .cm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-style: italic; }
+  .contact.unread .cn { font-weight: bold; }
+  .contact input { flex: 1; min-width: 0; padding: 1px 3px; }
+  .empty { margin: 26px 18px; text-align: center; color: var(--muted); line-height: 1.6; }
+
+  .bottom { flex: none; padding: 7px 10px; border-top: 1px solid #c5d3e8; background: linear-gradient(180deg, #f7faff, #e3ecf8); display: flex; flex-direction: column; gap: 6px; }
+  .tip { display: flex; gap: 8px; align-items: center; padding: 6px 8px; min-height: 44px; border: 1px solid #c9b979; background: linear-gradient(180deg, #fffdf0, #fff3c4); color: #5b4a10; }
+  .tip b { color: #7a5600; }
+</style>
+</head>
+<body>
+  <div class="titlebar"><span class="tb-icon"></span><span class="tb-title">Retro Messenger</span>
+    <div class="tb-btns"><button data-win="min" title="Simge durumuna küçült">_</button><button data-win="max" title="Ekranı kapla">□</button><button data-win="close" title="Kapat">×</button></div>
+  </div>
+
+  <section id="signin">
+    <div class="brand"><span id="si-logo"></span><div>Retro Messenger<small>Claude Code ile sohbet, eski usul</small></div></div>
+    <span id="si-avatar" title="Resminizi değiştirin" style="cursor:pointer"></span>
+    <button class="link" id="si-avatar-btn">Görünen resmi değiştir</button>
+    <div class="field"><label for="si-name">Görünen ad:</label><input type="text" id="si-name" maxlength="40" placeholder="örn. Yiğit ~ kodluyor"></div>
+    <div class="field"><label for="si-status">Durum:</label>
+      <select id="si-status"><option value="online">Çevrimiçi</option><option value="busy">Meşgul</option><option value="away">Dışarıda</option><option value="hidden">Çevrimdışı görün</option></select>
+    </div>
+    <button class="xp-btn" id="si-go">Oturum Aç</button>
+    <div id="si-progress"><svg class="ring" viewBox="0 0 54 54"><circle cx="27" cy="27" r="21" fill="none" stroke="#d6e4f7" stroke-width="6"/><path d="M27 6a21 21 0 0 1 21 21" fill="none" stroke="#2f7be6" stroke-width="6" stroke-linecap="round"/><path d="M27 48A21 21 0 0 1 6 27" fill="none" stroke="#4fcf3f" stroke-width="6" stroke-linecap="round"/></svg><span>Oturum açılıyor…</span></div>
+    <p class="si-note" id="si-note"></p>
+  </section>
+
+  <section id="main">
+    <div class="me">
+      <span id="me-avatar" title="Görünen resmi değiştir"></span>
+      <div class="who">
+        <div class="name-row"><span id="me-name"></span><select id="me-status" title="Durumunuzu değiştirin"><option value="online">(Çevrimiçi)</option><option value="busy">(Meşgul)</option><option value="away">(Dışarıda)</option><option value="hidden">(Çevrimdışı görün)</option></select><span class="caret">▼</span></div>
+        <input type="text" id="me-personal" maxlength="80" placeholder="<Kişisel bir ileti yazın>">
+      </div>
+    </div>
+    <div class="usage" id="usage" title="Claude kullanım sınırı"><span id="usage-label">Kullanım</span><div class="bar"><div class="fill" id="usage-fill"></div></div><span id="usage-pct"></span></div>
+    <div class="searchbar"><input type="text" id="search" placeholder="Bir sohbet arayın…"><button class="xp-btn" id="add" title="Yeni sohbet başlat">+ 👤</button></div>
+    <div id="groups"></div>
+    <div class="bottom">
+      <button class="link" id="new-chat" style="align-self:flex-start">👤 Yeni sohbet başlat</button>
+      <div class="tip" id="tip"></div>
+    </div>
+  </section>
+
+  <script src="common.js"></script>
+  <script src="list.js"></script>
+</body>
+</html>

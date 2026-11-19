@@ -1,0 +1,36 @@
+{
+  "name": "retro-messenger",
+  "version": "0.1.0",
+  "description": "Claude Code için 2000'lerin anlık mesajlaşma havasında bir sohbet uygulaması",
+  "main": "main.js",
+  "author": "Wynfirdolf",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "install:mac": "electron-builder --mac --dir && codesign --force --deep --sign - \"dist/mac-arm64/Retro Messenger.app\" && rm -rf \"/Applications/Retro Messenger.app\" && ditto \"dist/mac-arm64/Retro Messenger.app\" \"/Applications/Retro Messenger.app\" && echo 'Kuruldu: /Applications/Retro Messenger.app'"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.wynfirdolf.retromessenger",
+    "productName": "Retro Messenger",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "renderer/**"
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
