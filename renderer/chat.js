@@ -1,4 +1,4 @@
-/* global rm, t, LOCALE, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
+/* global rm, t, LOCALE, MODELS, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
 
 const id = new URLSearchParams(location.search).get('id');
 let chat = null;
@@ -57,7 +57,7 @@ function renderChrome() {
   setTitle(t('chat.title', { name: chat.name }));
   $('#to-name').textContent = chat.name;
   $('#to-cwd').textContent = chat.cwd;
-  $('#model').value = chat.model || '';
+  renderModelPickers();
   $('#perm').value = chat.permissionMode || 'acceptEdits';
   $('#dp-claude').innerHTML = avatarHtml(chat.avatar, 'xl', busy ? 'busy-ring' : '');
   $('#lbl-claude').textContent = chat.name;
@@ -108,7 +108,36 @@ $('#stop').onclick = () => rm.stop(id);
 $('#btn-nudge').onclick = () => rm.nudge(id);
 $('#btn-folder').onclick = () => rm.reveal(id);
 $('#btn-new').onclick = () => rm.newSession(id);
-$('#model').onchange = (e) => rm.updateChat(id, { model: e.target.value });
+// ---------- Model, sürüm ve efor ----------
+
+function renderModelPickers() {
+  const { family, version } = MODELS.parse(chat.model);
+  $('#family').innerHTML =
+    `<option value="">${esc(t('chat.modelDefault'))}</option>` +
+    MODELS.FAMILIES.map((f) => `<option value="${f.key}">${f.name}</option>`).join('');
+  $('#family').value = family;
+
+  const fam = MODELS.FAMILIES.find((f) => f.key === family);
+  $('#version').style.display = fam ? '' : 'none';
+  $('#version').innerHTML = fam
+    ? `<option value="">${esc(t('chat.latest'))}</option>` +
+      fam.versions.map((v) => `<option value="${v.id}">${fam.name} ${v.label}</option>`).join('')
+    : '';
+  $('#version').value = version;
+
+  const allowed = MODELS.efforts(chat.model);
+  const effortSel = $('#effort');
+  effortSel.disabled = allowed.length === 0;
+  effortSel.title = allowed.length ? '' : t('chat.effortNone');
+  effortSel.innerHTML =
+    `<option value="">${esc(t('effort.default'))}</option>` +
+    allowed.map((e) => `<option value="${e}">${esc(t(`effort.${e}`))}</option>`).join('');
+  effortSel.value = allowed.includes(chat.effort) ? chat.effort : '';
+}
+
+$('#family').onchange = (e) => rm.updateChat(id, { model: e.target.value });
+$('#version').onchange = (e) => rm.updateChat(id, { model: e.target.value || $('#family').value });
+$('#effort').onchange = (e) => rm.updateChat(id, { effort: e.target.value });
 $('#perm').onchange = (e) => rm.updateChat(id, { permissionMode: e.target.value });
 $('#btn-emo').onclick = (e) => {
   e.stopPropagation();

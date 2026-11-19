@@ -53,6 +53,7 @@ function createChat({ name, cwd, avatar }) {
     avatar: avatar || '🤖',
     sessionId: null,
     model: '',
+    effort: '',
     permissionMode: 'acceptEdits',
     pinned: false,
     createdAt: Date.now(),

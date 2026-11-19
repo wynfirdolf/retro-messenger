@@ -84,7 +84,8 @@ Set your status to "Busy" to silence all of it.
 </table>
 
 ### ⚙️ And also
-- **Model** (Opus, Sonnet, Haiku) and **permission** choice for each chat: read only, plan, edit files or full access.
+- **Model, version and effort** for each chat. Pick a family (Fable, Opus, Sonnet, Haiku), then a version (for example Opus 5.5, 5 or 4.8) or "Latest". Effort runs from Low to Max; levels a model doesn't support are hidden.
+- **Permissions** for each chat: read only, plan, edit files or full access.
 - A **usage bar** that shows Claude's 5-hour usage limit.
 - **English and Turkish** UI. It follows your system language, and you can switch it from the contact list.
 - Chats and Claude sessions pick up where they left off after you restart the app.
@@ -140,6 +141,7 @@ Each chat runs a `claude -p --input-format stream-json --output-format stream-js
 | `src/claude-session.js` | Runs the `claude` process and simplifies its event stream |
 | `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
 | `renderer/i18n.js` | English and Turkish strings |
+| `renderer/models.js` | Model families, versions and the effort levels each one supports |
 | `renderer/` | UI: `list` contact list, `chat` conversation window, `toast` notification, `common` shared styles and helpers |
 
 ### Adding a language

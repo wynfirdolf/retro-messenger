@@ -84,7 +84,8 @@ Durumunuz "Meşgul" ise hepsi susar.
 </table>
 
 ### ⚙️ Diğerleri
-- Her sohbet için **model** (Opus, Sonnet, Haiku) ve **yetki** seçimi: yalnızca okuma, plan, dosya düzenleme veya tam yetki.
+- Her sohbet için **model, sürüm ve efor** seçimi. Önce aileyi (Fable, Opus, Sonnet, Haiku), sonra sürümü (örneğin Opus 5.5, 5 veya 4.8) ya da "En yeni"yi seçin. Efor Düşük'ten Maksimum'a kadar ayarlanabilir; modelin desteklemediği seviyeler listede görünmez.
+- Her sohbet için **yetki** seçimi: yalnızca okuma, plan, dosya düzenleme veya tam yetki.
 - Claude'un 5 saatlik kullanım sınırını gösteren **kullanım çubuğu**.
 - **Türkçe ve İngilizce** arayüz. Sistem dilinize göre açılır; kişi listesinin altından değiştirebilirsiniz.
 - Uygulama kapanıp açılınca sohbetler ve Claude oturumları kaldığı yerden devam eder.
@@ -140,6 +141,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 | `src/claude-session.js` | `claude` sürecini yönetir ve akan olayları sadeleştirir |
 | `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
 | `renderer/i18n.js` | Türkçe ve İngilizce metinler |
+| `renderer/models.js` | Model aileleri, sürümler ve her birinin desteklediği efor seviyeleri |
 | `renderer/` | Arayüz: `list` kişi listesi, `chat` sohbet penceresi, `toast` bildirim kutusu, `common` ortak stil ve yardımcılar |
 
 ### Yeni dil ekleme

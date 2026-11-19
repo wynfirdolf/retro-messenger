@@ -4,6 +4,7 @@ const os = require('os');
 const store = require('./src/store');
 const { ClaudeSession, resolveEnvironment } = require('./src/claude-session');
 const I18N = require('./renderer/i18n');
+const MODELS = require('./renderer/models');
 
 const isMac = process.platform === 'darwin';
 const PRELOAD = path.join(__dirname, 'preload.js');
@@ -183,6 +184,7 @@ function getSession(chat) {
     cwd: chat.cwd,
     sessionId: chat.sessionId,
     model: chat.model,
+    effort: MODELS.efforts(chat.model).includes(chat.effort) ? chat.effort : '',
     permissionMode: chat.permissionMode,
     t,
   });
@@ -315,8 +317,8 @@ ipcMain.handle('chat:get', (_e, id) => ({
 
 ipcMain.handle('chat:update', (_e, id, patch) => {
   const allowed = {};
-  for (const k of ['name', 'avatar', 'pinned', 'model', 'permissionMode']) if (k in patch) allowed[k] = patch[k];
-  const restart = ('model' in allowed || 'permissionMode' in allowed) && sessions.has(id);
+  for (const k of ['name', 'avatar', 'pinned', 'model', 'effort', 'permissionMode']) if (k in patch) allowed[k] = patch[k];
+  const restart = ['model', 'effort', 'permissionMode'].some((k) => k in allowed) && sessions.has(id);
   store.updateChat(id, allowed);
   if (restart) {
     const wasBusy = busy.has(id);

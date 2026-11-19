@@ -75,13 +75,14 @@ function describeTool({ name, input = {} }, t) {
 }
 
 class ClaudeSession extends EventEmitter {
-  constructor({ env, cwd, sessionId, model, permissionMode, t }) {
+  constructor({ env, cwd, sessionId, model, effort, permissionMode, t }) {
     super();
     this.t = t;
     this.env = env;
     this.cwd = cwd;
     this.sessionId = sessionId || null;
     this.model = model || '';
+    this.effort = effort || '';
     this.permissionMode = permissionMode || 'acceptEdits';
     this.proc = null;
     this.busy = false;
@@ -112,6 +113,7 @@ class ClaudeSession extends EventEmitter {
       '--permission-mode', this.permissionMode,
     ];
     if (this.model) args.push('--model', this.model);
+    if (this.effort) args.push('--effort', this.effort);
     if (this.sessionId) args.push('--resume', this.sessionId);
 
     const proc = spawn(this.env.claudePath, args, {
