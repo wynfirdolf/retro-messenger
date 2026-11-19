@@ -180,7 +180,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 - [ ] Windows sürümü
 - [ ] Uygulama içinden izin onayı (onay/ret penceresi)
 - [ ] Görünen resim olarak kendi fotoğrafını yükleme
-- [ ] Yazı tipi ve renk seçimi
+- [x] ~~*Yazı tipi ve renk seçimi*~~
 - [ ] Sohbet geçmişini dışa aktarma
 
 Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gönderebilirsiniz.
