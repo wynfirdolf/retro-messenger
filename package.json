@@ -31,7 +31,8 @@
       "category": "public.app-category.developer-tools"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "artifactName": "Retro-Messenger-Setup-${version}-${arch}.exe"
     }
   },
   "repository": {

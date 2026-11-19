@@ -10,11 +10,11 @@ Kişi listesi, görünen resimler, ifadeler, titreşim ve "… diyor ki:" iletil
 Her sohbet, bilgisayarınızda çalışan gerçek bir Claude Code ya da ChatGPT (Codex) oturumu.
 
 [![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20(yak%C4%B1nda)-lightgrey)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey)
 ![Diller](https://img.shields.io/badge/aray%C3%BCz-English%20%7C%20T%C3%BCrk%C3%A7e-orange)
 ![Electron](https://img.shields.io/badge/Electron-45-47848F?logo=electron&logoColor=white)
 
-[**⬇️ macOS için indir**](../../releases/latest) · [Özellikler](#özellikler) · [Kurulum](#kurulum) · [Kaynaktan çalıştırma](#kaynaktan-çalıştırma) · [🇬🇧 English](README.md)
+[**⬇️ macOS veya Windows için indir**](../../releases/latest) · [Özellikler](#özellikler) · [Kurulum](#kurulum) · [Kaynaktan çalıştırma](#kaynaktan-çalıştırma) · [🇬🇧 English](README.md)
 
 <br>
 
@@ -74,7 +74,7 @@ Pencere arka plandayken yanıt gelirse:
 
 - ses çalar,
 - sağ altta bildirim kutusu açılır,
-- Dock simgesi zıplar ve rozet sayısı görünür.
+- Dock simgesi zıplar ve rozet sayısı görünür (Windows'ta görev çubuğu düğmesi yanıp söner ve kırmızı bir nokta çıkar).
 
 Durumunuz "Meşgul" ise hepsi susar.
 
@@ -93,17 +93,17 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </table>
 
 ### 🤖 Claude ve ChatGPT
-**Yeni sohbet başlat**'a tıklayıp **Claude Code** ya da **ChatGPT (Codex)** seçin. ChatGPT sohbetleri, ChatGPT uygulamasıyla gelen Codex CLI'ı (ya da PATH'teki Codex'i) ve Mac'inizde zaten giriş yapılmış ChatGPT hesabını kullanır; Retro Messenger'da giriş yapmanız gerekmez. Modeli hesabınızdaki listeden (GPT-6.2-Sol, Astra…), düşünme eforunu ve ne kadar yetkisi olacağını (yalnızca okuma, proje klasörünü düzenleme ya da tam yetki) seçersiniz. ChatGPT sohbetleri kişi listesinde yeşil bir etiketle görünür.
+**Yeni sohbet başlat**'a tıklayıp **Claude Code** ya da **ChatGPT (Codex)** seçin. ChatGPT sohbetleri, ChatGPT uygulamasıyla gelen Codex CLI'ı (ya da PATH'teki Codex'i) ve bilgisayarınızda zaten giriş yapılmış ChatGPT hesabını kullanır; Retro Messenger'da giriş yapmanız gerekmez. Modeli hesabınızdaki listeden (GPT-6.2-Sol, Astra…), düşünme eforunu ve ne kadar yetkisi olacağını (yalnızca okuma, proje klasörünü düzenleme ya da tam yetki) seçersiniz. ChatGPT sohbetleri kişi listesinde yeşil bir etiketle görünür.
 
 <img src="docs/tr/chatgpt.png" alt="Bir ChatGPT sohbeti" width="70%">
 
 ### 📎 Dosya ve resim gönderme
-**📎 Dosya gönder** düğmesine tıklayın, dosyaları sohbete sürükleyin ya da ⌘V ile yapıştırın (ekran görüntüleri dahil). Dosyalar, siz Gönder'e basana kadar mesaj kutusunun üstündeki tepside bekler. Claude resimleri açmasına gerek kalmadan hemen görür. Diğer dosya ve klasörlerin yolunu alır ve onları kendisi açar; proje klasörünün dışındaysa önce bir izin kartı çıkar. Geçmişte resimler küçük resim, dosyalar kart olarak görünür; tıklayınca açılırlar.
+**📎 Dosya gönder** düğmesine tıklayın, dosyaları sohbete sürükleyin ya da ⌘V / Ctrl+V ile yapıştırın (ekran görüntüleri dahil). Dosyalar, siz Gönder'e basana kadar mesaj kutusunun üstündeki tepside bekler. Claude resimleri açmasına gerek kalmadan hemen görür. Diğer dosya ve klasörlerin yolunu alır ve onları kendisi açar; proje klasörünün dışındaysa önce bir izin kartı çıkar. Geçmişte resimler küçük resim, dosyalar kart olarak görünür; tıklayınca açılırlar.
 
 <img src="docs/tr/files.png" alt="Dosya ve resim gönderme" width="70%">
 
 ### 🔐 İzin onayı
-Claude bir komut çalıştırmak, bir dosyayı düzenlemek ya da bir plana başlamak istediğinde sohbette sarı bir kart açılır. Kartta tam olarak ne yapmak istediği görünür: komut, değişiklik ya da plan. **İzin ver**, **Bu oturumda hep izin ver** veya **Reddet**'i seçersiniz. Pencere arka plandaysa ses çalar, bildirim kutusu açılır, Dock simgesi zıplar ve kişi listesinde o sohbet kırmızıya döner. Her sohbet için Claude'un ne kadarını kendi başına yapabileceğini seçebilirsiniz:
+Claude bir komut çalıştırmak, bir dosyayı düzenlemek ya da bir plana başlamak istediğinde sohbette sarı bir kart açılır. Kartta tam olarak ne yapmak istediği görünür: komut, değişiklik ya da plan. **İzin ver**, **Bu oturumda hep izin ver** veya **Reddet**'i seçersiniz. Pencere arka plandaysa ses çalar, bildirim kutusu açılır, Dock simgesi zıplar (Windows'ta görev çubuğu düğmesi yanıp söner) ve kişi listesinde o sohbet kırmızıya döner. Her sohbet için Claude'un ne kadarını kendi başına yapabileceğini seçebilirsiniz:
 
 | Yetki | Claude şundan önce sorar… |
 | --- | --- |
@@ -143,6 +143,12 @@ Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomati
    xattr -dr com.apple.quarantine "/Applications/Retro Messenger.app"
    ```
 
+### Hazır sürüm (Windows, 64 bit)
+
+1. [Releases](../../releases/latest) sayfasından `Retro-Messenger-Setup-X.Y.Z-x64.exe` dosyasını indirin.
+2. Çalıştırın. Yalnızca sizin kullanıcınız için kurulur (yönetici izni gerekmez) ve uygulamayı açar.
+3. Kurulum dosyası imzalı olmadığı için Windows SmartScreen "Windows kişisel bilgisayarınızı korudu" diyebilir. **Ek bilgi → Yine de çalıştır**'a tıklayın.
+
 **Gereksinim:** aşağıdakilerden en az biri kurulu ve giriş yapılmış olmalı:
 - [Claude Code](https://code.claude.com): terminalde bir kez `claude` çalıştırın.
 - [ChatGPT uygulaması](https://chatgpt.com/download) (Codex içinde gelir) ya da [Codex CLI](https://github.com/openai/codex): bir kez giriş yapın.
@@ -164,7 +170,7 @@ npm 11 kurulum betiklerini varsayılan olarak çalıştırmayabilir. `npm start`
 | --- | --- |
 | `npm run install:mac` | Uygulamayı derler, yerel imzayla imzalar ve `/Applications` klasörüne kurar |
 | `npm run dist:mac` | `dist/` içine `.dmg` üretir |
-| `npm run dist:win` | `dist/` içine Windows kurulum dosyası üretir |
+| `npm run dist:win` | `dist/` içine Windows kurulum dosyası (`.exe`) üretir; Windows'ta çalıştırın |
 
 ## Nasıl çalışır?
 
@@ -180,7 +186,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 
 | Dosya | Görev |
 | --- | --- |
-| `main.js` | Pencereler, IPC, bildirimler, Dock rozeti, titreşim |
+| `main.js` | Pencereler, IPC, bildirimler, Dock rozeti / görev çubuğu noktası, titreşim |
 | `src/codex-session.js` | ChatGPT sohbetleri için `codex exec --json` çalıştırır ve olaylarını aynı biçime çevirir |
 | `src/claude-session.js` | `claude` sürecini yönetir ve akan olayları sadeleştirir |
 | `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
@@ -197,12 +203,12 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 
 - ChatGPT (Codex) sohbetleri izin sormak yerine bir korumalı alanda çalışır; yanıtlar akarak değil, bütün olarak gelir.
 - Google Antigravity desteklenmiyor: Antigravity uygulamasının dışında çalışan bir komut satırı aracı yok.
-- Windows sürümü aynı kodla çalışacak şekilde yazıldı ama henüz test edilmedi.
-- Hazır sürüm şimdilik yalnızca Apple Silicon Mac'ler içindir.
+- ChatGPT (Codex) sohbetleri Windows'ta henüz test edilmedi.
+- Hazır sürümler Apple Silicon Mac'ler ve 64 bit Windows içindir. Intel Mac'lerde kaynaktan çalıştırılabilir.
 
 ## Yol haritası
 
-- [ ] Windows sürümü
+- [x] ~~*Windows sürümü*~~
 - [x] ~~*Uygulama içinden izin onayı*~~
 - [ ] Görünen resim olarak kendi fotoğrafını yükleme
 - [x] ~~*Yazı tipi ve renk seçimi*~~

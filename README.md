@@ -10,11 +10,11 @@ Contact list, display pictures, emoticons, nudges and "… says:" messages.<br>
 Every conversation is a real Claude Code or ChatGPT (Codex) session running on your machine.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20(soon)-lightgrey)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey)
 ![Languages](https://img.shields.io/badge/UI-English%20%7C%20T%C3%BCrk%C3%A7e-orange)
 ![Electron](https://img.shields.io/badge/Electron-45-47848F?logo=electron&logoColor=white)
 
-[**⬇️ Download for macOS**](../../releases/latest) · [Features](#features) · [Install](#install) · [Run from source](#run-from-source) · [🇹🇷 Türkçe](README.tr.md)
+[**⬇️ Download for macOS or Windows**](../../releases/latest) · [Features](#features) · [Install](#install) · [Run from source](#run-from-source) · [🇹🇷 Türkçe](README.tr.md)
 
 <br>
 
@@ -74,7 +74,7 @@ When a reply arrives while the window is in the background:
 
 - a sound plays,
 - a toast pops up in the corner,
-- the Dock icon bounces and shows a badge.
+- the Dock icon bounces and shows a badge (on Windows, the taskbar button flashes and gets a red dot).
 
 Set your status to "Busy" to silence all of it.
 
@@ -93,17 +93,17 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </table>
 
 ### 🤖 Claude and ChatGPT
-Click **Start a new chat** and choose **Claude Code** or **ChatGPT (Codex)**. ChatGPT chats use the Codex CLI that comes with the ChatGPT app (or one on your PATH) and the ChatGPT account already signed in on your Mac, so there's no login in Retro Messenger. You pick the model from your account's list (GPT-6.2-Sol, Astra…), the reasoning effort, and how much it may touch: read only, edit the project folder, or full access. ChatGPT chats get a green badge in your contact list.
+Click **Start a new chat** and choose **Claude Code** or **ChatGPT (Codex)**. ChatGPT chats use the Codex CLI that comes with the ChatGPT app (or one on your PATH) and the ChatGPT account already signed in on your computer, so there's no login in Retro Messenger. You pick the model from your account's list (GPT-6.2-Sol, Astra…), the reasoning effort, and how much it may touch: read only, edit the project folder, or full access. ChatGPT chats get a green badge in your contact list.
 
 <img src="docs/chatgpt.png" alt="A ChatGPT chat" width="70%">
 
 ### 📎 Send files and images
-Click **📎 Send files**, drag files onto the conversation, or paste with ⌘V (screenshots too). They wait in a tray above the message box until you hit Send. Claude sees images right away, without opening them. For other files and folders it gets the path and opens them itself; if they're outside the project folder, you'll get a permission card first. In the history, images show as thumbnails and files as chips; click one to open it.
+Click **📎 Send files**, drag files onto the conversation, or paste with ⌘V / Ctrl+V (screenshots too). They wait in a tray above the message box until you hit Send. Claude sees images right away, without opening them. For other files and folders it gets the path and opens them itself; if they're outside the project folder, you'll get a permission card first. In the history, images show as thumbnails and files as chips; click one to open it.
 
 <img src="docs/files.png" alt="Sending files and images" width="70%">
 
 ### 🔐 Permission prompts
-When Claude wants to run a command, edit a file or start on a plan, a yellow card pops up in the conversation showing exactly what it wants to do: the command, the diff, or the plan. Choose **Allow**, **Always allow this session** or **Deny**. If the window is in the background you get a sound, a toast and a bouncing Dock icon, and the contact turns red in your list. Pick how much Claude may do on its own for each chat:
+When Claude wants to run a command, edit a file or start on a plan, a yellow card pops up in the conversation showing exactly what it wants to do: the command, the diff, or the plan. Choose **Allow**, **Always allow this session** or **Deny**. If the window is in the background you get a sound, a toast and a bouncing Dock icon (a flashing taskbar button on Windows), and the contact turns red in your list. Pick how much Claude may do on its own for each chat:
 
 | Permissions | Claude asks before… |
 | --- | --- |
@@ -143,6 +143,12 @@ For late-night coding. Choose **Automatic** (follows your system), **Light** or 
    xattr -dr com.apple.quarantine "/Applications/Retro Messenger.app"
    ```
 
+### Prebuilt app (Windows, 64-bit)
+
+1. Download `Retro-Messenger-Setup-X.Y.Z-x64.exe` from the [Releases](../../releases/latest) page.
+2. Run it. It installs for your user only (no admin rights needed) and opens the app.
+3. The installer isn't code-signed, so Windows SmartScreen may say "Windows protected your PC". Click **More info → Run anyway**.
+
 **Requirement:** at least one of these, installed and signed in:
 - [Claude Code](https://code.claude.com): run `claude` in the terminal once.
 - The [ChatGPT app](https://chatgpt.com/download) (it includes Codex) or the [Codex CLI](https://github.com/openai/codex): sign in once.
@@ -164,7 +170,7 @@ npm 11 may skip install scripts by default. If `npm start` says "Electron failed
 | --- | --- |
 | `npm run install:mac` | Builds the app, signs it locally and installs it to `/Applications` |
 | `npm run dist:mac` | Produces a `.dmg` in `dist/` |
-| `npm run dist:win` | Produces a Windows installer in `dist/` |
+| `npm run dist:win` | Produces a Windows installer (`.exe`) in `dist/`; run it on Windows |
 
 ## How it works
 
@@ -180,7 +186,7 @@ Each chat runs a `claude -p --input-format stream-json --output-format stream-js
 
 | File | Role |
 | --- | --- |
-| `main.js` | Windows, IPC, notifications, Dock badge, nudge |
+| `main.js` | Windows, IPC, notifications, Dock badge / taskbar dot, nudge |
 | `src/claude-session.js` | Runs the `claude` process and simplifies its event stream |
 | `src/codex-session.js` | Runs `codex exec --json` for ChatGPT chats and maps its events to the same shape |
 | `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
@@ -197,12 +203,12 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 
 - ChatGPT (Codex) chats run in a sandbox instead of asking for permission, and replies arrive whole rather than streaming.
 - Google Antigravity isn't supported: it has no command-line tool that works outside the Antigravity app.
-- The Windows build uses the same code but hasn't been tested yet.
-- The prebuilt release is for Apple Silicon Macs only for now.
+- ChatGPT (Codex) chats haven't been tested on Windows yet.
+- Prebuilt releases are for Apple Silicon Macs and 64-bit Windows. Intel Macs can run it from source.
 
 ## Roadmap
 
-- [ ] Windows build
+- [x] ~~*Windows build*~~
 - [x] ~~*In-app permission prompts*~~
 - [ ] Upload your own photo as a display picture
 - [x] ~~*Font and color choice*~~
