@@ -1,17 +1,131 @@
-/* Retro Messenger — 2000'lerin masaüstü havası: Luna mavisi başlıklar, parlak düğmeler, Tahoma. */
+/* Retro Messenger: 2000s desktop look. Luna-blue title bars, glossy buttons, Tahoma.
+   Every color is a token below; the dark theme only redefines the tokens. */
 :root {
+  color-scheme: light;
+  --ui-font: Tahoma, Verdana, "Segoe UI", sans-serif;
+  --chat-font: "Segoe UI", Tahoma, Verdana, sans-serif;
+
   --title-1: #0a5fe0;
   --title-2: #3b8cf7;
   --title-3: #0846b8;
-  --line: #7f9db9;
-  --panel: #eef3fb;
-  --panel-2: #d9e6f7;
-  --ink: #000;
+  --title-hi: #4a96ff;
+  --frame: #0831a0;
+
+  --surface: #ffffff;
+  --field: #ffffff;
+  --ink: #000000;
+  --ink-2: #333333;
   --muted: #6d6d6d;
+  --faint: #9a9a9a;
+  --heading: #1d3f84;
   --link: #0b4bb5;
-  --face: #ece9d8;
-  --ui-font: Tahoma, Verdana, "Segoe UI", sans-serif;
-  --chat-font: "Segoe UI", Tahoma, Verdana, sans-serif;
+  --label: #4a5d7e;
+  --line: #7f9db9;
+  --soft-line: #b8cbe8;
+
+  --win-bg: linear-gradient(180deg, #e3edf9 0, #c9daf1 100%);
+  --list-bg: linear-gradient(180deg, #dbe8f8 0, #ffffff 150px);
+  --bar-bg: linear-gradient(180deg, #f6f9fe, #dbe7f7);
+  --hover: #eef4fd;
+  --hover-border: #c5d8f4;
+  --sel: #cfe0fb;
+  --sel-border: #8fb1e6;
+
+  --claude-ink: #102a6b;
+  --tool-ink: #5e6f8c;
+  --error: #b3261e;
+  --code-bg: #f6f8fb;
+  --code-inline: #f1f4f9;
+  --code-border: #d5ddea;
+  --code-ink: #222222;
+
+  --tip-bg: linear-gradient(180deg, #fffdf0, #fff3c4);
+  --tip-border: #c9b979;
+  --tip-ink: #5b4a10;
+  --tip-strong: #7a5600;
+
+  --btn-bg: linear-gradient(180deg, #ffffff 0%, #f1efe5 60%, #dcd8c6 100%);
+  --btn-bg-active: linear-gradient(180deg, #dcd8c6, #f1efe5);
+  --btn-border: #003c74;
+  --btn-shadow: #c9c4ad;
+  --btn-disabled: #a4a29a;
+  --btn-disabled-border: #b9b7aa;
+  --tool-hover: linear-gradient(180deg, #ffffff, #dfeafa);
+  --tool-hover-border: #9fb9e0;
+
+  --dp-bg: linear-gradient(180deg, #ffffff, #c9d9ef);
+  --dp-border: #7d98c2;
+
+  --scroll-track: #f4f3ee;
+  --scroll-thumb: linear-gradient(90deg, #c9d9fb, #b4cbf7);
+  --scroll-border: #94b0e0;
+
+  --toast-bg: linear-gradient(180deg, #ffffff 0, #dfeafa 100%);
+  --toast-strong: #0b2a6b;
+}
+
+/* Night mode: deep navy panels, soft blue text. The title bars stay Luna blue, just a little dimmer. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --title-1: #0b4fba;
+    --title-2: #2f72d6;
+    --title-3: #083a96;
+    --title-hi: #3a7fe0;
+    --frame: #06173f;
+
+    --surface: #1c2331;
+    --field: #151b26;
+    --ink: #e4e9f2;
+    --ink-2: #c3cddd;
+    --muted: #8d9ab0;
+    --faint: #6f7b90;
+    --heading: #9dbdff;
+    --link: #82aeff;
+    --label: #9aaac4;
+    --line: #3e4d68;
+    --soft-line: #2e3a50;
+
+    --win-bg: linear-gradient(180deg, #232e42 0, #161d2a 100%);
+    --list-bg: linear-gradient(180deg, #25314a 0, #1c2331 150px);
+    --bar-bg: linear-gradient(180deg, #2b3549, #222a3a);
+    --hover: #26324a;
+    --hover-border: #34466a;
+    --sel: #2c4a7c;
+    --sel-border: #4a6fae;
+
+    --claude-ink: #a8c5ff;
+    --tool-ink: #8ea3c7;
+    --error: #ff8a80;
+    --code-bg: #141a24;
+    --code-inline: #253045;
+    --code-border: #2f3b52;
+    --code-ink: #d8e0ec;
+
+    --tip-bg: linear-gradient(180deg, #3a3522, #2e2a1a);
+    --tip-border: #6b5d2a;
+    --tip-ink: #eadca6;
+    --tip-strong: #ffd76a;
+
+    --btn-bg: linear-gradient(180deg, #4a5670 0%, #3a4459 60%, #2e3647 100%);
+    --btn-bg-active: linear-gradient(180deg, #2e3647, #3a4459);
+    --btn-border: #0d1a33;
+    --btn-shadow: #1f2635;
+    --btn-disabled: #6b768a;
+    --btn-disabled-border: #3a4458;
+    --tool-hover: linear-gradient(180deg, #34415a, #2a3448);
+    --tool-hover-border: #4b5f86;
+
+    --dp-bg: linear-gradient(180deg, #46536e, #26304a);
+    --dp-border: #52668c;
+
+    --scroll-track: #1a202c;
+    --scroll-thumb: linear-gradient(90deg, #3c4b68, #33405a);
+    --scroll-border: #4b5d80;
+
+    --toast-bg: linear-gradient(180deg, #26314a 0, #1a2233 100%);
+    --toast-strong: #b9d0ff;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -22,16 +136,16 @@ html, body {
   overflow: hidden;
   font: 11px/1.35 var(--ui-font);
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   user-select: none;
   -webkit-user-select: none;
 }
 
-body { display: flex; flex-direction: column; border: 1px solid #0831a0; }
+body { display: flex; flex-direction: column; border: 1px solid var(--frame); }
 
 button, input, select, textarea { font: inherit; color: inherit; }
 
-/* ---------- Başlık çubuğu ---------- */
+/* ---------- Title bar ---------- */
 .titlebar {
   flex: none;
   height: 30px;
@@ -43,7 +157,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-weight: bold;
   font-size: 12px;
   text-shadow: 1px 1px 0 #0a246a;
-  background: linear-gradient(180deg, #4a96ff 0%, var(--title-1) 12%, var(--title-2) 50%, var(--title-1) 88%, var(--title-3) 100%);
+  background: linear-gradient(180deg, var(--title-hi) 0%, var(--title-1) 12%, var(--title-2) 50%, var(--title-1) 88%, var(--title-3) 100%);
   -webkit-app-region: drag;
 }
 .titlebar .tb-icon { width: 16px; height: 16px; flex: none; }
@@ -64,19 +178,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .titlebar .tb-btns button:hover { filter: brightness(1.15); }
 .titlebar .tb-btns button[data-win="close"] { background: linear-gradient(180deg, #f08a6e, #d1401c); }
 
-/* ---------- Düğmeler ve alanlar ---------- */
+/* ---------- Buttons and fields ---------- */
 .xp-btn {
   min-width: 70px;
   padding: 4px 12px;
-  border: 1px solid #003c74;
+  border: 1px solid var(--btn-border);
   border-radius: 3px;
-  background: linear-gradient(180deg, #ffffff 0%, #f1efe5 60%, #dcd8c6 100%);
-  box-shadow: inset 0 -1px 0 #c9c4ad;
+  color: var(--ink);
+  background: var(--btn-bg);
+  box-shadow: inset 0 -1px 0 var(--btn-shadow);
   cursor: default;
 }
 .xp-btn:hover:not(:disabled) { box-shadow: inset 0 0 0 2px #f9c552; }
-.xp-btn:active:not(:disabled) { background: linear-gradient(180deg, #dcd8c6, #f1efe5); }
-.xp-btn:disabled { color: #a4a29a; border-color: #b9b7aa; }
+.xp-btn:active:not(:disabled) { background: var(--btn-bg-active); }
+.xp-btn:disabled { color: var(--btn-disabled); border-color: var(--btn-disabled-border); }
 
 .tool-btn {
   display: inline-flex;
@@ -88,22 +203,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
   background: none;
   cursor: default;
 }
-.tool-btn:hover:not(:disabled) { border-color: #9fb9e0; background: linear-gradient(180deg, #fff, #dfeafa); }
+.tool-btn:hover:not(:disabled) { border-color: var(--tool-hover-border); background: var(--tool-hover); }
 .tool-btn:disabled { opacity: 0.45; }
 .tool-btn .ico { font-size: 15px; line-height: 1; }
 
 input[type="text"], select, textarea {
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--field);
+  color: var(--ink);
   padding: 3px 4px;
   outline: none;
 }
 input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
+::placeholder { color: var(--faint); }
 
 .link { color: var(--link); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 .link:hover { text-decoration: underline; }
 
-/* ---------- Görünen resim ---------- */
+/* ---------- Display picture ---------- */
 .dp {
   position: relative;
   display: inline-grid;
@@ -113,8 +230,8 @@ input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
   flex: none;
   padding: 3px;
   border-radius: 7px;
-  background: linear-gradient(180deg, #ffffff, #c9d9ef);
-  border: 1px solid #7d98c2;
+  background: var(--dp-bg);
+  border: 1px solid var(--dp-border);
   box-shadow: 0 1px 2px #0003;
 }
 .dp > span {
@@ -134,23 +251,23 @@ input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
 .dp.xl > span { font-size: 60px; }
 .dp.busy-ring { border-color: #e2a200; box-shadow: 0 0 0 2px #ffd34d88; }
 
-/* ---------- Durum simgesi ---------- */
+/* ---------- Status icon ---------- */
 .buddy { width: 16px; height: 16px; flex: none; }
 .blink { animation: blink 0.9s steps(2, start) infinite; }
 @keyframes blink { to { visibility: hidden; } }
 .pulse { animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: 0.35; } }
 
-/* ---------- Açılır pencereler ---------- */
+/* ---------- Popovers ---------- */
 .popover {
   position: fixed;
   z-index: 50;
   padding: 6px;
-  background: #fff;
-  border: 1px solid #7d98c2;
+  background: var(--surface);
+  border: 1px solid var(--dp-border);
   box-shadow: 2px 3px 8px #0004;
 }
-.popover h4 { margin: 0 0 6px; font-size: 11px; color: #1d3f84; }
+.popover h4 { margin: 0 0 6px; font-size: 11px; color: var(--heading); }
 .grid { display: grid; gap: 2px; }
 .grid button {
   width: 30px;
@@ -162,12 +279,13 @@ input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
   padding: 0;
   cursor: default;
 }
-.grid button:hover { border-color: #316ac5; background: #e3ecfa; }
+.grid button:hover { border-color: var(--sel-border); background: var(--hover); }
 
 ::-webkit-scrollbar { width: 16px; height: 16px; }
-::-webkit-scrollbar-track { background: #f4f3ee; }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
 ::-webkit-scrollbar-thumb {
-  border: 1px solid #94b0e0;
+  border: 1px solid var(--scroll-border);
   border-radius: 2px;
-  background: linear-gradient(90deg, #c9d9fb, #b4cbf7);
+  background: var(--scroll-thumb);
 }
+::-webkit-scrollbar-corner { background: var(--scroll-track); }

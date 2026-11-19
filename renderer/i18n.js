@@ -18,6 +18,10 @@
       chatAvatar: 'Picture for this chat',
       language: 'Language:',
       langAuto: 'Automatic',
+      'theme.label': 'Theme',
+      'theme.system': 'Automatic',
+      'theme.light': 'Light',
+      'theme.dark': 'Dark',
 
       'signin.tagline': 'Chat with Claude Code, old-school',
       'signin.changePicture': 'Change display picture',
@@ -168,6 +172,10 @@
       chatAvatar: 'Bu sohbetin resmi',
       language: 'Dil:',
       langAuto: 'Otomatik',
+      'theme.label': 'Tema',
+      'theme.system': 'Otomatik',
+      'theme.light': 'Açık',
+      'theme.dark': 'Koyu',
 
       'signin.tagline': 'Claude Code ile sohbet, eski usul',
       'signin.changePicture': 'Görünen resmi değiştir',

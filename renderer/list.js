@@ -71,12 +71,6 @@ function renderHeader() {
   $('#me-name').textContent = p.name;
   $('#me-status').value = p.status;
   if (document.activeElement !== $('#me-personal')) $('#me-personal').value = p.personal || '';
-  setTitleStatus();
-}
-
-function setTitleStatus() {
-  const st = STATUS[state.profile.status] || STATUS.online;
-  $('#me-status').style.color = st.color === '#a3a3a3' ? '#666' : '#333';
 }
 
 function renderUsage() {
@@ -235,12 +229,17 @@ $$('.lang-select').forEach((sel) => {
   sel.innerHTML = langOptions;
   sel.onchange = () => rm.updateProfile({ lang: sel.value });
 });
+$('#theme').innerHTML = ['system', 'light', 'dark']
+  .map((k) => `<option value="${k}">${esc(t(`theme.${k}`))}</option>`)
+  .join('');
+$('#theme').onchange = (e) => rm.updateProfile({ theme: e.target.value });
 
 (async () => {
   applyI18n();
   initTitlebar('Retro Messenger');
   state = await rm.getState();
   $$('.lang-select').forEach((sel) => (sel.value = state.profile.lang || 'auto'));
+  $('#theme').value = state.profile.theme || 'system';
   render();
   showTip();
   setInterval(showTip, 20000);

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen, nativeTheme } = require('electron');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -26,11 +26,18 @@ const alive = (w) => w && !w.isDestroyed();
 const currentLang = () => I18N.resolveLang(store.profile().lang, app.getLocale());
 const t = (key, vars) => I18N.makeT(currentLang())(key, vars);
 
+// 'system' follows macOS / Windows; 'light' and 'dark' force a theme. The CSS reacts through prefers-color-scheme.
+function applyTheme() {
+  const pref = store.profile().theme;
+  nativeTheme.themeSource = ['light', 'dark'].includes(pref) ? pref : 'system';
+}
+const windowBg = () => (nativeTheme.shouldUseDarkColors ? '#1c2331' : '#ffffff');
+
 function makeWindow(opts) {
   const win = new BrowserWindow({
     frame: false,
     show: false,
-    backgroundColor: '#ffffff',
+    backgroundColor: windowBg(),
     ...opts,
     webPreferences: { preload: PRELOAD, autoplayPolicy: 'no-user-gesture-required' },
   });
@@ -157,7 +164,7 @@ function showToast(chat, text) {
     alwaysOnTop: true,
     skipTaskbar: true,
     show: false,
-    backgroundColor: '#ffffff',
+    backgroundColor: windowBg(),
     webPreferences: { preload: PRELOAD },
   });
   toastWin.loadFile(page('toast.html'), {
@@ -297,6 +304,7 @@ ipcMain.on('lang', (e) => {
 ipcMain.handle('profile:update', (_e, patch) => {
   const langBefore = currentLang();
   store.updateProfile(patch);
+  if ('theme' in patch) applyTheme();
   if (currentLang() !== langBefore) {
     for (const w of BrowserWindow.getAllWindows()) if (alive(w)) w.webContents.reload();
     return;
@@ -468,6 +476,7 @@ app.setName('Retro Messenger');
 
 app.whenReady().then(() => {
   store.load(app.getPath('userData'));
+  applyTheme();
   env = resolveEnvironment();
   createListWindow();
   app.on('activate', () => {

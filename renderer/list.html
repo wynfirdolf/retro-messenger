@@ -6,20 +6,20 @@
 <title>Retro Messenger</title>
 <link rel="stylesheet" href="common.css">
 <style>
-  body { background: linear-gradient(180deg, #dbe8f8 0, #fff 150px); }
+  body { background: var(--list-bg); }
 
   /* Oturum açma */
   #signin { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 26px 26px 14px; gap: 7px; overflow: auto; }
-  #signin .brand { display: flex; align-items: center; gap: 8px; font: bold 20px/1 Tahoma, sans-serif; color: #1d3f84; letter-spacing: -0.5px; margin-bottom: 10px; }
+  #signin .brand { display: flex; align-items: center; gap: 8px; font: bold 20px/1 Tahoma, sans-serif; color: var(--heading); letter-spacing: -0.5px; margin-bottom: 10px; }
   #signin .brand small { display: block; font: 11px Tahoma, sans-serif; color: var(--muted); letter-spacing: 0; margin-top: 4px; }
   #signin .field { width: 100%; max-width: 230px; display: flex; flex-direction: column; gap: 3px; }
-  #signin .field label { color: #333; }
+  #signin .field label { color: var(--ink-2); }
   #signin .xp-btn { margin-top: 10px; min-width: 110px; font-weight: bold; }
-  #si-progress { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 14px; color: #1d3f84; }
+  #si-progress { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 14px; color: var(--heading); }
   #si-progress .ring { width: 54px; height: 54px; animation: spin 1.1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .si-note { margin-top: auto; padding-top: 18px; color: var(--muted); text-align: center; word-break: break-all; }
-  .si-note.bad { color: #b3261e; }
+  .si-note.bad { color: var(--error); }
 
   /* Ana liste */
   #main { flex: 1; display: none; flex-direction: column; min-height: 0; }
@@ -27,41 +27,41 @@
   .me .dp { cursor: pointer; }
   .me .who { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
   .me .name-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
-  #me-name { font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #111; }
-  #me-status { border: 0; background: none; padding: 0 2px; color: #333; cursor: pointer; appearance: none; -webkit-appearance: none; field-sizing: content; }
-  .name-row .caret { color: #555; font-size: 9px; pointer-events: none; }
-  #me-personal { border: 1px solid transparent; background: transparent; color: #555; font-style: italic; width: 100%; padding: 2px 3px; }
-  #me-personal:hover, #me-personal:focus { border-color: var(--line); background: #fff; font-style: normal; }
+  #me-name { font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+  #me-status { border: 0; background: none; padding: 0 2px; color: var(--ink-2); cursor: pointer; appearance: none; -webkit-appearance: none; field-sizing: content; }
+  .name-row .caret { color: var(--muted); font-size: 9px; pointer-events: none; }
+  #me-personal { border: 1px solid transparent; background: transparent; color: var(--muted); font-style: italic; width: 100%; padding: 2px 3px; }
+  #me-personal:hover, #me-personal:focus { border-color: var(--line); background: var(--field); font-style: normal; }
 
-  .usage { margin: 0 10px 6px; display: none; align-items: center; gap: 6px; color: #3d4d6a; }
-  .usage .bar { flex: 1; height: 11px; border: 1px solid #7f9db9; background: #fff; padding: 1px; border-radius: 2px; }
+  .usage { margin: 0 10px 6px; display: none; align-items: center; gap: 6px; color: var(--label); }
+  .usage .bar { flex: 1; height: 11px; border: 1px solid var(--line); background: var(--field); padding: 1px; border-radius: 2px; }
   .usage .fill { height: 100%; background: repeating-linear-gradient(90deg, #37b532 0 7px, transparent 7px 9px); }
 
-  .searchbar { display: flex; gap: 4px; padding: 5px 8px; background: linear-gradient(180deg, #eef4fc, #dce8f8); border-top: 1px solid #b8cbe8; border-bottom: 1px solid #b8cbe8; }
+  .searchbar { display: flex; gap: 4px; padding: 5px 8px; background: var(--bar-bg); border-top: 1px solid var(--soft-line); border-bottom: 1px solid var(--soft-line); }
   #search { flex: 1; min-width: 0; }
   #add { min-width: 0; padding: 2px 8px; font-weight: bold; }
 
-  #groups { flex: 1; overflow-y: auto; padding: 4px 0 8px; background: #fff; }
-  .group-head { display: flex; align-items: center; gap: 5px; padding: 4px 8px; font-weight: bold; color: #1d3f84; cursor: pointer; }
-  .group-head .tri { width: 0; height: 0; border: 4px solid transparent; border-top: 5px solid #1d3f84; margin-top: 4px; transition: transform 0.1s; }
+  #groups { flex: 1; overflow-y: auto; padding: 4px 0 8px; background: var(--surface); }
+  .group-head { display: flex; align-items: center; gap: 5px; padding: 4px 8px; font-weight: bold; color: var(--heading); cursor: pointer; }
+  .group-head .tri { width: 0; height: 0; border: 4px solid transparent; border-top: 5px solid var(--heading); margin-top: 4px; transition: transform 0.1s; }
   .group.closed .tri { transform: rotate(-90deg); margin-top: 0; }
   .group.closed .contact { display: none; }
   .contact { display: flex; align-items: center; gap: 6px; padding: 3px 8px 3px 20px; cursor: default; border: 1px solid transparent; }
-  .contact:hover { background: #eef4fd; border-color: #c5d8f4; }
-  .contact.sel { background: #cfe0fb; border-color: #8fb1e6; }
-  .contact .cn { white-space: nowrap; color: #111; }
+  .contact:hover { background: var(--hover); border-color: var(--hover-border); }
+  .contact.sel { background: var(--sel); border-color: var(--sel-border); }
+  .contact .cn { white-space: nowrap; color: var(--ink); }
   .contact .cm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-style: italic; }
   .contact.unread .cn { font-weight: bold; }
   .contact input { flex: 1; min-width: 0; padding: 1px 3px; }
   .empty { margin: 26px 18px; text-align: center; color: var(--muted); line-height: 1.6; }
 
-  .bottom { flex: none; padding: 7px 10px; border-top: 1px solid #c5d3e8; background: linear-gradient(180deg, #f7faff, #e3ecf8); display: flex; flex-direction: column; gap: 6px; }
-  .tip { display: flex; gap: 8px; align-items: center; padding: 6px 8px; min-height: 44px; border: 1px solid #c9b979; background: linear-gradient(180deg, #fffdf0, #fff3c4); color: #5b4a10; }
-  .tip b { color: #7a5600; }
+  .bottom { flex: none; padding: 7px 10px; border-top: 1px solid var(--soft-line); background: var(--bar-bg); display: flex; flex-direction: column; gap: 6px; }
+  .tip { display: flex; gap: 8px; align-items: center; padding: 6px 8px; min-height: 44px; border: 1px solid var(--tip-border); background: var(--tip-bg); color: var(--tip-ink); }
+  .tip b { color: var(--tip-strong); }
   .bottom-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .lang-pick { display: inline-flex; align-items: center; gap: 3px; color: #555; }
-  .lang-pick select { border: 1px solid transparent; background: transparent; padding: 0 2px; color: #0b4bb5; field-sizing: content; }
-  .lang-pick select:hover { border-color: var(--line); background: #fff; }
+  .lang-pick { display: inline-flex; align-items: center; gap: 3px; color: var(--muted); }
+  .lang-pick select { border: 1px solid transparent; background: transparent; padding: 0 2px; color: var(--link); field-sizing: content; }
+  .lang-pick select:hover { border-color: var(--line); background: var(--field); }
 </style>
 </head>
 <body>
@@ -96,7 +96,7 @@
     <div id="groups"></div>
     <div class="bottom">
       <div class="bottom-row"><button class="link" id="new-chat">👤 <span data-i18n="list.newChat"></span></button><label class="lang-pick">🌐 <select id="lang" class="lang-select" data-i18n-title="language"></select></label></div>
-      <div class="bottom-row"><button class="link" id="import-chat">🕘 <span data-i18n="list.importChat"></span></button></div>
+      <div class="bottom-row"><button class="link" id="import-chat">🕘 <span data-i18n="list.importChat"></span></button><label class="lang-pick">🌓 <select id="theme" data-i18n-title="theme.label"></select></label></div>
       <div class="tip" id="tip"></div>
     </div>
   </section>

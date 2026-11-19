@@ -92,10 +92,16 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </tr>
 </table>
 
+### 🌙 Dark mode
+For late-night coding. Choose **Automatic** (follows your system), **Light** or **Dark** from the 🌓 menu at the bottom of the contact list.
+
+<img src="docs/dark.png" alt="Retro Messenger in dark mode" width="100%">
+
 ### ⚙️ And also
 - **Model, version and effort** for each chat. Pick a family (Fable, Opus, Sonnet, Haiku), then a version (for example Opus 5.5, 5 or 4.8) or "Latest". Effort runs from Low to Max; levels a model doesn't support are hidden.
 - **Permissions** for each chat: read only, plan, edit files or full access.
 - A **usage bar** that shows Claude's 5-hour usage limit.
+- **Light and dark themes**, automatic by default.
 - **English and Turkish** UI. It follows your system language, and you can switch it from the contact list.
 - Chats and Claude sessions pick up where they left off after you restart the app.
 - All sounds are generated in the app; there are no external audio files.

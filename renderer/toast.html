@@ -6,14 +6,14 @@
 <title>Bildirim</title>
 <link rel="stylesheet" href="common.css">
 <style>
-  body { cursor: pointer; background: linear-gradient(180deg, #ffffff 0, #dfeafa 100%); animation: rise 0.35s ease-out; }
+  body { cursor: pointer; background: var(--toast-bg); animation: rise 0.35s ease-out; }
   @keyframes rise { from { transform: translateY(100%); } to { transform: none; } }
-  .head { flex: none; display: flex; align-items: center; gap: 5px; padding: 4px 6px; color: #fff; font-weight: bold; background: linear-gradient(180deg, #4a96ff, #0a5fe0 60%, #0846b8); text-shadow: 1px 1px 0 #0a246a; }
+  .head { flex: none; display: flex; align-items: center; gap: 5px; padding: 4px 6px; color: #fff; font-weight: bold; background: linear-gradient(180deg, var(--title-hi), var(--title-1) 60%, var(--title-3)); text-shadow: 1px 1px 0 #0a246a; }
   .head .x { margin-left: auto; font-size: 13px; padding: 0 4px; }
   .body { flex: 1; display: flex; gap: 10px; align-items: center; padding: 10px; min-height: 0; }
-  .txt { min-width: 0; color: #1d3f84; }
-  .txt b { display: block; margin-bottom: 3px; color: #0b2a6b; }
-  .txt span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: #333; }
+  .txt { min-width: 0; color: var(--heading); }
+  .txt b { display: block; margin-bottom: 3px; color: var(--toast-strong); }
+  .txt span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: var(--ink-2); }
 </style>
 </head>
 <body>

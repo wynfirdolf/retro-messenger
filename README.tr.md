@@ -92,10 +92,16 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </tr>
 </table>
 
+### 🌙 Karanlık mod
+Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomatik** (sistemi takip eder), **Açık** veya **Koyu** seçebilirsiniz.
+
+<img src="docs/tr/dark.png" alt="Karanlık modda Retro Messenger" width="100%">
+
 ### ⚙️ Diğerleri
 - Her sohbet için **model, sürüm ve efor** seçimi. Önce aileyi (Fable, Opus, Sonnet, Haiku), sonra sürümü (örneğin Opus 5.5, 5 veya 4.8) ya da "En yeni"yi seçin. Efor Düşük'ten Maksimum'a kadar ayarlanabilir; modelin desteklemediği seviyeler listede görünmez.
 - Her sohbet için **yetki** seçimi: yalnızca okuma, plan, dosya düzenleme veya tam yetki.
 - Claude'un 5 saatlik kullanım sınırını gösteren **kullanım çubuğu**.
+- **Açık ve koyu tema**, varsayılan olarak otomatik.
 - **Türkçe ve İngilizce** arayüz. Sistem dilinize göre açılır; kişi listesinin altından değiştirebilirsiniz.
 - Uygulama kapanıp açılınca sohbetler ve Claude oturumları kaldığı yerden devam eder.
 - Seslerin hepsi uygulama içinde üretilir; harici ses dosyası yoktur.
