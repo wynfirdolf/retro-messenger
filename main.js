@@ -20,6 +20,8 @@ let rateLimit = null;
 const chatWins = new Map(); // sohbet id -> pencere
 const sessions = new Map(); // sohbet id -> ClaudeSession
 const busy = new Set();
+const pending = new Map(); // sohbet id -> Map(istek id -> izin isteği)
+const userDenied = new Set(); // bu turda kullanıcının bir isteği reddettiği sohbetler
 const unread = new Set();
 
 const alive = (w) => w && !w.isDestroyed();
@@ -68,6 +70,7 @@ function snapshot() {
       pinned: c.pinned,
       updatedAt: c.updatedAt,
       busy: busy.has(c.id),
+      waiting: !!pending.get(c.id)?.size,
       unread: unread.has(c.id),
       last: lastSnippet(c),
     })),
@@ -212,7 +215,13 @@ function getSession(chat) {
   return s;
 }
 
+function clearPending(id) {
+  if (pending.get(id)?.size) sendToChat(id, 'permission-clear');
+  pending.delete(id);
+}
+
 function resetSession(id) {
+  clearPending(id);
   const s = sessions.get(id);
   if (s) {
     s.removeAllListeners();
@@ -247,6 +256,17 @@ function handleEvent(id, ev) {
     case 'tool':
       addAndShow(id, { from: 'tool', text: ev.text });
       break;
+    case 'permission': {
+      if (!pending.has(id)) pending.set(id, new Map());
+      pending.get(id).set(ev.request.id, ev.request);
+      sendToChat(id, 'permission', ev.request);
+      askForAttention(chat, ev.request);
+      break;
+    }
+    case 'permission-cancel':
+      pending.get(id)?.delete(ev.requestId);
+      sendToChat(id, 'permission-done', ev.requestId);
+      break;
     case 'error':
       busy.delete(id);
       addAndShow(id, { from: 'error', text: ev.text });
@@ -255,7 +275,8 @@ function handleEvent(id, ev) {
     case 'done':
       busy.delete(id);
       if (ev.isError) addAndShow(id, { from: 'error', text: ev.errorText });
-      if (ev.denied) {
+      clearPending(id);
+      if (ev.denied && !userDenied.has(id)) {
         addAndShow(id, {
           from: 'system',
           text: t('sys.denied', { n: ev.denied }),
@@ -280,10 +301,22 @@ function onReplyFinished(chat) {
   if (isMac && app.dock) app.dock.bounce('informational');
 }
 
+// A permission request is urgent: always notify unless the chat window is in front.
+function askForAttention(chat, req) {
+  const win = chatWins.get(chat.id);
+  if (alive(win) && win.isFocused()) return;
+  if (alive(win)) win.flashFrame(true);
+  if (isMac && app.dock) app.dock.bounce('critical');
+  if (store.profile().status === 'busy') return;
+  playSound('nudge', chat.id);
+  showToast(chat, `🔐 ${t('ask.toast', { what: req.summary })}`);
+}
+
 function sendToClaude(id, text) {
   const chat = store.getChat(id);
   if (!chat || busy.has(id)) return false;
   busy.add(id);
+  userDenied.delete(id);
   sendToChat(id, 'busy', true);
   if (!getSession(chat).send(text)) {
     busy.delete(id);
@@ -333,7 +366,21 @@ ipcMain.handle('chat:get', (_e, id) => ({
   chat: store.getChat(id),
   busy: busy.has(id),
   profile: store.profile(),
+  pending: [...(pending.get(id)?.values() || [])],
 }));
+
+ipcMain.handle('perm:answer', (_e, id, requestId, decision) => {
+  const req = pending.get(id)?.get(requestId);
+  const s = sessions.get(id);
+  if (!req || !s) return;
+  pending.get(id).delete(requestId);
+  s.respond(requestId, decision, req);
+  if (decision === 'deny') userDenied.add(id);
+  sendToChat(id, 'permission-done', requestId);
+  const key = decision === 'deny' ? 'ask.denied' : decision === 'always' ? 'ask.alwaysAllowed' : 'ask.allowed';
+  addAndShow(id, { from: 'system', text: t(key, { what: req.target || req.summary }) });
+  pushState();
+});
 
 ipcMain.handle('chat:update', (_e, id, patch) => {
   const allowed = {};

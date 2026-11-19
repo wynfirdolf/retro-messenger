@@ -68,6 +68,12 @@ const TOOL_KEYS = {
   TodoWrite: ['tool.TodoWrite', () => ''],
 };
 
+// The short thing a tool acts on (a command, a file name, a URL), for one-line notes.
+function toolTarget({ name, input = {} }) {
+  const entry = TOOL_KEYS[name];
+  return (entry && entry[1](input || {})) || name;
+}
+
 function describeTool({ name, input = {} }, t) {
   const entry = TOOL_KEYS[name];
   if (!entry) return t('tool.other', { x: name });
@@ -83,7 +89,8 @@ class ClaudeSession extends EventEmitter {
     this.sessionId = sessionId || null;
     this.model = model || '';
     this.effort = effort || '';
-    this.permissionMode = permissionMode || 'acceptEdits';
+    // 'default' was the old name of 'manual' (ask before every change).
+    this.permissionMode = permissionMode === 'default' ? 'manual' : permissionMode || 'acceptEdits';
     this.proc = null;
     this.busy = false;
     this.stderr = '';
@@ -111,6 +118,10 @@ class ClaudeSession extends EventEmitter {
       '--verbose',
       '--include-partial-messages',
       '--permission-mode', this.permissionMode,
+      // Permission prompts come to us as control_request messages on stdout; we answer on stdin.
+      '--permission-prompt-tool', 'stdio',
+      // Multiple-choice questions would need their own UI; Claude asks in plain text instead.
+      '--disallowedTools', 'AskUserQuestion',
     ];
     if (this.model) args.push('--model', this.model);
     if (this.effort) args.push('--effort', this.effort);
@@ -155,6 +166,25 @@ class ClaudeSession extends EventEmitter {
     return true;
   }
 
+  // decision: 'allow' | 'always' | 'deny'. 'always' adds Claude's suggested rules for this session only.
+  respond(requestId, decision, request) {
+    if (!this.proc) return;
+    let response;
+    if (decision === 'deny') {
+      response = { behavior: 'deny', message: 'The user declined this action in the app.' };
+    } else {
+      response = { behavior: 'allow', updatedInput: request.input };
+      if (decision === 'always' && Array.isArray(request.suggestions) && request.suggestions.length) {
+        response.updatedPermissions = request.suggestions.map((s) => ({ ...s, destination: 'session' }));
+      }
+    }
+    this.write({ type: 'control_response', response: { subtype: 'success', request_id: requestId, response } });
+  }
+
+  write(obj) {
+    try { this.proc.stdin.write(JSON.stringify(obj) + '\n'); } catch { /* process already gone */ }
+  }
+
   kill() {
     const p = this.proc;
     this.proc = null;
@@ -175,6 +205,29 @@ class ClaudeSession extends EventEmitter {
     }
 
     switch (m.type) {
+      case 'control_request': {
+        const r = m.request || {};
+        if (r.subtype === 'can_use_tool') {
+          this.emitEvent({
+            kind: 'permission',
+            request: {
+              id: m.request_id,
+              tool: r.tool_name,
+              input: r.input || {},
+              description: r.description || '',
+              suggestions: r.permission_suggestions || [],
+              summary: describeTool({ name: r.tool_name, input: r.input || {} }, this.t),
+              target: toolTarget({ name: r.tool_name, input: r.input || {} }),
+            },
+          });
+        } else {
+          this.write({ type: 'control_response', response: { subtype: 'error', request_id: m.request_id, error: `Unsupported request: ${r.subtype}` } });
+        }
+        return;
+      }
+      case 'control_cancel_request':
+        this.emitEvent({ kind: 'permission-cancel', requestId: m.request_id });
+        return;
       case 'stream_event': {
         if (m.parent_tool_use_id) return;
         const e = m.event;

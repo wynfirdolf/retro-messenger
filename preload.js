@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('rm', {
   send: (id, text, style) => ipcRenderer.invoke('chat:send', id, text, style),
   stop: (id) => ipcRenderer.invoke('chat:stop', id),
   nudge: (id) => ipcRenderer.invoke('chat:nudge', id),
+  answerPermission: (id, requestId, decision) => ipcRenderer.invoke('perm:answer', id, requestId, decision),
   reveal: (id) => ipcRenderer.invoke('chat:reveal', id),
   newSession: (id) => ipcRenderer.invoke('chat:new-session', id),
   contextMenu: (id) => ipcRenderer.send('chat:context-menu', id),

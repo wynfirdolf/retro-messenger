@@ -47,7 +47,7 @@ function renderMessage(m) {
 
 function renderAll() {
   lastDay = '';
-  const readOnly = chat.permissionMode === 'default' || chat.permissionMode === 'plan';
+  const readOnly = ['default', 'manual', 'plan'].includes(chat.permissionMode);
   const welcome = esc(t(readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit', { cwd: '\u0000' })).replace('\u0000', `<b>${esc(chat.cwd)}</b>`);
   history.innerHTML = `<div class="welcome">${welcome}</div>`;
   for (const m of chat.messages) history.appendChild(renderMessage(m));
@@ -59,7 +59,7 @@ function renderChrome() {
   $('#to-name').textContent = chat.name;
   $('#to-cwd').textContent = chat.cwd;
   renderModelPickers();
-  $('#perm').value = chat.permissionMode || 'acceptEdits';
+  $('#perm').value = chat.permissionMode === 'default' ? 'manual' : chat.permissionMode || 'acceptEdits';
   $('#dp-claude').innerHTML = avatarHtml(chat.avatar, 'xl', busy ? 'busy-ring' : '');
   $('#lbl-claude').textContent = chat.name;
   $('#dp-me').innerHTML = avatarHtml(profile.avatar, 'xl');
@@ -68,7 +68,9 @@ function renderChrome() {
 
 function renderStatus() {
   const s = $('#status');
-  if (busy) {
+  if (permissions.size) {
+    s.innerHTML = `<span class="waiting blink">${esc(t('ask.waiting', { name: chat.name }))}</span>`;
+  } else if (busy) {
     s.innerHTML = `<span class="typing pulse">${esc(t('chat.typing', { name: chat.name }))}</span>`;
   } else {
     const last = [...chat.messages].reverse().find((m) => m.from === 'claude');
@@ -109,6 +111,77 @@ $('#stop').onclick = () => rm.stop(id);
 $('#btn-nudge').onclick = () => rm.nudge(id);
 $('#btn-folder').onclick = () => rm.reveal(id);
 $('#btn-new').onclick = () => rm.newSession(id);
+// ---------- İzin istekleri ----------
+
+const permissions = new Map(); // istek id -> kart elemanı
+
+function permDetail(req) {
+  const i = req.input || {};
+  const clip = (s, n = 1500) => (String(s).length > n ? String(s).slice(0, n) + '\n…' : String(s));
+  switch (req.tool) {
+    case 'Bash': return `<pre class="code">${esc(clip(i.command))}</pre>`;
+    case 'Edit': {
+      const diff = String(i.old_string || '').split('\n').map((l) => '- ' + l)
+        .concat(String(i.new_string || '').split('\n').map((l) => '+ ' + l)).join('\n');
+      return `<pre class="code">${esc(i.file_path || '')}\n\n${esc(clip(diff))}</pre>`;
+    }
+    case 'MultiEdit': return `<pre class="code">${esc(i.file_path || '')} (${(i.edits || []).length} edits)</pre>`;
+    case 'Write': return `<pre class="code">${esc(i.file_path || '')}\n\n${esc(clip(i.content || '', 800))}</pre>`;
+    case 'ExitPlanMode': return `<div class="plan">${fmt(i.plan || '')}</div>`;
+    case 'WebFetch': return `<pre class="code">${esc(i.url || '')}</pre>`;
+    default: return `<pre class="code">${esc(clip(JSON.stringify(i, null, 2), 800))}</pre>`;
+  }
+}
+
+// What "always allow" would add, e.g. "Bash(npm test *)" or a folder, shown as the button's tooltip.
+function ruleText(suggestions) {
+  const out = [];
+  for (const sug of suggestions) {
+    for (const r of sug.rules || []) out.push(r.ruleContent ? `${r.toolName}(${r.ruleContent})` : r.toolName);
+    for (const d of sug.directories || []) out.push(d);
+    if (sug.mode) out.push(sug.mode);
+  }
+  return out.join('\n');
+}
+
+function addPermission(req) {
+  if (permissions.has(req.id)) return;
+  const isPlan = req.tool === 'ExitPlanMode';
+  const card = document.createElement('div');
+  card.className = 'perm';
+  card.innerHTML = `
+    <div class="head">🔐 ${esc(t(isPlan ? 'ask.planTitle' : 'ask.title', { name: chat.name }))}</div>
+    <div class="what">${esc(isPlan ? t('ask.plan') : req.summary)}</div>
+    ${req.description && !isPlan ? `<div class="desc">${esc(req.description)}</div>` : ''}
+    ${permDetail(req)}
+    <div class="btns">
+      <button class="xp-btn allow" data-d="allow">${esc(t(isPlan ? 'ask.approve' : 'ask.allow'))}</button>
+      ${!isPlan && req.suggestions?.length ? `<button class="xp-btn" data-d="always" title="${esc(ruleText(req.suggestions))}">${esc(t('ask.always'))}</button>` : ''}
+      <button class="xp-btn" data-d="deny">${esc(t('ask.deny'))}</button>
+    </div>`;
+  card.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-d]');
+    if (!b) return;
+    card.querySelectorAll('button').forEach((x) => (x.disabled = true));
+    rm.answerPermission(id, req.id, b.dataset.d);
+  });
+  permissions.set(req.id, card);
+  if (live) history.insertBefore(card, live.nextSibling); else history.appendChild(card);
+  scrollDown(true);
+  renderStatus();
+  card.querySelector('.allow').focus();
+}
+
+function removePermission(requestId) {
+  permissions.get(requestId)?.remove();
+  permissions.delete(requestId);
+  renderStatus();
+}
+
+rm.on('permission', addPermission);
+rm.on('permission-done', removePermission);
+rm.on('permission-clear', () => [...permissions.keys()].forEach(removePermission));
+
 // ---------- Yazı tipi ve renk (MSN'deki "Yazı tipini değiştir") ----------
 
 const myFont = () => ({ family: '', color: '', bold: false, italic: false, underline: false, strike: false, ...(profile.font || {}) });
@@ -271,14 +344,18 @@ rm.on('busy', setBusy);
 rm.on('chat-updated', (c) => {
   chat = c;
   renderChrome();
+  const cards = [...permissions.values()];
   renderAll();
+  cards.forEach((card) => history.appendChild(card));
   renderStatus();
 });
 
 rm.on('profile', (p) => {
   profile = p;
   renderChrome();
+  const cards = [...permissions.values()];
   renderAll();
+  cards.forEach((card) => history.appendChild(card));
   applyInputFont();
   renderFontPanel();
 });
@@ -302,4 +379,5 @@ rm.on('shake', () => {
   renderStatus();
   applyInputFont();
   input.focus();
+  (res.pending || []).forEach(addPermission);
 })();

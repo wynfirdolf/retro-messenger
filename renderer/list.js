@@ -92,6 +92,7 @@ function renderUsage() {
 }
 
 function contactIcon(c) {
+  if (c.waiting) return buddySvg('#e0412f', 'blink');
   if (c.busy) return buddySvg('#f0b000', 'pulse');
   if (c.unread) return buddySvg('#ff7a1a', 'blink');
   return buddySvg('#43b83a');
@@ -102,7 +103,7 @@ function contactHtml(c) {
   if (renaming === c.id) {
     return `<div class="${cls}" data-id="${c.id}">${contactIcon(c)}<input type="text" class="rename" value="${esc(c.name)}" maxlength="60"></div>`;
   }
-  const sub = c.busy ? t('list.typing') : c.last ? `- ${c.last}` : `- ${c.cwd}`;
+  const sub = c.waiting ? t('list.waiting') : c.busy ? t('list.typing') : c.last ? `- ${c.last}` : `- ${c.cwd}`;
   return `<div class="${cls}" data-id="${c.id}" title="${esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span><span class="cm">${esc(sub)}</span></div>`;
 }
 

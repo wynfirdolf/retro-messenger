@@ -92,6 +92,18 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </tr>
 </table>
 
+### 🔐 Permission prompts
+When Claude wants to run a command, edit a file or start on a plan, a yellow card pops up in the conversation showing exactly what it wants to do: the command, the diff, or the plan. Choose **Allow**, **Always allow this session** or **Deny**. If the window is in the background you get a sound, a toast and a bouncing Dock icon, and the contact turns red in your list. Pick how much Claude may do on its own for each chat:
+
+| Permissions | Claude asks before… |
+| --- | --- |
+| Ask before every change | any edit or command |
+| Allow edits, ask for commands *(default)* | running commands |
+| Plan mode | starting work; it plans first, you approve |
+| Full access | nothing |
+
+<img src="docs/permission.png" alt="Permission card" width="70%">
+
 ### 🎨 Your own font and color
 Just like the old days: click **A Font** under the conversation and pick a font, **B** / *I* / U / S, and a color. Your messages, and even the box you type in, show up in that style. Choose from classics like Tahoma and Georgia or 14 Google Fonts, from Comic Neue to Press Start 2P. The fonts ship with the app, so they work offline. On the dark theme, dark colors are lifted automatically so they stay readable.
 
@@ -104,7 +116,6 @@ For late-night coding. Choose **Automatic** (follows your system), **Light** or 
 
 ### ⚙️ And also
 - **Model, version and effort** for each chat. Pick a family (Fable, Opus, Sonnet, Haiku), then a version (for example Opus 5.5, 5 or 4.8) or "Latest". Effort runs from Low to Max; levels a model doesn't support are hidden.
-- **Permissions** for each chat: read only, plan, edit files or full access.
 - A **usage bar** that shows Claude's 5-hour usage limit.
 - **Light and dark themes**, automatic by default.
 - **English and Turkish** UI. It follows your system language, and you can switch it from the contact list.
@@ -171,14 +182,13 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 
 ## Known limitations
 
-- In `-p` mode Claude can't ask for permission. If an action needs permission and gets denied, a note appears in the chat. Change the **Permissions** setting at the top if needed.
 - The Windows build uses the same code but hasn't been tested yet.
 - The prebuilt release is for Apple Silicon Macs only for now.
 
 ## Roadmap
 
 - [ ] Windows build
-- [ ] In-app permission prompts (approve / deny window)
+- [x] ~~*In-app permission prompts*~~
 - [ ] Upload your own photo as a display picture
 - [x] ~~*Font and color choice*~~
 - [ ] Export chat history

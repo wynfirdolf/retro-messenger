@@ -92,6 +92,18 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </tr>
 </table>
 
+### 🔐 İzin onayı
+Claude bir komut çalıştırmak, bir dosyayı düzenlemek ya da bir plana başlamak istediğinde sohbette sarı bir kart açılır. Kartta tam olarak ne yapmak istediği görünür: komut, değişiklik ya da plan. **İzin ver**, **Bu oturumda hep izin ver** veya **Reddet**'i seçersiniz. Pencere arka plandaysa ses çalar, bildirim kutusu açılır, Dock simgesi zıplar ve kişi listesinde o sohbet kırmızıya döner. Her sohbet için Claude'un ne kadarını kendi başına yapabileceğini seçebilirsiniz:
+
+| Yetki | Claude şundan önce sorar… |
+| --- | --- |
+| Her değişiklikte sor | her düzenleme ve komut |
+| Düzenlemelere izin ver, komutları sor *(varsayılan)* | komut çalıştırmak |
+| Plan modu | çalışmaya başlamak; önce plan yapar, siz onaylarsınız |
+| Tam yetki | hiçbir şey |
+
+<img src="docs/tr/permission.png" alt="İzin kartı" width="70%">
+
 ### 🎨 Kendi yazı tipin ve rengin
 Tıpkı eskisi gibi: sohbetin altındaki **A Yazı tipi** düğmesine tıklayın; bir yazı tipi, **K** / *İ* / altı çizili / üstü çizili ve bir renk seçin. İletileriniz, hatta yazdığınız kutu bile o stilde görünür. Tahoma ve Georgia gibi klasiklerden ya da Comic Neue'dan Press Start 2P'ye 14 Google Fonts yazı tipinden seçebilirsiniz. Yazı tipleri uygulamayla birlikte gelir, internet olmadan da çalışır. Koyu temada koyu renkler okunabilsin diye otomatik olarak açılır.
 
@@ -104,7 +116,6 @@ Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomati
 
 ### ⚙️ Diğerleri
 - Her sohbet için **model, sürüm ve efor** seçimi. Önce aileyi (Fable, Opus, Sonnet, Haiku), sonra sürümü (örneğin Opus 5.5, 5 veya 4.8) ya da "En yeni"yi seçin. Efor Düşük'ten Maksimum'a kadar ayarlanabilir; modelin desteklemediği seviyeler listede görünmez.
-- Her sohbet için **yetki** seçimi: yalnızca okuma, plan, dosya düzenleme veya tam yetki.
 - Claude'un 5 saatlik kullanım sınırını gösteren **kullanım çubuğu**.
 - **Açık ve koyu tema**, varsayılan olarak otomatik.
 - **Türkçe ve İngilizce** arayüz. Sistem dilinize göre açılır; kişi listesinin altından değiştirebilirsiniz.
@@ -171,14 +182,13 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 
 ## Bilinen sınırlar
 
-- `-p` modunda Claude izin soramaz. İzin gerektiren bir işlem reddedilirse sohbette bir not çıkar. Gerekirse üstteki **Yetki** ayarını değiştirin.
 - Windows sürümü aynı kodla çalışacak şekilde yazıldı ama henüz test edilmedi.
 - Hazır sürüm şimdilik yalnızca Apple Silicon Mac'ler içindir.
 
 ## Yol haritası
 
 - [ ] Windows sürümü
-- [ ] Uygulama içinden izin onayı (onay/ret penceresi)
+- [x] ~~*Uygulama içinden izin onayı*~~
 - [ ] Görünen resim olarak kendi fotoğrafını yükleme
 - [x] ~~*Yazı tipi ve renk seçimi*~~
 - [ ] Sohbet geçmişini dışa aktarma
