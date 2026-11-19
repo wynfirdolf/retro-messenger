@@ -281,6 +281,13 @@ input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
 }
 .grid button:hover { border-color: var(--sel-border); background: var(--hover); }
 
+/* ---------- Message fonts and colors ---------- */
+.mc, .msg.me .text.mc { color: var(--mc); }
+@media (prefers-color-scheme: dark) {
+  /* Lift dark picks (navy, black) so they stay readable on the night theme. */
+  .mc, .msg.me .text.mc { color: color-mix(in oklab, var(--mc) 62%, white); }
+}
+
 ::-webkit-scrollbar { width: 16px; height: 16px; }
 ::-webkit-scrollbar-track { background: var(--scroll-track); }
 ::-webkit-scrollbar-thumb {

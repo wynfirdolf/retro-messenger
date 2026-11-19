@@ -61,6 +61,35 @@ const EMOTICONS = [
   '🍺', '🎂', '🎁', '🎵', '📞', '✉️', '💻', '🐛', '🔥', '✅', '❌', '⚠️', '🚀', '🎉', '🌙', '☀️',
 ];
 
+// Message fonts. [family, size scale, group]; 'google' fonts ship in renderer/fonts (scripts/fetch-fonts.mjs).
+const FONTS = [
+  ['', 1, 'classic'],
+  ['Tahoma', 1, 'classic'], ['Verdana', 0.95, 'classic'], ['Georgia', 1.05, 'classic'], ['Times New Roman', 1.1, 'classic'],
+  ['Comic Neue', 1.05, 'google'], ['Indie Flower', 1.1, 'google'], ['Caveat', 1.35, 'google'], ['Pacifico', 1, 'google'],
+  ['Lobster', 1.1, 'google'], ['Dancing Script', 1.3, 'google'], ['Permanent Marker', 1, 'google'], ['Bangers', 1.15, 'google'],
+  ['Press Start 2P', 0.7, 'google'], ['VT323', 1.4, 'google'], ['Courier Prime', 1, 'google'], ['Merriweather', 0.95, 'google'],
+  ['Nunito', 1.02, 'google'], ['Orbitron', 0.9, 'google'],
+];
+const FONT_COLORS = [
+  '#c00000', '#ff3b30', '#e36c09', '#b58900', '#22a33a', '#2e8b57', '#008080', '#00a2e8',
+  '#1f5fbf', '#000080', '#7030a0', '#c71585', '#ff4fa3', '#8b4513', '#808080', '#000000',
+];
+
+// A message style object -> safe inline CSS. Unknown fonts and malformed colors are ignored.
+function msgStyle(s, baseSize = 13) {
+  if (!s) return '';
+  const parts = [];
+  const f = FONTS.find((x) => x[0] && x[0] === s.family);
+  if (f) parts.push(`font-family:'${f[0]}', var(--chat-font)`, `font-size:${(baseSize * f[1]).toFixed(1)}px`);
+  if (/^#[0-9a-f]{6}$/i.test(s.color || '')) parts.push(`--mc:${s.color}`);
+  if (s.bold) parts.push('font-weight:700');
+  if (s.italic) parts.push('font-style:italic');
+  const deco = [s.underline && 'underline', s.strike && 'line-through'].filter(Boolean).join(' ');
+  if (deco) parts.push(`text-decoration:${deco}`);
+  return parts.join(';');
+}
+const hasColor = (s) => !!s && /^#[0-9a-f]{6}$/i.test(s.color || '');
+
 function applyShortcuts(text) {
   let out = text;
   for (const [k, v] of SHORTCUTS) out = out.split(k).join(v);

@@ -5,6 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
 <title>Sohbet</title>
 <link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   body { background: var(--win-bg); }
   body.shake .frame { animation: shake 0.5s linear; }
@@ -64,6 +65,20 @@
   .statusbar .typing { color: var(--heading); }
   #hint { color: var(--label); }
 
+  .fontpop { width: 330px; }
+  .fontpop .fonts { height: 176px; overflow-y: auto; border: 1px solid var(--line); background: var(--field); margin-bottom: 8px; }
+  .fontpop .fonts .grp { padding: 3px 6px; font-weight: bold; color: var(--label); background: var(--bar-bg); position: sticky; top: 0; }
+  .fontpop .fonts button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 4px 8px; font-size: 14px; color: var(--ink); cursor: default; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fontpop .fonts button:hover { background: var(--hover); }
+  .fontpop .fonts button.on { background: var(--sel); }
+  .fontpop .row { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .fontpop .tog { width: 28px; height: 26px; padding: 0; min-width: 0; font: 14px Georgia, serif; }
+  .fontpop .tog.on { background: var(--sel); border-color: var(--sel-border); }
+  .fontpop .sw { width: 20px; height: 20px; border: 1px solid #0005; border-radius: 3px; padding: 0; cursor: default; }
+  .fontpop .sw.on { outline: 2px solid var(--heading); outline-offset: 1px; }
+  .fontpop .sw.auto { background: linear-gradient(135deg, var(--surface) 50%, var(--ink) 50%); }
+  .fontpop input[type="color"] { width: 26px; height: 22px; padding: 0; border: 1px solid var(--line); background: none; }
+  .fontpop .preview { padding: 8px; border: 1px dashed var(--line); background: var(--surface); font: 13px var(--chat-font); min-height: 38px; overflow: hidden; }
   @media (max-width: 560px) { .side { display: none; } }
 </style>
 </head>
@@ -99,6 +114,7 @@
     <div class="convo">
       <div id="history"></div>
       <div class="compose-tools">
+        <button class="tool-btn" id="btn-font" data-i18n-title="chat.fontTitle"><span class="ico" style="font:bold 15px Georgia,serif">A</span><span data-i18n="chat.font"></span></button>
         <button class="tool-btn" id="btn-emo" data-i18n-title="chat.emoTitle"><span class="ico">😊</span></button>
         <button class="tool-btn" id="btn-nudge" data-i18n-title="chat.nudgeTitle">
           <svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-10 2 4h3" fill="none" stroke="#d04020" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><span data-i18n="chat.nudge"></span>

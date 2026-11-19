@@ -92,6 +92,11 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </tr>
 </table>
 
+### 🎨 Kendi yazı tipin ve rengin
+Tıpkı eskisi gibi: sohbetin altındaki **A Yazı tipi** düğmesine tıklayın; bir yazı tipi, **K** / *İ* / altı çizili / üstü çizili ve bir renk seçin. İletileriniz, hatta yazdığınız kutu bile o stilde görünür. Tahoma ve Georgia gibi klasiklerden ya da Comic Neue'dan Press Start 2P'ye 14 Google Fonts yazı tipinden seçebilirsiniz. Yazı tipleri uygulamayla birlikte gelir, internet olmadan da çalışır. Koyu temada koyu renkler okunabilsin diye otomatik olarak açılır.
+
+<img src="docs/tr/fonts.png" alt="Yazı tipi ve renk seçici" width="70%">
+
 ### 🌙 Karanlık mod
 Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomatik** (sistemi takip eder), **Açık** veya **Koyu** seçebilirsiniz.
 
@@ -157,6 +162,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 | `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
 | `src/history.js` | Claude Code'un kaydettiği konuşmaları (`~/.claude/projects`) içe aktarmak için okur |
 | `renderer/i18n.js` | Türkçe ve İngilizce metinler |
+| `renderer/fonts/` | Google Fonts'tan alınan ileti yazı tipleri ve lisansları (`npm run fonts` ile yeniden indirilir) |
 | `renderer/models.js` | Model aileleri, sürümler ve her birinin desteklediği efor seviyeleri |
 | `renderer/` | Arayüz: `list` kişi listesi, `chat` sohbet penceresi, `toast` bildirim kutusu, `common` ortak stil ve yardımcılar |
 
@@ -184,6 +190,10 @@ Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gön
 Fikir, Claude Code'u 2000'lerin başındaki Messenger tarzı bir pencerede çalıştıran Mac uygulaması **[CMSN](https://cmsn.app)**'den geliyor. Bu fikrin özenle yapılmış, yerel bir sürümünü istiyorsanız CMSN'e göz atın ve yapımcısını destekleyin. 💙
 
 Retro Messenger sıfırdan yazılmış ayrı ve açık kaynaklı bir projedir. CMSN ile ortak kodu, görseli veya sesi yoktur.
+
+## Yazı tipleri
+
+İleti yazı tipleri [Google Fonts](https://fonts.google.com)'tan alınmıştır ve kendi lisanslarıyla birlikte dağıtılır (SIL Open Font License 1.1; Permanent Marker için Apache 2.0). Lisans metinleri `renderer/fonts/licenses/` klasöründedir.
 
 ## Yasal not
 

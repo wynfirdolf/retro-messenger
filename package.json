@@ -1,6 +1,6 @@
 {
   "name": "retro-messenger",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Chat with Claude Code like it's 2004: a retro instant-messenger desktop app",
   "main": "main.js",
   "author": "Wynfirdolf",
@@ -10,7 +10,8 @@
     "start": "electron .",
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
-    "install:mac": "electron-builder --mac --dir && codesign --force --deep --sign - \"dist/mac-arm64/Retro Messenger.app\" && rm -rf \"/Applications/Retro Messenger.app\" && ditto \"dist/mac-arm64/Retro Messenger.app\" \"/Applications/Retro Messenger.app\" && echo 'Kuruldu: /Applications/Retro Messenger.app'"
+    "install:mac": "electron-builder --mac --dir && codesign --force --deep --sign - \"dist/mac-arm64/Retro Messenger.app\" && rm -rf \"/Applications/Retro Messenger.app\" && ditto \"dist/mac-arm64/Retro Messenger.app\" \"/Applications/Retro Messenger.app\" && echo 'Kuruldu: /Applications/Retro Messenger.app'",
+    "fonts": "node scripts/fetch-fonts.mjs"
   },
   "devDependencies": {
     "electron": "^45.4.1",

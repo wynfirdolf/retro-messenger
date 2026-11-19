@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('rm', {
   openImport: () => ipcRenderer.invoke('history:open'),
   listSessions: () => ipcRenderer.invoke('history:list'),
   importSession: (sessionId) => ipcRenderer.invoke('history:import', sessionId),
-  send: (id, text) => ipcRenderer.invoke('chat:send', id, text),
+  send: (id, text, style) => ipcRenderer.invoke('chat:send', id, text, style),
   stop: (id) => ipcRenderer.invoke('chat:stop', id),
   nudge: (id) => ipcRenderer.invoke('chat:nudge', id),
   reveal: (id) => ipcRenderer.invoke('chat:reveal', id),

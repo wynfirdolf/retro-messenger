@@ -408,9 +408,19 @@ ipcMain.handle('history:import', (_e, sessionId) => {
   return true;
 });
 
-ipcMain.handle('chat:send', (_e, id, text) => {
+// Only known keys with simple values are kept from the sender's font style.
+function cleanStyle(s) {
+  if (!s || typeof s !== 'object') return undefined;
+  const out = {};
+  if (typeof s.family === 'string' && s.family.length < 40) out.family = s.family;
+  if (typeof s.color === 'string' && /^#[0-9a-f]{6}$/i.test(s.color)) out.color = s.color;
+  for (const k of ['bold', 'italic', 'underline', 'strike']) if (s[k] === true) out[k] = true;
+  return Object.keys(out).length ? out : undefined;
+}
+
+ipcMain.handle('chat:send', (_e, id, text, style) => {
   if (busy.has(id)) return false;
-  addAndShow(id, { from: 'me', text });
+  addAndShow(id, { from: 'me', text, style: cleanStyle(style) });
   return sendToClaude(id, text);
 });
 

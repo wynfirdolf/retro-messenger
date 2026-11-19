@@ -1,4 +1,4 @@
-/* global rm, t, LOCALE, MODELS, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
+/* global rm, t, LOCALE, MODELS, FONTS, FONT_COLORS, msgStyle, hasColor, closePopovers, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
 
 const id = new URLSearchParams(location.search).get('id');
 let chat = null;
@@ -33,8 +33,9 @@ function renderMessage(m) {
   const el = document.createElement('div');
   if (m.from === 'me' || m.from === 'claude') {
     const name = m.from === 'me' ? profile.name : chat.name;
+    const st = m.from === 'me' ? m.style : null;
     el.className = `msg ${m.from}`;
-    el.innerHTML = `<div class="who">${esc(t('says', { name }))} <span class="t">(${timeStr(m.ts)})</span></div><div class="text">${fmt(m.text)}</div>`;
+    el.innerHTML = `<div class="who">${esc(t('says', { name }))} <span class="t">(${timeStr(m.ts)})</span></div><div class="text${hasColor(st) ? ' mc' : ''}" style="${msgStyle(st)}">${fmt(m.text)}</div>`;
   } else {
     const icon = { tool: '⚙️', error: '⚠️', system: '•' }[m.from] || '•';
     el.className = `line ${m.from}`;
@@ -94,7 +95,7 @@ async function send() {
   const raw = input.value.trim();
   if (!raw || busy) return;
   input.value = '';
-  await rm.send(id, applyShortcuts(raw));
+  await rm.send(id, applyShortcuts(raw), profile.font || null);
 }
 
 input.addEventListener('keydown', (e) => {
@@ -108,6 +109,90 @@ $('#stop').onclick = () => rm.stop(id);
 $('#btn-nudge').onclick = () => rm.nudge(id);
 $('#btn-folder').onclick = () => rm.reveal(id);
 $('#btn-new').onclick = () => rm.newSession(id);
+// ---------- Yazı tipi ve renk (MSN'deki "Yazı tipini değiştir") ----------
+
+const myFont = () => ({ family: '', color: '', bold: false, italic: false, underline: false, strike: false, ...(profile.font || {}) });
+
+function applyInputFont() {
+  const s = profile.font;
+  input.setAttribute('style', msgStyle(s));
+  input.classList.toggle('mc', hasColor(s));
+}
+
+function saveFont(patch) {
+  profile.font = { ...myFont(), ...patch };
+  applyInputFont();
+  renderFontPanel();
+  rm.updateProfile({ font: profile.font });
+}
+
+function renderFontPanel() {
+  const pop = $('.fontpop');
+  if (!pop) return;
+  const f = myFont();
+  const groups = { classic: t('font.classic'), google: 'Google Fonts' };
+  let list = '';
+  let lastGroup = '';
+  for (const [family, , group] of FONTS) {
+    if (group !== lastGroup) {
+      list += `<div class="grp">${esc(groups[group])}</div>`;
+      lastGroup = group;
+    }
+    const label = family || t('font.default');
+    const css = family ? `font-family:'${family}', var(--chat-font)` : '';
+    list += `<button data-family="${esc(family)}" class="${f.family === family ? 'on' : ''}" style="${css}">${esc(label)}</button>`;
+  }
+  const tog = (k, label, css) => `<button class="xp-btn tog ${f[k] ? 'on' : ''}" data-tog="${k}" title="${esc(t(`font.${k}`))}" style="${css}">${label}</button>`;
+  const swatches = [`<button class="sw auto ${f.color ? '' : 'on'}" data-color="" title="${esc(t('font.auto'))}"></button>`]
+    .concat(FONT_COLORS.map((c) => `<button class="sw ${f.color === c ? 'on' : ''}" data-color="${c}" style="background:${c}"></button>`))
+    .join('');
+  pop.innerHTML = `
+    <h4>${esc(t('chat.font'))}</h4>
+    <div class="fonts">${list}</div>
+    <div class="row">${tog('bold', 'B', 'font-weight:bold')}${tog('italic', 'I', 'font-style:italic')}${tog('underline', 'U', 'text-decoration:underline')}${tog('strike', 'S', 'text-decoration:line-through')}</div>
+    <h4>${esc(t('font.color'))}</h4>
+    <div class="row">${swatches}<input type="color" title="${esc(t('font.custom'))}" value="${f.color || '#1f5fbf'}"></div>
+    <div class="preview"><span class="${hasColor(f) ? 'mc' : ''}" style="${msgStyle(f)}">${esc(t('font.preview'))}</span></div>`;
+  const on = pop.querySelector('.fonts .on');
+  if (on && !pop.dataset.scrolled) { on.scrollIntoView({ block: 'center' }); pop.dataset.scrolled = '1'; }
+}
+
+function openFontPanel(anchor) {
+  if ($('.fontpop')) return closePopovers();
+  closePopovers();
+  const pop = document.createElement('div');
+  pop.className = 'popover fontpop';
+  document.body.appendChild(pop);
+  renderFontPanel();
+  const r = anchor.getBoundingClientRect();
+  const pr = pop.getBoundingClientRect();
+  pop.style.top = `${Math.max(6, r.top - pr.height - 4)}px`;
+  pop.style.left = `${Math.max(6, Math.min(r.left, innerWidth - pr.width - 6))}px`;
+  pop.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const b = e.target.closest('button');
+    if (!b) return;
+    if ('family' in b.dataset) saveFont({ family: b.dataset.family });
+    else if (b.dataset.tog) saveFont({ [b.dataset.tog]: !myFont()[b.dataset.tog] });
+    else if ('color' in b.dataset) saveFont({ color: b.dataset.color });
+  });
+  pop.addEventListener('change', (e) => {
+    if (e.target.type === 'color') saveFont({ color: e.target.value });
+  });
+  const away = (e) => {
+    if (!pop.contains(e.target) && e.target !== anchor && !anchor.contains(e.target)) {
+      pop.remove();
+      document.removeEventListener('mousedown', away);
+    }
+  };
+  setTimeout(() => document.addEventListener('mousedown', away));
+}
+
+$('#btn-font').onclick = (e) => {
+  e.stopPropagation();
+  openFontPanel(e.currentTarget);
+};
+
 // ---------- Model, sürüm ve efor ----------
 
 function renderModelPickers() {
@@ -194,6 +279,8 @@ rm.on('profile', (p) => {
   profile = p;
   renderChrome();
   renderAll();
+  applyInputFont();
+  renderFontPanel();
 });
 
 rm.on('shake', () => {
@@ -213,5 +300,6 @@ rm.on('shake', () => {
   renderChrome();
   renderAll();
   renderStatus();
+  applyInputFont();
   input.focus();
 })();

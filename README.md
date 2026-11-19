@@ -92,6 +92,11 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </tr>
 </table>
 
+### 🎨 Your own font and color
+Just like the old days: click **A Font** under the conversation and pick a font, **B** / *I* / U / S, and a color. Your messages, and even the box you type in, show up in that style. Choose from classics like Tahoma and Georgia or 14 Google Fonts, from Comic Neue to Press Start 2P. The fonts ship with the app, so they work offline. On the dark theme, dark colors are lifted automatically so they stay readable.
+
+<img src="docs/fonts.png" alt="Font and color picker" width="70%">
+
 ### 🌙 Dark mode
 For late-night coding. Choose **Automatic** (follows your system), **Light** or **Dark** from the 🌓 menu at the bottom of the contact list.
 
@@ -157,6 +162,7 @@ Each chat runs a `claude -p --input-format stream-json --output-format stream-js
 | `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
 | `src/history.js` | Reads Claude Code's saved conversations (`~/.claude/projects`) so they can be imported |
 | `renderer/i18n.js` | English and Turkish strings |
+| `renderer/fonts/` | Message fonts from Google Fonts with their licenses (regenerate with `npm run fonts`) |
 | `renderer/models.js` | Model families, versions and the effort levels each one supports |
 | `renderer/` | UI: `list` contact list, `chat` conversation window, `toast` notification, `common` shared styles and helpers |
 
@@ -184,6 +190,10 @@ Contributions are welcome. Open an issue or send a pull request.
 The idea comes from **[CMSN](https://cmsn.app)**, a Mac app that runs Claude Code inside an early-2000s Messenger-style window. If you'd like a polished, native version of this idea, check out CMSN and support its creator. 💙
 
 Retro Messenger is a separate, open-source project written from scratch. It shares no code, artwork or sounds with CMSN.
+
+## Fonts
+
+The message fonts come from [Google Fonts](https://fonts.google.com) and are bundled under their own licenses (SIL Open Font License 1.1, and Apache 2.0 for Permanent Marker). Each license is in `renderer/fonts/licenses/`.
 
 ## Legal
 
