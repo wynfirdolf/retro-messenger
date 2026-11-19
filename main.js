@@ -1,8 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen } = require('electron');
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
 const store = require('./src/store');
-const { ClaudeSession, resolveEnvironment } = require('./src/claude-session');
+const { ClaudeSession, resolveEnvironment, describeTool } = require('./src/claude-session');
+const history = require('./src/history');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
 
@@ -13,6 +15,7 @@ const page = (name) => path.join(__dirname, 'renderer', name);
 let env = { env: process.env, claudePath: null };
 let listWin = null;
 let toastWin = null;
+let importWin = null;
 let rateLimit = null;
 const chatWins = new Map(); // sohbet id -> pencere
 const sessions = new Map(); // sohbet id -> ClaudeSession
@@ -128,6 +131,15 @@ function openChat(id) {
   chatWins.set(id, win);
   markRead(id);
 }
+
+function openImportWindow(parent) {
+  if (alive(importWin)) return importWin.focus();
+  importWin = makeWindow({ width: 620, height: 560, minWidth: 460, minHeight: 360, parent: alive(parent) ? parent : undefined });
+  importWin.loadFile(page('import.html'));
+  importWin.on('closed', () => { importWin = null; });
+}
+
+const homeLabel = (p) => (p.startsWith(os.homedir()) ? '~' + p.slice(os.homedir().length) : p);
 
 function showToast(chat, text) {
   if (alive(toastWin)) toastWin.close();
@@ -354,6 +366,39 @@ ipcMain.handle('chat:delete', async (e, id) => {
 });
 
 ipcMain.handle('chat:open', (_e, id) => openChat(id));
+
+// ---------- Terminalde başlatılmış konuşmaları içe aktarma ----------
+
+ipcMain.handle('history:open', (e) => openImportWindow(BrowserWindow.fromWebContents(e.sender)));
+
+ipcMain.handle('history:list', () => {
+  const known = new Set(store.chats().map((c) => c.sessionId).filter(Boolean));
+  return history.listSessions(known).map((s) => ({
+    ...s,
+    file: undefined,
+    cwdLabel: homeLabel(s.cwd),
+    cwdExists: fs.existsSync(s.cwd),
+  }));
+});
+
+ipcMain.handle('history:import', (_e, sessionId) => {
+  const existing = store.chats().find((c) => c.sessionId === sessionId);
+  if (existing) {
+    openChat(existing.id);
+  } else {
+    const s = history.listSessions().find((x) => x.sessionId === sessionId);
+    if (!s) return false;
+    const tr = (b) => describeTool(b, t);
+    const messages = history.loadTranscript(s.file, tr).slice(-499);
+    messages.push({ from: 'system', text: t('sys.imported'), ts: Date.now() });
+    const chat = store.createChat({ cwd: s.cwd, name: s.title || path.basename(s.cwd) });
+    store.updateChat(chat.id, { sessionId, messages, updatedAt: Date.now() });
+    pushState();
+    openChat(chat.id);
+  }
+  if (alive(importWin)) importWin.close();
+  return true;
+});
 
 ipcMain.handle('chat:send', (_e, id, text) => {
   if (busy.has(id)) return false;

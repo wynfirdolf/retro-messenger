@@ -120,8 +120,9 @@ function renderGroups() {
   const box = $('#groups');
 
   if (!state.chats.length) {
-    box.innerHTML = `<div class="empty">${esc(t('list.empty'))}<br><br><button class="xp-btn" id="empty-new">${esc(t('list.newChat'))}</button><br><br>${esc(t('list.emptyHint'))}</div>`;
+    box.innerHTML = `<div class="empty">${esc(t('list.empty'))}<br><br><button class="xp-btn" id="empty-new">${esc(t('list.newChat'))}</button><br><br><button class="xp-btn" id="empty-import">${esc(t('list.importChat'))}</button><br><br>${esc(t('list.emptyHint'))}</div>`;
     $('#empty-new').onclick = newChat;
+    $('#empty-import').onclick = () => rm.openImport();
     return;
   }
 
@@ -203,6 +204,7 @@ async function newChat() {
 }
 $('#add').onclick = newChat;
 $('#new-chat').onclick = newChat;
+$('#import-chat').onclick = () => rm.openImport();
 $('#search').addEventListener('input', renderGroups);
 
 $('#me-avatar').onclick = (e) => {

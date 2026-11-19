@@ -223,4 +223,4 @@ class ClaudeSession extends EventEmitter {
   }
 }
 
-module.exports = { ClaudeSession, resolveEnvironment };
+module.exports = { ClaudeSession, resolveEnvironment, describeTool };

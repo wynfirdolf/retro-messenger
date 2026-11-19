@@ -81,6 +81,15 @@ Set your status to "Busy" to silence all of it.
 </td>
 <td width="50%" align="center"><img src="docs/toast.png" alt="Notification toast" width="300"><br><br><img src="docs/signin.png" alt="Sign-in screen" width="260"></td>
 </tr>
+<tr>
+<td width="50%"><img src="docs/import.png" alt="Open a past conversation"></td>
+<td width="50%" valign="top">
+
+### 🕘 Continue terminal conversations
+Started something in the terminal with `claude`? Click **Open a past conversation** at the bottom of the contact list. You'll see every Claude Code conversation on your machine, with its title, folder and how long ago it was used. Pick one and it joins your contact list with its full history. Claude remembers everything, so you just keep talking.
+
+</td>
+</tr>
 </table>
 
 ### ⚙️ And also
@@ -140,6 +149,7 @@ Each chat runs a `claude -p --input-format stream-json --output-format stream-js
 | `main.js` | Windows, IPC, notifications, Dock badge, nudge |
 | `src/claude-session.js` | Runs the `claude` process and simplifies its event stream |
 | `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
+| `src/history.js` | Reads Claude Code's saved conversations (`~/.claude/projects`) so they can be imported |
 | `renderer/i18n.js` | English and Turkish strings |
 | `renderer/models.js` | Model families, versions and the effort levels each one supports |
 | `renderer/` | UI: `list` contact list, `chat` conversation window, `toast` notification, `common` shared styles and helpers |

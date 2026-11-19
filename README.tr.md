@@ -81,6 +81,15 @@ Durumunuz "Meşgul" ise hepsi susar.
 </td>
 <td width="50%" align="center"><img src="docs/tr/toast.png" alt="Bildirim kutusu" width="300"><br><br><img src="docs/tr/signin.png" alt="Oturum açma ekranı" width="260"></td>
 </tr>
+<tr>
+<td width="50%"><img src="docs/tr/import.png" alt="Önceki bir konuşmayı aç"></td>
+<td width="50%" valign="top">
+
+### 🕘 Terminaldeki konuşmalara devam
+Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki **Önceki bir konuşmayı aç** bağlantısına tıklayın. Bilgisayarınızdaki tüm Claude Code konuşmaları başlığı, klasörü ve en son ne zaman kullanıldığıyla listelenir. Birini seçtiğinizde tüm geçmişiyle kişi listenize eklenir. Claude her şeyi hatırlar, siz de kaldığınız yerden yazmaya devam edersiniz.
+
+</td>
+</tr>
 </table>
 
 ### ⚙️ Diğerleri
@@ -140,6 +149,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 | `main.js` | Pencereler, IPC, bildirimler, Dock rozeti, titreşim |
 | `src/claude-session.js` | `claude` sürecini yönetir ve akan olayları sadeleştirir |
 | `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
+| `src/history.js` | Claude Code'un kaydettiği konuşmaları (`~/.claude/projects`) içe aktarmak için okur |
 | `renderer/i18n.js` | Türkçe ve İngilizce metinler |
 | `renderer/models.js` | Model aileleri, sürümler ve her birinin desteklediği efor seviyeleri |
 | `renderer/` | Arayüz: `list` kişi listesi, `chat` sohbet penceresi, `toast` bildirim kutusu, `common` ortak stil ve yardımcılar |

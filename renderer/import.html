@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>Retro Messenger</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { background: linear-gradient(180deg, #e3edf9 0, #c9daf1 100%); }
+  .intro { flex: none; display: flex; gap: 10px; align-items: center; padding: 10px 12px 6px; color: #1d3f84; }
+  .intro .big { font-size: 30px; line-height: 1; }
+  .intro p { margin: 0; line-height: 1.45; }
+  .bar { flex: none; padding: 4px 12px 8px; }
+  #search { width: 100%; padding: 4px 6px; }
+  #list { flex: 1; min-height: 0; overflow-y: auto; margin: 0 12px; background: #fff; border: 1px solid #7f9db9; border-radius: 3px; }
+  .row { display: flex; gap: 10px; padding: 7px 10px; border-bottom: 1px solid #edf1f7; cursor: default; }
+  .row:hover { background: #eef4fd; }
+  .row.sel { background: #cfe0fb; }
+  .row .ico { flex: none; font-size: 20px; line-height: 1.2; }
+  .row .main { flex: 1; min-width: 0; }
+  .row .t { font-weight: bold; color: #111; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .p { color: #555; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .row .meta { color: #7b8aa3; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .meta .missing { color: #b3261e; }
+  .row .when { flex: none; color: #7b8aa3; text-align: right; }
+  .empty { padding: 30px 20px; text-align: center; color: var(--muted); }
+  .foot { flex: none; display: flex; gap: 8px; align-items: center; padding: 10px 12px; }
+  .foot .note { flex: 1; color: #4a5d7e; }
+</style>
+</head>
+<body>
+  <div class="titlebar"><span class="tb-icon"></span><span class="tb-title"></span>
+    <div class="tb-btns"><button data-win="close">×</button></div>
+  </div>
+  <div class="intro"><span class="big">🕘</span><p data-i18n="import.intro"></p></div>
+  <div class="bar"><input type="text" id="search" data-i18n-ph="import.search"></div>
+  <div id="list"><div class="empty" data-i18n="import.loading"></div></div>
+  <div class="foot">
+    <span class="note" data-i18n="import.note"></span>
+    <button class="xp-btn" id="cancel" data-i18n="import.cancel"></button>
+    <button class="xp-btn" id="open" data-i18n="import.open" disabled style="font-weight:bold"></button>
+  </div>
+  <script src="i18n.js"></script>
+  <script src="common.js"></script>
+  <script src="import.js"></script>
+</body>
+</html>
