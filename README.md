@@ -180,7 +180,7 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 - [ ] Windows build
 - [ ] In-app permission prompts (approve / deny window)
 - [ ] Upload your own photo as a display picture
-- [ ] Font and color choice
+- [x] ~~*Font and color choice*~~
 - [ ] Export chat history
 
 Contributions are welcome. Open an issue or send a pull request.
