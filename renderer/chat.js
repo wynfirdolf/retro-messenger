@@ -1,4 +1,4 @@
-/* global rm, t, LOCALE, MODELS, FONTS, FONT_COLORS, msgStyle, hasColor, closePopovers, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
+/* global rm, t, LOCALE, MODELS, sizeStr, fileIcon, fileUrl, FONTS, FONT_COLORS, msgStyle, hasColor, closePopovers, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
 
 const id = new URLSearchParams(location.search).get('id');
 let chat = null;
@@ -35,12 +35,21 @@ function renderMessage(m) {
     const name = m.from === 'me' ? profile.name : chat.name;
     const st = m.from === 'me' ? m.style : null;
     el.className = `msg ${m.from}`;
-    el.innerHTML = `<div class="who">${esc(t('says', { name }))} <span class="t">(${timeStr(m.ts)})</span></div><div class="text${hasColor(st) ? ' mc' : ''}" style="${msgStyle(st)}">${fmt(m.text)}</div>`;
+    el.innerHTML = `<div class="who">${esc(t('says', { name }))} <span class="t">(${timeStr(m.ts)})</span></div>`
+      + (m.text ? `<div class="text${hasColor(st) ? ' mc' : ''}" style="${msgStyle(st)}">${fmt(m.text)}</div>` : '')
+      + filesHtml(m.files);
   } else {
     const icon = { tool: '⚙️', error: '⚠️', system: '•' }[m.from] || '•';
     el.className = `line ${m.from}`;
     el.innerHTML = `<span class="bullet">${icon}</span><span>${esc(m.text)}</span>`;
   }
+  // A deleted image falls back to a grey chip instead of a broken picture.
+  el.querySelectorAll('img.thumb').forEach((img) => img.addEventListener('error', () => {
+    const chip = document.createElement('span');
+    chip.className = 'fchip missing';
+    chip.textContent = '🖼️ ' + img.alt;
+    img.replaceWith(chip);
+  }));
   frag.appendChild(el);
   return frag;
 }
@@ -95,10 +104,88 @@ function setBusy(b) {
 
 async function send() {
   const raw = input.value.trim();
-  if (!raw || busy) return;
+  if ((!raw && !attachments.length) || busy) return;
+  const files = attachments.map((f) => f.path);
   input.value = '';
-  await rm.send(id, applyShortcuts(raw), profile.font || null);
+  attachments = [];
+  renderTray();
+  await rm.send(id, raw ? applyShortcuts(raw) : '', profile.font || null, files);
 }
+
+// ---------- Dosya ekleri ----------
+
+let attachments = []; // gönderilmeyi bekleyen dosyalar
+
+function filesHtml(files) {
+  if (!files?.length) return '';
+  return `<div class="files">${files.map((f) => (f.kind === 'image'
+    ? `<img class="thumb" src="${esc(fileUrl(f.path))}" alt="${esc(f.name)}" title="${esc(f.name)}" data-open="${esc(f.path)}">`
+    : `<button class="fchip" data-open="${esc(f.path)}" title="${esc(f.path)}"><span class="fi">${fileIcon(f)}</span><span class="fn">${esc(f.name)}</span><span class="fs">${esc(sizeStr(f.kind === 'folder' ? null : f.size))}</span></button>`)).join('')}</div>`;
+}
+
+function renderTray() {
+  const tray = $('#tray');
+  tray.classList.toggle('has', attachments.length > 0);
+  tray.innerHTML = attachments.map((f, i) => `<span class="fchip" title="${esc(f.path)}">
+      ${f.kind === 'image' ? `<img src="${esc(fileUrl(f.path))}" alt="">` : `<span class="fi">${fileIcon(f)}</span>`}
+      <span class="fn">${esc(f.name)}</span><span class="fs">${esc(sizeStr(f.kind === 'folder' ? null : f.size))}</span>
+      <button class="rm" data-i="${i}" title="${esc(t('file.remove'))}">×</button></span>`).join('');
+}
+
+function addAttachments(list) {
+  for (const f of list) {
+    if (!f || attachments.some((a) => a.path === f.path)) continue;
+    if (attachments.length >= 10) break;
+    attachments.push(f);
+  }
+  renderTray();
+  input.focus();
+}
+
+$('#tray').addEventListener('click', (e) => {
+  const b = e.target.closest('.rm');
+  if (!b) return;
+  attachments.splice(Number(b.dataset.i), 1);
+  renderTray();
+});
+$('#btn-file').onclick = async () => addAttachments(await rm.pickFiles());
+history.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-open]');
+  if (el) rm.openFile(el.dataset.open);
+});
+
+// Sürükle-bırak
+let dragDepth = 0;
+const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files');
+document.addEventListener('dragenter', (e) => {
+  if (!hasFiles(e)) return;
+  dragDepth++;
+  $('#drop-text').textContent = t('file.drop', { name: chat.name });
+  document.body.classList.add('dragging');
+});
+document.addEventListener('dragleave', () => {
+  if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('dragging'); }
+});
+document.addEventListener('drop', async (e) => {
+  dragDepth = 0;
+  document.body.classList.remove('dragging');
+  const paths = [...(e.dataTransfer?.files || [])].map((f) => rm.pathForFile(f)).filter(Boolean);
+  if (paths.length) addAttachments(await rm.describeFiles(paths));
+});
+
+// Yapıştırma: Finder'dan kopyalanan dosyalar ya da panodaki bir ekran görüntüsü
+input.addEventListener('paste', async (e) => {
+  const files = [...(e.clipboardData?.files || [])];
+  if (!files.length) return;
+  e.preventDefault();
+  const out = [];
+  for (const f of files) {
+    const p = rm.pathForFile(f);
+    if (p) out.push(...(await rm.describeFiles([p])));
+    else if (f.type.startsWith('image/')) out.push(await rm.savePasted(f.name || 'image.png', new Uint8Array(await f.arrayBuffer())));
+  }
+  addAttachments(out.filter(Boolean));
+});
 
 input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {

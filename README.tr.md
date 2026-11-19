@@ -92,6 +92,11 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </tr>
 </table>
 
+### 📎 Dosya ve resim gönderme
+**📎 Dosya gönder** düğmesine tıklayın, dosyaları sohbete sürükleyin ya da ⌘V ile yapıştırın (ekran görüntüleri dahil). Dosyalar, siz Gönder'e basana kadar mesaj kutusunun üstündeki tepside bekler. Claude resimleri açmasına gerek kalmadan hemen görür. Diğer dosya ve klasörlerin yolunu alır ve onları kendisi açar; proje klasörünün dışındaysa önce bir izin kartı çıkar. Geçmişte resimler küçük resim, dosyalar kart olarak görünür; tıklayınca açılırlar.
+
+<img src="docs/tr/files.png" alt="Dosya ve resim gönderme" width="70%">
+
 ### 🔐 İzin onayı
 Claude bir komut çalıştırmak, bir dosyayı düzenlemek ya da bir plana başlamak istediğinde sohbette sarı bir kart açılır. Kartta tam olarak ne yapmak istediği görünür: komut, değişiklik ya da plan. **İzin ver**, **Bu oturumda hep izin ver** veya **Reddet**'i seçersiniz. Pencere arka plandaysa ses çalar, bildirim kutusu açılır, Dock simgesi zıplar ve kişi listesinde o sohbet kırmızıya döner. Her sohbet için Claude'un ne kadarını kendi başına yapabileceğini seçebilirsiniz:
 

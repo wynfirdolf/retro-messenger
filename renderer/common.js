@@ -194,4 +194,30 @@ function applyI18n(root = document) {
   $$('[data-i18n-ph]', root).forEach((el) => (el.placeholder = t(el.dataset.i18nPh)));
 }
 
+// File sizes and icons for attachments.
+function sizeStr(bytes) {
+  if (bytes == null) return '';
+  const u = ['B', 'KB', 'MB', 'GB'];
+  let i = 0;
+  let n = bytes;
+  while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return `${n < 10 && i ? n.toFixed(1) : Math.round(n)} ${u[i]}`;
+}
+function fileIcon(f) {
+  if (f.kind === 'folder') return '📁';
+  if (f.kind === 'image') return '🖼️';
+  const ext = (f.name.split('.').pop() || '').toLowerCase();
+  if (['pdf'].includes(ext)) return '📕';
+  if (['zip', 'gz', 'tar', 'rar', '7z'].includes(ext)) return '🗜️';
+  if (['mp3', 'wav', 'm4a', 'ogg'].includes(ext)) return '🎵';
+  if (['mp4', 'mov', 'webm'].includes(ext)) return '🎬';
+  if (['js', 'ts', 'tsx', 'jsx', 'py', 'swift', 'go', 'rs', 'java', 'kt', 'rb', 'php', 'c', 'cpp', 'h', 'cs', 'sh', 'json', 'html', 'css', 'md', 'yml', 'yaml'].includes(ext)) return '📝';
+  return '📄';
+}
+const fileUrl = (p) => 'file://' + encodeURI(p).replace(/#/g, '%23').replace(/\?/g, '%3F');
+
+// Dropping a file anywhere must never navigate the window away from the app.
+document.addEventListener('dragover', (e) => e.preventDefault());
+document.addEventListener('drop', (e) => e.preventDefault());
+
 rm.on('play-sound', (name) => Sounds.play(name));

@@ -159,10 +159,11 @@ class ClaudeSession extends EventEmitter {
     return true;
   }
 
-  send(text) {
+  // content: a string, or an array of content blocks (images + text).
+  send(content) {
     if (!this.proc && !this.start()) return false;
     this.busy = true;
-    this.proc.stdin.write(JSON.stringify({ type: 'user', message: { role: 'user', content: text } }) + '\n');
+    this.proc.stdin.write(JSON.stringify({ type: 'user', message: { role: 'user', content } }) + '\n');
     return true;
   }
 

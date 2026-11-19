@@ -92,6 +92,11 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </tr>
 </table>
 
+### 📎 Send files and images
+Click **📎 Send files**, drag files onto the conversation, or paste with ⌘V (screenshots too). They wait in a tray above the message box until you hit Send. Claude sees images right away, without opening them. For other files and folders it gets the path and opens them itself; if they're outside the project folder, you'll get a permission card first. In the history, images show as thumbnails and files as chips; click one to open it.
+
+<img src="docs/files.png" alt="Sending files and images" width="70%">
+
 ### 🔐 Permission prompts
 When Claude wants to run a command, edit a file or start on a plan, a yellow card pops up in the conversation showing exactly what it wants to do: the command, the diff, or the plan. Choose **Allow**, **Always allow this session** or **Deny**. If the window is in the background you get a sound, a toast and a bouncing Dock icon, and the contact turns red in your list. Pick how much Claude may do on its own for each chat:
 

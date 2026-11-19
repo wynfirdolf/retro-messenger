@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: file:">
 <title>Sohbet</title>
 <link rel="stylesheet" href="common.css">
 <link rel="stylesheet" href="fonts/fonts.css">
@@ -79,6 +79,31 @@
   .perm .btns { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
   .perm .btns .allow { font-weight: bold; }
   .statusbar .waiting { color: var(--error); font-weight: bold; }
+  .files { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; margin-top: 4px; padding-left: 12px; }
+  .fchip {
+    display: inline-flex; align-items: center; gap: 6px; max-width: 260px; padding: 4px 8px 4px 6px;
+    border: 1px solid var(--soft-line); border-radius: 4px; background: var(--bar-bg); color: var(--ink);
+    font: 11px var(--ui-font); cursor: pointer; text-align: left;
+  }
+  .fchip:hover { border-color: var(--sel-border); }
+  .fchip .fi { font-size: 18px; line-height: 1; flex: none; }
+  .fchip .fn { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fchip .fs { color: var(--muted); white-space: nowrap; flex: none; }
+  .fchip.missing { opacity: 0.55; cursor: default; }
+  .thumb { display: block; max-width: 220px; max-height: 160px; border: 1px solid var(--soft-line); border-radius: 4px; cursor: pointer; background: var(--surface); }
+  #tray { display: none; flex-wrap: wrap; gap: 6px; }
+  #tray.has { display: flex; }
+  #tray .fchip { cursor: default; padding-right: 4px; }
+  #tray .fchip img { width: 28px; height: 28px; object-fit: cover; border-radius: 3px; flex: none; }
+  #tray .rm { border: 0; background: none; color: var(--muted); font-size: 14px; padding: 0 4px; cursor: pointer; }
+  #tray .rm:hover { color: var(--error); }
+  #drop {
+    position: fixed; inset: 30px 0 0; display: none; place-items: center; z-index: 40;
+    background: color-mix(in srgb, var(--title-2) 22%, transparent); border: 3px dashed var(--title-2);
+    font: bold 16px var(--ui-font); color: var(--heading); pointer-events: none;
+  }
+  body.dragging #drop { display: grid; }
+  #drop span { padding: 12px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 16px #0004; }
   .fontpop { width: 330px; }
   .fontpop .fonts { height: 176px; overflow-y: auto; border: 1px solid var(--line); background: var(--field); margin-bottom: 8px; }
   .fontpop .fonts .grp { padding: 3px 6px; font-weight: bold; color: var(--label); background: var(--bar-bg); position: sticky; top: 0; }
@@ -130,12 +155,14 @@
       <div class="compose-tools">
         <button class="tool-btn" id="btn-font" data-i18n-title="chat.fontTitle"><span class="ico" style="font:bold 15px Georgia,serif">A</span><span data-i18n="chat.font"></span></button>
         <button class="tool-btn" id="btn-emo" data-i18n-title="chat.emoTitle"><span class="ico">😊</span></button>
+        <button class="tool-btn" id="btn-file" data-i18n-title="file.sendTitle"><span class="ico">📎</span><span data-i18n="file.send"></span></button>
         <button class="tool-btn" id="btn-nudge" data-i18n-title="chat.nudgeTitle">
           <svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-10 2 4h3" fill="none" stroke="#d04020" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><span data-i18n="chat.nudge"></span>
         </button>
         <span class="spacer"></span>
         <span id="hint" data-i18n="chat.hint"></span>
       </div>
+      <div id="tray"></div>
       <div class="compose">
         <textarea id="input" data-i18n-ph="chat.placeholder"></textarea>
         <div class="btns">
@@ -151,6 +178,7 @@
   </div>
 
   <div class="statusbar" id="status"></div>
+  <div id="drop"><span id="drop-text"></span></div>
 
   <script src="i18n.js"></script>
   <script src="models.js"></script>

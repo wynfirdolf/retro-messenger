@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen, nativeTheme } 
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const crypto = require('crypto');
 const store = require('./src/store');
 const { ClaudeSession, resolveEnvironment, describeTool } = require('./src/claude-session');
 const history = require('./src/history');
@@ -52,9 +53,46 @@ function makeWindow(opts) {
 function lastSnippet(chat) {
   for (let i = chat.messages.length - 1; i >= 0; i--) {
     const m = chat.messages[i];
-    if (m.from === 'claude' || m.from === 'me') return m.text.replace(/[`*#]/g, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (m.from !== 'claude' && m.from !== 'me') continue;
+    const text = m.text.replace(/[`*#]/g, '').replace(/\s+/g, ' ').trim();
+    if (text) return text.slice(0, 80);
+    if (m.files?.length) return '📎 ' + m.files.map((f) => f.name).join(', ').slice(0, 78);
   }
   return '';
+}
+
+// ---------- Dosya ekleri ----------
+
+const IMAGE_TYPES = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+const MAX_INLINE_IMAGE = 5 * 1024 * 1024; // bigger images go to Claude as a path instead
+const MAX_FILES = 10;
+const attachmentsDir = () => path.join(app.getPath('userData'), 'attachments');
+
+function describeFile(p) {
+  try {
+    const st = fs.statSync(p);
+    const mime = IMAGE_TYPES[path.extname(p).toLowerCase()] || null;
+    return { path: p, name: path.basename(p), size: st.size, kind: st.isDirectory() ? 'folder' : mime ? 'image' : 'file', mime };
+  } catch {
+    return null;
+  }
+}
+
+// Images small enough are sent inline so Claude sees them right away; everything is also listed by path.
+function buildContent(text, files) {
+  if (!files.length) return text;
+  const blocks = [];
+  const inline = new Set();
+  for (const f of files) {
+    if (f.kind === 'image' && f.size <= MAX_INLINE_IMAGE) {
+      blocks.push({ type: 'image', source: { type: 'base64', media_type: f.mime, data: fs.readFileSync(f.path).toString('base64') } });
+      inline.add(f.path);
+    }
+  }
+  const note = (f) => (f.kind === 'folder' ? ' (folder)' : inline.has(f.path) ? ' (image, already included above; no need to open it)' : '');
+  const list = files.map((f) => `- ${f.path}${note(f)}`).join('\n');
+  blocks.push({ type: 'text', text: `${text}${text ? '\n\n' : ''}[Attached ${files.length === 1 ? 'file' : 'files'}]\n${list}` });
+  return blocks;
 }
 
 function snapshot() {
@@ -312,13 +350,13 @@ function askForAttention(chat, req) {
   showToast(chat, `🔐 ${t('ask.toast', { what: req.summary })}`);
 }
 
-function sendToClaude(id, text) {
+function sendToClaude(id, content) {
   const chat = store.getChat(id);
   if (!chat || busy.has(id)) return false;
   busy.add(id);
   userDenied.delete(id);
   sendToChat(id, 'busy', true);
-  if (!getSession(chat).send(text)) {
+  if (!getSession(chat).send(content)) {
     busy.delete(id);
     sendToChat(id, 'busy', false);
   }
@@ -465,10 +503,45 @@ function cleanStyle(s) {
   return Object.keys(out).length ? out : undefined;
 }
 
-ipcMain.handle('chat:send', (_e, id, text, style) => {
+ipcMain.handle('chat:send', (_e, id, text, style, filePaths) => {
   if (busy.has(id)) return false;
-  addAndShow(id, { from: 'me', text, style: cleanStyle(style) });
-  return sendToClaude(id, text);
+  const files = (Array.isArray(filePaths) ? filePaths : [])
+    .filter((p) => typeof p === 'string' && path.isAbsolute(p))
+    .slice(0, MAX_FILES)
+    .map(describeFile)
+    .filter(Boolean);
+  if (!text && !files.length) return false;
+  addAndShow(id, { from: 'me', text, style: cleanStyle(style), files: files.length ? files.map(({ mime, ...f }) => f) : undefined });
+  return sendToClaude(id, buildContent(text, files));
+});
+
+ipcMain.handle('file:pick', async (e) => {
+  const r = await dialog.showOpenDialog(BrowserWindow.fromWebContents(e.sender), {
+    title: t('file.pick'),
+    buttonLabel: t('file.send'),
+    properties: ['openFile', 'multiSelections'],
+  });
+  return r.canceled ? [] : r.filePaths.map(describeFile).filter(Boolean);
+});
+
+ipcMain.handle('file:describe', (_e, paths) => (Array.isArray(paths) ? paths : []).map(describeFile).filter(Boolean));
+
+// A pasted image (e.g. a screenshot) has no file yet: save it so it can be sent and shown later.
+ipcMain.handle('file:save-pasted', (_e, name, bytes) => {
+  if (!(bytes instanceof Uint8Array) || bytes.length > 25 * 1024 * 1024) return null;
+  const ext = path.extname(String(name || '')).toLowerCase();
+  const safeExt = IMAGE_TYPES[ext] ? ext : '.png';
+  fs.mkdirSync(attachmentsDir(), { recursive: true });
+  const d = new Date();
+  const two = (n) => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())} ${two(d.getHours())}.${two(d.getMinutes())}.${two(d.getSeconds())}`;
+  const p = path.join(attachmentsDir(), `Screenshot ${stamp} ${crypto.randomUUID().slice(0, 4)}${safeExt}`);
+  fs.writeFileSync(p, bytes);
+  return describeFile(p);
+});
+
+ipcMain.handle('file:open', (_e, p) => {
+  if (typeof p === 'string' && path.isAbsolute(p) && fs.existsSync(p)) shell.openPath(p);
 });
 
 ipcMain.handle('chat:stop', (_e, id) => {

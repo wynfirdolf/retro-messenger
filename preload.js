@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('rm', {
   platform: process.platform,
@@ -14,7 +14,13 @@ contextBridge.exposeInMainWorld('rm', {
   openImport: () => ipcRenderer.invoke('history:open'),
   listSessions: () => ipcRenderer.invoke('history:list'),
   importSession: (sessionId) => ipcRenderer.invoke('history:import', sessionId),
-  send: (id, text, style) => ipcRenderer.invoke('chat:send', id, text, style),
+  send: (id, text, style, files) => ipcRenderer.invoke('chat:send', id, text, style, files),
+  pickFiles: () => ipcRenderer.invoke('file:pick'),
+  describeFiles: (paths) => ipcRenderer.invoke('file:describe', paths),
+  savePasted: (name, bytes) => ipcRenderer.invoke('file:save-pasted', name, bytes),
+  openFile: (p) => ipcRenderer.invoke('file:open', p),
+  // Dropped and pasted File objects only reveal their path through webUtils.
+  pathForFile: (file) => { try { return webUtils.getPathForFile(file) || ''; } catch { return ''; } },
   stop: (id) => ipcRenderer.invoke('chat:stop', id),
   nudge: (id) => ipcRenderer.invoke('chat:nudge', id),
   answerPermission: (id, requestId, decision) => ipcRenderer.invoke('perm:answer', id, requestId, decision),
