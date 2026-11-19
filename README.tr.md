@@ -30,6 +30,8 @@ Retro Messenger, [Claude Code](https://code.claude.com)'u 2000'lerin anlık mesa
 
 Bilgisayarınızda kurulu olan `claude` komutunu çalıştırır. Bu yüzden aboneliğiniz, ayarlarınız, eklentileriniz ve MCP sunucularınız olduğu gibi kullanılır. Claude dosyalarınızı okur, düzenler ve komut çalıştırır; siz de ona eski arkadaşlarınıza yazar gibi yazarsınız.
 
+> 💡 Bu proje, Claude Code'u ilk kez Messenger tarzı bir sohbet penceresine taşıyan Mac uygulaması **[CMSN](https://cmsn.app)**'den ilham aldı. Ayrıntılar için [Teşekkürler](#teşekkürler) bölümüne bakın.
+
 ## Özellikler
 
 <table>
@@ -158,6 +160,12 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 - [ ] Sohbet geçmişini dışa aktarma
 
 Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gönderebilirsiniz.
+
+## Teşekkürler
+
+Fikir, Claude Code'u 2000'lerin başındaki Messenger tarzı bir pencerede çalıştıran Mac uygulaması **[CMSN](https://cmsn.app)**'den geliyor. Bu fikrin özenle yapılmış, yerel bir sürümünü istiyorsanız CMSN'e göz atın ve yapımcısını destekleyin. 💙
+
+Retro Messenger sıfırdan yazılmış ayrı ve açık kaynaklı bir projedir. CMSN ile ortak kodu, görseli veya sesi yoktur.
 
 ## Yasal not
 

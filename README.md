@@ -30,6 +30,8 @@ Retro Messenger is a desktop app for using [Claude Code](https://code.claude.com
 
 It runs the `claude` command already installed on your computer, so your subscription, settings, plugins and MCP servers all work as usual. Claude reads and edits your files and runs commands. You just write to it the way you used to write to your friends.
 
+> 💡 This project was inspired by **[CMSN](https://cmsn.app)**, the Mac app that first put Claude Code in a Messenger-style chat window. See [Credits](#credits).
+
 ## Features
 
 <table>
@@ -158,6 +160,12 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 - [ ] Export chat history
 
 Contributions are welcome. Open an issue or send a pull request.
+
+## Credits
+
+The idea comes from **[CMSN](https://cmsn.app)**, a Mac app that runs Claude Code inside an early-2000s Messenger-style window. If you'd like a polished, native version of this idea, check out CMSN and support its creator. 💙
+
+Retro Messenger is a separate, open-source project written from scratch. It shares no code, artwork or sounds with CMSN.
 
 ## Legal
 
