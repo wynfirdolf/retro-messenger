@@ -104,7 +104,8 @@ function contactHtml(c) {
     return `<div class="${cls}" data-id="${c.id}">${contactIcon(c)}<input type="text" class="rename" value="${esc(c.name)}" maxlength="60"></div>`;
   }
   const sub = c.waiting ? t('list.waiting') : c.busy ? t('list.typing') : c.last ? `- ${c.last}` : `- ${c.cwd}`;
-  return `<div class="${cls}" data-id="${c.id}" title="${esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span><span class="cm">${esc(sub)}</span></div>`;
+  const badge = c.provider === 'codex' ? `<span class="prov codex">${esc(t('prov.codex'))}</span>` : '';
+  return `<div class="${cls}" data-id="${c.id}" title="${esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span>${badge}<span class="cm">${esc(sub)}</span></div>`;
 }
 
 function renderGroups() {
@@ -193,9 +194,9 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && selected) rm.openChat(selected);
 });
 
+// Main shows a Claude / ChatGPT menu when both are installed, then asks for the folder.
 async function newChat() {
-  const cwd = await rm.pickFolder();
-  if (cwd) await rm.createChat({ cwd });
+  await rm.newChat();
 }
 $('#add').onclick = newChat;
 $('#new-chat').onclick = newChat;

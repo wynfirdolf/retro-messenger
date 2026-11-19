@@ -5,6 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const store = require('./src/store');
 const { ClaudeSession, resolveEnvironment, describeTool } = require('./src/claude-session');
+const { CodexSession, findCodex, listModels: codexModels } = require('./src/codex-session');
 const history = require('./src/history');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
@@ -79,13 +80,16 @@ function describeFile(p) {
 }
 
 // Images small enough are sent inline so Claude sees them right away; everything is also listed by path.
-function buildContent(text, files) {
+// Claude gets images as base64 blocks; Codex gets them as -i file paths.
+function buildContent(text, files, provider = 'claude') {
   if (!files.length) return text;
   const blocks = [];
   const inline = new Set();
   for (const f of files) {
     if (f.kind === 'image' && f.size <= MAX_INLINE_IMAGE) {
-      blocks.push({ type: 'image', source: { type: 'base64', media_type: f.mime, data: fs.readFileSync(f.path).toString('base64') } });
+      blocks.push(provider === 'codex'
+        ? { type: 'image', path: f.path }
+        : { type: 'image', source: { type: 'base64', media_type: f.mime, data: fs.readFileSync(f.path).toString('base64') } });
       inline.add(f.path);
     }
   }
@@ -99,12 +103,14 @@ function snapshot() {
   return {
     profile: store.profile(),
     claudePath: env.claudePath && env.claudePath.replace(os.homedir(), '~'),
+    providers: { claude: !!env.claudePath, codex: !!env.codexPath },
     rateLimit,
     chats: store.chats().map((c) => ({
       id: c.id,
       name: c.name,
       cwd: c.cwd,
       avatar: c.avatar,
+      provider: c.provider || 'claude',
       pinned: c.pinned,
       updatedAt: c.updatedAt,
       busy: busy.has(c.id),
@@ -236,18 +242,19 @@ function shake(win) {
 
 // ---------- Claude oturumları ----------
 
+function codexEfforts(model) {
+  const list = codexModels();
+  const m = list.find((x) => x.id === model) || list[0];
+  return m ? m.efforts : [];
+}
+
 function getSession(chat) {
   let s = sessions.get(chat.id);
   if (s) return s;
-  s = new ClaudeSession({
-    env,
-    cwd: chat.cwd,
-    sessionId: chat.sessionId,
-    model: chat.model,
-    effort: MODELS.efforts(chat.model).includes(chat.effort) ? chat.effort : '',
-    permissionMode: chat.permissionMode,
-    t,
-  });
+  const common = { env, cwd: chat.cwd, sessionId: chat.sessionId, model: chat.model, permissionMode: chat.permissionMode, t };
+  s = chat.provider === 'codex'
+    ? new CodexSession({ ...common, codexPath: env.codexPath, effort: codexEfforts(chat.model).includes(chat.effort) ? chat.effort : '' })
+    : new ClaudeSession({ ...common, effort: MODELS.efforts(chat.model).includes(chat.effort) ? chat.effort : '' });
   s.on('event', (ev) => handleEvent(chat.id, ev));
   sessions.set(chat.id, s);
   return s;
@@ -393,14 +400,36 @@ ipcMain.handle('folder:pick', async (e) => {
   return r.canceled ? null : r.filePaths[0];
 });
 
-ipcMain.handle('chat:create', (_e, { cwd, name, avatar }) => {
-  const chat = store.createChat({ cwd, name: name || path.basename(cwd), avatar });
+ipcMain.handle('chat:create', (_e, { cwd, name, avatar, provider }) => {
+  const p = provider === 'codex' ? 'codex' : 'claude';
+  const chat = store.createChat({ cwd, name: name || path.basename(cwd), avatar, provider: p });
   pushState();
   openChat(chat.id);
   return chat.id;
 });
 
+// "New chat": pick who to talk to (when more than one is installed), then a folder.
+ipcMain.handle('chat:new', async (e) => {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  const pickFolderAndCreate = async (provider) => {
+    const r = await dialog.showOpenDialog(win, { title: t('dlg.pickFolder'), buttonLabel: t('dlg.choose'), properties: ['openDirectory', 'createDirectory'] });
+    if (r.canceled) return;
+    const cwd = r.filePaths[0];
+    const chat = store.createChat({ cwd, name: path.basename(cwd), provider });
+    pushState();
+    openChat(chat.id);
+  };
+  if (!env.codexPath) return pickFolderAndCreate('claude');
+  Menu.buildFromTemplate([
+    { label: t('list.newClaude'), enabled: !!env.claudePath, click: () => pickFolderAndCreate('claude') },
+    { label: t('list.newCodex'), click: () => pickFolderAndCreate('codex') },
+  ]).popup({ window: win });
+});
+
+ipcMain.handle('codex:models', () => codexModels());
+
 ipcMain.handle('chat:get', (_e, id) => ({
+  codexModels: store.getChat(id)?.provider === 'codex' ? codexModels() : [],
   chat: store.getChat(id),
   busy: busy.has(id),
   profile: store.profile(),
@@ -512,7 +541,7 @@ ipcMain.handle('chat:send', (_e, id, text, style, filePaths) => {
     .filter(Boolean);
   if (!text && !files.length) return false;
   addAndShow(id, { from: 'me', text, style: cleanStyle(style), files: files.length ? files.map(({ mime, ...f }) => f) : undefined });
-  return sendToClaude(id, buildContent(text, files));
+  return sendToClaude(id, buildContent(text, files, store.getChat(id)?.provider));
 });
 
 ipcMain.handle('file:pick', async (e) => {
@@ -538,6 +567,10 @@ ipcMain.handle('file:save-pasted', (_e, name, bytes) => {
   const p = path.join(attachmentsDir(), `Screenshot ${stamp} ${crypto.randomUUID().slice(0, 4)}${safeExt}`);
   fs.writeFileSync(p, bytes);
   return describeFile(p);
+});
+
+ipcMain.handle('url:open', (_e, u) => {
+  if (typeof u === 'string' && /^https?:\/\//.test(u)) shell.openExternal(u);
 });
 
 ipcMain.handle('file:open', (_e, p) => {
@@ -608,6 +641,7 @@ app.whenReady().then(() => {
   store.load(app.getPath('userData'));
   applyTheme();
   env = resolveEnvironment();
+  env.codexPath = findCodex(env.env);
   createListWindow();
   app.on('activate', () => {
     if (!alive(listWin)) createListWindow();

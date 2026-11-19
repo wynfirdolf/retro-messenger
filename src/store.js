@@ -45,16 +45,18 @@ function updateProfile(patch) {
 const chats = () => data.chats;
 const getChat = (id) => data.chats.find((c) => c.id === id) || null;
 
-function createChat({ name, cwd, avatar }) {
+function createChat({ name, cwd, avatar, provider = 'claude' }) {
+  const codex = provider === 'codex';
   const chat = {
     id: crypto.randomUUID(),
+    provider,
     name,
     cwd,
-    avatar: avatar || '🤖',
+    avatar: avatar || (codex ? '🧠' : '🤖'),
     sessionId: null,
     model: '',
     effort: '',
-    permissionMode: 'acceptEdits',
+    permissionMode: codex ? 'workspace-write' : 'acceptEdits',
     pinned: false,
     createdAt: Date.now(),
     updatedAt: Date.now(),

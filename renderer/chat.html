@@ -22,6 +22,8 @@
   .to { flex: none; padding: 5px 10px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .to b { color: var(--ink); }
   .to .path { color: var(--muted); }
+  .prov-tag { font-size: 9px; font-weight: bold; padding: 1px 5px; border-radius: 6px; color: #fff; background: #d97757; vertical-align: 1px; }
+  .prov-tag.codex { background: #10a37f; }
 
   .frame { flex: 1; min-height: 0; display: flex; gap: 8px; padding: 0 8px 8px; }
   .convo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -138,16 +140,11 @@
       <select id="effort"></select>
     </label>
     <label data-i18n-title="chat.permTitle"><span data-i18n="chat.perm"></span>
-      <select id="perm">
-        <option value="manual" data-i18n="perm.manual"></option>
-        <option value="plan" data-i18n="perm.plan"></option>
-        <option value="acceptEdits" data-i18n="perm.acceptEdits"></option>
-        <option value="bypassPermissions" data-i18n="perm.bypassPermissions"></option>
-      </select>
+      <select id="perm"></select>
     </label>
   </div>
 
-  <div class="to"><span data-i18n="chat.to"></span> <b id="to-name"></b> <span class="path">&lt;<span id="to-cwd"></span>&gt;</span></div>
+  <div class="to"><span data-i18n="chat.to"></span> <b id="to-name"></b> <span class="prov-tag" id="to-prov"></span> <span class="path">&lt;<span id="to-cwd"></span>&gt;</span></div>
 
   <div class="frame">
     <div class="convo">

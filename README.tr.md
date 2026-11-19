@@ -4,10 +4,10 @@
 
 # Retro Messenger
 
-**Claude Code ile, 2004'teymişiz gibi sohbet edin.**
+**Claude Code ve ChatGPT ile, 2004'teymişiz gibi sohbet edin.**
 
 Kişi listesi, görünen resimler, ifadeler, titreşim ve "… diyor ki:" iletileri.<br>
-Her sohbet, bilgisayarınızda çalışan gerçek bir Claude Code oturumu.
+Her sohbet, bilgisayarınızda çalışan gerçek bir Claude Code ya da ChatGPT (Codex) oturumu.
 
 [![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20(yak%C4%B1nda)-lightgrey)
@@ -92,6 +92,11 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </tr>
 </table>
 
+### 🤖 Claude ve ChatGPT
+**Yeni sohbet başlat**'a tıklayıp **Claude Code** ya da **ChatGPT (Codex)** seçin. ChatGPT sohbetleri, ChatGPT uygulamasıyla gelen Codex CLI'ı (ya da PATH'teki Codex'i) ve Mac'inizde zaten giriş yapılmış ChatGPT hesabını kullanır; Retro Messenger'da giriş yapmanız gerekmez. Modeli hesabınızdaki listeden (GPT-6.2-Sol, Astra…), düşünme eforunu ve ne kadar yetkisi olacağını (yalnızca okuma, proje klasörünü düzenleme ya da tam yetki) seçersiniz. ChatGPT sohbetleri kişi listesinde yeşil bir etiketle görünür.
+
+<img src="docs/tr/chatgpt.png" alt="Bir ChatGPT sohbeti" width="70%">
+
 ### 📎 Dosya ve resim gönderme
 **📎 Dosya gönder** düğmesine tıklayın, dosyaları sohbete sürükleyin ya da ⌘V ile yapıştırın (ekran görüntüleri dahil). Dosyalar, siz Gönder'e basana kadar mesaj kutusunun üstündeki tepside bekler. Claude resimleri açmasına gerek kalmadan hemen görür. Diğer dosya ve klasörlerin yolunu alır ve onları kendisi açar; proje klasörünün dışındaysa önce bir izin kartı çıkar. Geçmişte resimler küçük resim, dosyalar kart olarak görünür; tıklayınca açılırlar.
 
@@ -138,7 +143,9 @@ Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomati
    xattr -dr com.apple.quarantine "/Applications/Retro Messenger.app"
    ```
 
-**Gereksinim:** [Claude Code](https://code.claude.com) kurulu olmalı ve terminalde en az bir kez `claude` çalıştırılarak oturum açılmış olmalı.
+**Gereksinim:** aşağıdakilerden en az biri kurulu ve giriş yapılmış olmalı:
+- [Claude Code](https://code.claude.com): terminalde bir kez `claude` çalıştırın.
+- [ChatGPT uygulaması](https://chatgpt.com/download) (Codex içinde gelir) ya da [Codex CLI](https://github.com/openai/codex): bir kez giriş yapın.
 
 ### Kaynaktan çalıştırma
 
@@ -174,6 +181,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 | Dosya | Görev |
 | --- | --- |
 | `main.js` | Pencereler, IPC, bildirimler, Dock rozeti, titreşim |
+| `src/codex-session.js` | ChatGPT sohbetleri için `codex exec --json` çalıştırır ve olaylarını aynı biçime çevirir |
 | `src/claude-session.js` | `claude` sürecini yönetir ve akan olayları sadeleştirir |
 | `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
 | `src/history.js` | Claude Code'un kaydettiği konuşmaları (`~/.claude/projects`) içe aktarmak için okur |
@@ -187,6 +195,8 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 
 ## Bilinen sınırlar
 
+- ChatGPT (Codex) sohbetleri izin sormak yerine bir korumalı alanda çalışır; yanıtlar akarak değil, bütün olarak gelir.
+- Google Antigravity desteklenmiyor: Antigravity uygulamasının dışında çalışan bir komut satırı aracı yok.
 - Windows sürümü aynı kodla çalışacak şekilde yazıldı ama henüz test edilmedi.
 - Hazır sürüm şimdilik yalnızca Apple Silicon Mac'ler içindir.
 

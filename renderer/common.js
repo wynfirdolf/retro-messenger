@@ -106,6 +106,10 @@ function fmt(text) {
       if (i < parts.length - 1) p = p.replace(/\n$/, '');
       return esc(p)
         .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+        // [label](target): local paths open the file, web links open in the browser
+        .replace(/\[([^\]\n]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)/g, (m, label, target) => (/^https?:/.test(target)
+          ? `<a class="link" data-url="${target}" title="${target}">${label}</a>`
+          : `<a class="link" data-open="${target.replace(/#L?\d+.*$/, '')}" title="${target}">${label}</a>`))
         .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
         .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/g, '$1<i>$2</i>')
         .replace(/^#{1,6} (.+)$/gm, '<b>$1</b>')

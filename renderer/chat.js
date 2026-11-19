@@ -57,7 +57,8 @@ function renderMessage(m) {
 function renderAll() {
   lastDay = '';
   const readOnly = ['default', 'manual', 'plan'].includes(chat.permissionMode);
-  const welcome = esc(t(readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit', { cwd: '\u0000' })).replace('\u0000', `<b>${esc(chat.cwd)}</b>`);
+  const key = isCodex() ? 'chat.welcomeCodex' : readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit';
+  const welcome = esc(t(key, { cwd: '\u0000' })).replace('\u0000', `<b>${esc(chat.cwd)}</b>`);
   history.innerHTML = `<div class="welcome">${welcome}</div>`;
   for (const m of chat.messages) history.appendChild(renderMessage(m));
   scrollDown(true);
@@ -67,8 +68,9 @@ function renderChrome() {
   setTitle(t('chat.title', { name: chat.name }));
   $('#to-name').textContent = chat.name;
   $('#to-cwd').textContent = chat.cwd;
+  $('#to-prov').textContent = t(isCodex() ? 'prov.codex' : 'prov.claude');
+  $('#to-prov').className = `prov-tag${isCodex() ? ' codex' : ''}`;
   renderModelPickers();
-  $('#perm').value = chat.permissionMode === 'default' ? 'manual' : chat.permissionMode || 'acceptEdits';
   $('#dp-claude').innerHTML = avatarHtml(chat.avatar, 'xl', busy ? 'busy-ring' : '');
   $('#lbl-claude').textContent = chat.name;
   $('#dp-me').innerHTML = avatarHtml(profile.avatar, 'xl');
@@ -85,7 +87,7 @@ function renderStatus() {
     const last = [...chat.messages].reverse().find((m) => m.from === 'claude');
     s.textContent = last
       ? t('chat.lastReceived', { date: new Date(last.ts).toLocaleString(LOCALE, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) })
-      : t('chat.startHint');
+      : t(isCodex() ? 'chat.startHintCodex' : 'chat.startHint');
   }
   $('#send').disabled = busy;
   $('#stop').disabled = !busy;
@@ -150,6 +152,8 @@ $('#tray').addEventListener('click', (e) => {
 });
 $('#btn-file').onclick = async () => addAttachments(await rm.pickFiles());
 history.addEventListener('click', (e) => {
+  const url = e.target.closest('[data-url]');
+  if (url) return rm.openUrl(url.dataset.url);
   const el = e.target.closest('[data-open]');
   if (el) rm.openFile(el.dataset.open);
 });
@@ -355,7 +359,41 @@ $('#btn-font').onclick = (e) => {
 
 // ---------- Model, sürüm ve efor ----------
 
+const isCodex = () => chat.provider === 'codex';
+let codexModels = [];
+
+const PERM_OPTIONS = {
+  claude: ['manual', 'plan', 'acceptEdits', 'bypassPermissions'].map((v) => [v, `perm.${v}`]),
+  codex: ['read-only', 'workspace-write', 'danger-full-access'].map((v) => [v, `sandbox.${v}`]),
+};
+
+function renderPermPicker() {
+  const opts = PERM_OPTIONS[isCodex() ? 'codex' : 'claude'];
+  $('#perm').innerHTML = opts.map(([v, k]) => `<option value="${v}">${esc(t(k))}</option>`).join('');
+  const current = chat.permissionMode === 'default' ? 'manual' : chat.permissionMode;
+  $('#perm').value = opts.some(([v]) => v === current) ? current : opts[isCodex() ? 1 : 2][0];
+}
+
+// ChatGPT: one list of the models the signed-in account can use, with their own effort levels.
+function renderCodexPickers() {
+  $('#family').style.display = 'none';
+  $('#version').style.display = '';
+  $('#version').innerHTML = `<option value="">${esc(t('chat.modelDefault'))}</option>`
+    + codexModels.map((m) => `<option value="${esc(m.id)}">${esc(m.label)}</option>`).join('');
+  $('#version').value = codexModels.some((m) => m.id === chat.model) ? chat.model : '';
+  const model = codexModels.find((m) => m.id === chat.model) || codexModels[0];
+  const allowed = model ? model.efforts : [];
+  const effortSel = $('#effort');
+  effortSel.disabled = allowed.length === 0;
+  effortSel.innerHTML = `<option value="">${esc(t('effort.default'))}</option>`
+    + allowed.map((e) => `<option value="${e}">${esc(t(`effort.${e}`))}</option>`).join('');
+  effortSel.value = allowed.includes(chat.effort) ? chat.effort : '';
+}
+
 function renderModelPickers() {
+  renderPermPicker();
+  if (isCodex()) return renderCodexPickers();
+  $('#family').style.display = '';
   const { family, version } = MODELS.parse(chat.model);
   $('#family').innerHTML =
     `<option value="">${esc(t('chat.modelDefault'))}</option>` +
@@ -381,7 +419,7 @@ function renderModelPickers() {
 }
 
 $('#family').onchange = (e) => rm.updateChat(id, { model: e.target.value });
-$('#version').onchange = (e) => rm.updateChat(id, { model: e.target.value || $('#family').value });
+$('#version').onchange = (e) => rm.updateChat(id, { model: e.target.value || (isCodex() ? '' : $('#family').value) });
 $('#effort').onchange = (e) => rm.updateChat(id, { effort: e.target.value });
 $('#perm').onchange = (e) => rm.updateChat(id, { permissionMode: e.target.value });
 $('#btn-emo').onclick = (e) => {
@@ -460,6 +498,7 @@ rm.on('shake', () => {
   chat = res.chat;
   profile = res.profile;
   busy = res.busy;
+  codexModels = res.codexModels || [];
   if (!chat) return window.close();
   renderChrome();
   renderAll();

@@ -4,10 +4,10 @@
 
 # Retro Messenger
 
-**Chat with Claude Code like it's 2004.**
+**Chat with Claude Code and ChatGPT like it's 2004.**
 
 Contact list, display pictures, emoticons, nudges and "… says:" messages.<br>
-Every conversation is a real Claude Code session running on your machine.
+Every conversation is a real Claude Code or ChatGPT (Codex) session running on your machine.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20(soon)-lightgrey)
@@ -92,6 +92,11 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </tr>
 </table>
 
+### 🤖 Claude and ChatGPT
+Click **Start a new chat** and choose **Claude Code** or **ChatGPT (Codex)**. ChatGPT chats use the Codex CLI that comes with the ChatGPT app (or one on your PATH) and the ChatGPT account already signed in on your Mac, so there's no login in Retro Messenger. You pick the model from your account's list (GPT-6.2-Sol, Astra…), the reasoning effort, and how much it may touch: read only, edit the project folder, or full access. ChatGPT chats get a green badge in your contact list.
+
+<img src="docs/chatgpt.png" alt="A ChatGPT chat" width="70%">
+
 ### 📎 Send files and images
 Click **📎 Send files**, drag files onto the conversation, or paste with ⌘V (screenshots too). They wait in a tray above the message box until you hit Send. Claude sees images right away, without opening them. For other files and folders it gets the path and opens them itself; if they're outside the project folder, you'll get a permission card first. In the history, images show as thumbnails and files as chips; click one to open it.
 
@@ -138,7 +143,9 @@ For late-night coding. Choose **Automatic** (follows your system), **Light** or 
    xattr -dr com.apple.quarantine "/Applications/Retro Messenger.app"
    ```
 
-**Requirement:** [Claude Code](https://code.claude.com) installed and signed in. Run `claude` in the terminal at least once.
+**Requirement:** at least one of these, installed and signed in:
+- [Claude Code](https://code.claude.com): run `claude` in the terminal once.
+- The [ChatGPT app](https://chatgpt.com/download) (it includes Codex) or the [Codex CLI](https://github.com/openai/codex): sign in once.
 
 ### Run from source
 
@@ -175,6 +182,7 @@ Each chat runs a `claude -p --input-format stream-json --output-format stream-js
 | --- | --- |
 | `main.js` | Windows, IPC, notifications, Dock badge, nudge |
 | `src/claude-session.js` | Runs the `claude` process and simplifies its event stream |
+| `src/codex-session.js` | Runs `codex exec --json` for ChatGPT chats and maps its events to the same shape |
 | `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
 | `src/history.js` | Reads Claude Code's saved conversations (`~/.claude/projects`) so they can be imported |
 | `renderer/i18n.js` | English and Turkish strings |
@@ -187,6 +195,8 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 
 ## Known limitations
 
+- ChatGPT (Codex) chats run in a sandbox instead of asking for permission, and replies arrive whole rather than streaming.
+- Google Antigravity isn't supported: it has no command-line tool that works outside the Antigravity app.
 - The Windows build uses the same code but hasn't been tested yet.
 - The prebuilt release is for Apple Silicon Macs only for now.
 

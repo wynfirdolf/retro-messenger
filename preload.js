@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('rm', {
   updateProfile: (patch) => ipcRenderer.invoke('profile:update', patch),
   pickFolder: () => ipcRenderer.invoke('folder:pick'),
   createChat: (opts) => ipcRenderer.invoke('chat:create', opts),
+  newChat: () => ipcRenderer.invoke('chat:new'),
   getChat: (id) => ipcRenderer.invoke('chat:get', id),
   updateChat: (id, patch) => ipcRenderer.invoke('chat:update', id, patch),
   deleteChat: (id) => ipcRenderer.invoke('chat:delete', id),
@@ -19,6 +20,7 @@ contextBridge.exposeInMainWorld('rm', {
   describeFiles: (paths) => ipcRenderer.invoke('file:describe', paths),
   savePasted: (name, bytes) => ipcRenderer.invoke('file:save-pasted', name, bytes),
   openFile: (p) => ipcRenderer.invoke('file:open', p),
+  openUrl: (u) => ipcRenderer.invoke('url:open', u),
   // Dropped and pasted File objects only reveal their path through webUtils.
   pathForFile: (file) => { try { return webUtils.getPathForFile(file) || ''; } catch { return ''; } },
   stop: (id) => ipcRenderer.invoke('chat:stop', id),
