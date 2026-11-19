@@ -58,43 +58,49 @@
   .bottom { flex: none; padding: 7px 10px; border-top: 1px solid #c5d3e8; background: linear-gradient(180deg, #f7faff, #e3ecf8); display: flex; flex-direction: column; gap: 6px; }
   .tip { display: flex; gap: 8px; align-items: center; padding: 6px 8px; min-height: 44px; border: 1px solid #c9b979; background: linear-gradient(180deg, #fffdf0, #fff3c4); color: #5b4a10; }
   .tip b { color: #7a5600; }
+  .bottom-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .lang-pick { display: inline-flex; align-items: center; gap: 3px; color: #555; }
+  .lang-pick select { border: 1px solid transparent; background: transparent; padding: 0 2px; color: #0b4bb5; field-sizing: content; }
+  .lang-pick select:hover { border-color: var(--line); background: #fff; }
 </style>
 </head>
 <body>
   <div class="titlebar"><span class="tb-icon"></span><span class="tb-title">Retro Messenger</span>
-    <div class="tb-btns"><button data-win="min" title="Simge durumuna küçült">_</button><button data-win="max" title="Ekranı kapla">□</button><button data-win="close" title="Kapat">×</button></div>
+    <div class="tb-btns"><button data-win="min">_</button><button data-win="max">□</button><button data-win="close">×</button></div>
   </div>
 
   <section id="signin">
-    <div class="brand"><span id="si-logo"></span><div>Retro Messenger<small>Claude Code ile sohbet, eski usul</small></div></div>
-    <span id="si-avatar" title="Resminizi değiştirin" style="cursor:pointer"></span>
-    <button class="link" id="si-avatar-btn">Görünen resmi değiştir</button>
-    <div class="field"><label for="si-name">Görünen ad:</label><input type="text" id="si-name" maxlength="40" placeholder="örn. Yiğit ~ kodluyor"></div>
-    <div class="field"><label for="si-status">Durum:</label>
-      <select id="si-status"><option value="online">Çevrimiçi</option><option value="busy">Meşgul</option><option value="away">Dışarıda</option><option value="hidden">Çevrimdışı görün</option></select>
+    <div class="brand"><span id="si-logo"></span><div>Retro Messenger<small data-i18n="signin.tagline"></small></div></div>
+    <span id="si-avatar" data-i18n-title="signin.pictureTitle" style="cursor:pointer"></span>
+    <button class="link" id="si-avatar-btn" data-i18n="signin.changePicture"></button>
+    <div class="field"><label for="si-name" data-i18n="signin.name"></label><input type="text" id="si-name" maxlength="40" data-i18n-ph="signin.namePlaceholder"></div>
+    <div class="field"><label for="si-status" data-i18n="signin.status"></label>
+      <select id="si-status"><option value="online" data-i18n="status.online"></option><option value="busy" data-i18n="status.busy"></option><option value="away" data-i18n="status.away"></option><option value="hidden" data-i18n="status.hidden"></option></select>
     </div>
-    <button class="xp-btn" id="si-go">Oturum Aç</button>
-    <div id="si-progress"><svg class="ring" viewBox="0 0 54 54"><circle cx="27" cy="27" r="21" fill="none" stroke="#d6e4f7" stroke-width="6"/><path d="M27 6a21 21 0 0 1 21 21" fill="none" stroke="#2f7be6" stroke-width="6" stroke-linecap="round"/><path d="M27 48A21 21 0 0 1 6 27" fill="none" stroke="#4fcf3f" stroke-width="6" stroke-linecap="round"/></svg><span>Oturum açılıyor…</span></div>
+    <div class="field"><label for="si-lang" data-i18n="language"></label><select id="si-lang" class="lang-select"></select></div>
+    <button class="xp-btn" id="si-go" data-i18n="signin.go"></button>
+    <div id="si-progress"><svg class="ring" viewBox="0 0 54 54"><circle cx="27" cy="27" r="21" fill="none" stroke="#d6e4f7" stroke-width="6"/><path d="M27 6a21 21 0 0 1 21 21" fill="none" stroke="#2f7be6" stroke-width="6" stroke-linecap="round"/><path d="M27 48A21 21 0 0 1 6 27" fill="none" stroke="#4fcf3f" stroke-width="6" stroke-linecap="round"/></svg><span data-i18n="signin.progress"></span></div>
     <p class="si-note" id="si-note"></p>
   </section>
 
   <section id="main">
     <div class="me">
-      <span id="me-avatar" title="Görünen resmi değiştir"></span>
+      <span id="me-avatar" data-i18n-title="list.changePicture"></span>
       <div class="who">
-        <div class="name-row"><span id="me-name"></span><select id="me-status" title="Durumunuzu değiştirin"><option value="online">(Çevrimiçi)</option><option value="busy">(Meşgul)</option><option value="away">(Dışarıda)</option><option value="hidden">(Çevrimdışı görün)</option></select><span class="caret">▼</span></div>
-        <input type="text" id="me-personal" maxlength="80" placeholder="<Kişisel bir ileti yazın>">
+        <div class="name-row"><span id="me-name" data-i18n-title="list.signOutHint"></span><select id="me-status" data-i18n-title="list.changeStatus"></select><span class="caret">▼</span></div>
+        <input type="text" id="me-personal" maxlength="80" data-i18n-ph="list.personal">
       </div>
     </div>
-    <div class="usage" id="usage" title="Claude kullanım sınırı"><span id="usage-label">Kullanım</span><div class="bar"><div class="fill" id="usage-fill"></div></div><span id="usage-pct"></span></div>
-    <div class="searchbar"><input type="text" id="search" placeholder="Bir sohbet arayın…"><button class="xp-btn" id="add" title="Yeni sohbet başlat">+ 👤</button></div>
+    <div class="usage" id="usage"><span id="usage-label" data-i18n="list.usage"></span><div class="bar"><div class="fill" id="usage-fill"></div></div><span id="usage-pct"></span></div>
+    <div class="searchbar"><input type="text" id="search" data-i18n-ph="list.search"><button class="xp-btn" id="add" data-i18n-title="list.newChat">+ 👤</button></div>
     <div id="groups"></div>
     <div class="bottom">
-      <button class="link" id="new-chat" style="align-self:flex-start">👤 Yeni sohbet başlat</button>
+      <div class="bottom-row"><button class="link" id="new-chat">👤 <span data-i18n="list.newChat"></span></button><label class="lang-pick">🌐 <select id="lang" class="lang-select" data-i18n-title="language"></select></label></div>
       <div class="tip" id="tip"></div>
     </div>
   </section>
 
+  <script src="i18n.js"></script>
   <script src="common.js"></script>
   <script src="list.js"></script>
 </body>

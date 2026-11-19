@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('rm', {
   platform: process.platform,
+  lang: ipcRenderer.sendSync('lang'),
   getState: () => ipcRenderer.invoke('state'),
   updateProfile: (patch) => ipcRenderer.invoke('profile:update', patch),
   pickFolder: () => ipcRenderer.invoke('folder:pick'),

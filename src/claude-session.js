@@ -52,28 +52,32 @@ const short = (s, n = 80) => {
 };
 const base = (p) => (p ? path.basename(String(p)) : '');
 
-function describeTool({ name, input = {} }) {
-  switch (name) {
-    case 'Bash': return `Komut çalıştırıyor: ${short(input.command)}`;
-    case 'Read': return `Dosya okuyor: ${base(input.file_path)}`;
-    case 'Edit':
-    case 'MultiEdit': return `Dosya düzenliyor: ${base(input.file_path)}`;
-    case 'Write': return `Dosya yazıyor: ${base(input.file_path)}`;
-    case 'NotebookEdit': return `Not defteri düzenliyor: ${base(input.notebook_path)}`;
-    case 'Glob': return `Dosya arıyor: ${short(input.pattern)}`;
-    case 'Grep': return `Kodda arıyor: ${short(input.pattern)}`;
-    case 'WebFetch': return `Web sayfası okuyor: ${short(input.url)}`;
-    case 'WebSearch': return `Web'de arıyor: ${short(input.query)}`;
-    case 'Task':
-    case 'Agent': return `Yardımcı ajan başlattı: ${short(input.description || input.prompt, 60)}`;
-    case 'TodoWrite': return 'Yapılacaklar listesini güncelledi';
-    default: return `${name} aracını kullanıyor`;
-  }
+const TOOL_KEYS = {
+  Bash: ['tool.Bash', (i) => short(i.command)],
+  Read: ['tool.Read', (i) => base(i.file_path)],
+  Edit: ['tool.Edit', (i) => base(i.file_path)],
+  MultiEdit: ['tool.Edit', (i) => base(i.file_path)],
+  Write: ['tool.Write', (i) => base(i.file_path)],
+  NotebookEdit: ['tool.NotebookEdit', (i) => base(i.notebook_path)],
+  Glob: ['tool.Glob', (i) => short(i.pattern)],
+  Grep: ['tool.Grep', (i) => short(i.pattern)],
+  WebFetch: ['tool.WebFetch', (i) => short(i.url)],
+  WebSearch: ['tool.WebSearch', (i) => short(i.query)],
+  Task: ['tool.Task', (i) => short(i.description || i.prompt, 60)],
+  Agent: ['tool.Task', (i) => short(i.description || i.prompt, 60)],
+  TodoWrite: ['tool.TodoWrite', () => ''],
+};
+
+function describeTool({ name, input = {} }, t) {
+  const entry = TOOL_KEYS[name];
+  if (!entry) return t('tool.other', { x: name });
+  return t(entry[0], { x: entry[1](input || {}) });
 }
 
 class ClaudeSession extends EventEmitter {
-  constructor({ env, cwd, sessionId, model, permissionMode }) {
+  constructor({ env, cwd, sessionId, model, permissionMode, t }) {
     super();
+    this.t = t;
     this.env = env;
     this.cwd = cwd;
     this.sessionId = sessionId || null;
@@ -91,11 +95,11 @@ class ClaudeSession extends EventEmitter {
 
   start() {
     if (!this.env.claudePath) {
-      this.emitEvent({ kind: 'error', text: 'Claude Code bulunamadı. Önce Claude Code\'u kurup terminalde bir kez `claude` çalıştırın.' });
+      this.emitEvent({ kind: 'error', text: this.t('err.noClaude') });
       return false;
     }
     if (!fs.existsSync(this.cwd)) {
-      this.emitEvent({ kind: 'error', text: `Sohbetin klasörü bulunamadı: ${this.cwd}` });
+      this.emitEvent({ kind: 'error', text: this.t('err.noFolder', { cwd: this.cwd }) });
       return false;
     }
 
@@ -128,7 +132,7 @@ class ClaudeSession extends EventEmitter {
       if (this.proc !== proc) return;
       this.proc = null;
       this.busy = false;
-      this.emitEvent({ kind: 'error', text: `Claude Code başlatılamadı: ${err.message}` });
+      this.emitEvent({ kind: 'error', text: this.t('err.spawn', { msg: err.message }) });
     });
     proc.on('exit', (code) => {
       if (this.proc !== proc) return;
@@ -136,7 +140,7 @@ class ClaudeSession extends EventEmitter {
       if (this.busy) {
         this.busy = false;
         const tail = this.stderr.trim().slice(-800);
-        this.emitEvent({ kind: 'error', text: `Claude Code beklenmedik şekilde kapandı (kod ${code}).${tail ? '\n' + tail : ''}` });
+        this.emitEvent({ kind: 'error', text: this.t('err.crashed', { code }) + (tail ? '\n' + tail : '') });
       }
     });
     return true;
@@ -188,7 +192,7 @@ class ClaudeSession extends EventEmitter {
             this.emitEvent({ kind: 'text', text: b.text });
           } else if (b.type === 'tool_use') {
             this.seenBlocks.add(key);
-            this.emitEvent({ kind: 'tool', text: describeTool(b) });
+            this.emitEvent({ kind: 'tool', text: describeTool(b, this.t) });
           }
         });
         return;
@@ -211,7 +215,7 @@ class ClaudeSession extends EventEmitter {
     this.emitEvent({
       kind: 'done',
       isError: !!m.is_error,
-      errorText: m.is_error ? (errors || (typeof m.result === 'string' ? m.result : '') || 'Bir hata oluştu.') : null,
+      errorText: m.is_error ? (errors || (typeof m.result === 'string' ? m.result : '') || this.t('err.generic')) : null,
       denied: Array.isArray(m.permission_denials) ? m.permission_denials.length : 0,
     });
   }

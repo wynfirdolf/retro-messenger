@@ -1,4 +1,4 @@
-/* global rm, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle */
+/* global rm, t, LOCALE, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
 
 const id = new URLSearchParams(location.search).get('id');
 let chat = null;
@@ -17,7 +17,7 @@ function scrollDown(force) {
 }
 
 function dayLabel(ts) {
-  return new Date(ts).toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return new Date(ts).toLocaleDateString(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 function renderMessage(m) {
@@ -34,7 +34,7 @@ function renderMessage(m) {
   if (m.from === 'me' || m.from === 'claude') {
     const name = m.from === 'me' ? profile.name : chat.name;
     el.className = `msg ${m.from}`;
-    el.innerHTML = `<div class="who">${esc(name)} diyor ki: <span class="t">(${timeStr(m.ts)})</span></div><div class="text">${fmt(m.text)}</div>`;
+    el.innerHTML = `<div class="who">${esc(t('says', { name }))} <span class="t">(${timeStr(m.ts)})</span></div><div class="text">${fmt(m.text)}</div>`;
   } else {
     const icon = { tool: '⚙️', error: '⚠️', system: '•' }[m.from] || '•';
     el.className = `line ${m.from}`;
@@ -46,13 +46,15 @@ function renderMessage(m) {
 
 function renderAll() {
   lastDay = '';
-  history.innerHTML = `<div class="welcome">Bu sohbet <b>${esc(chat.cwd)}</b> klasöründe çalışan bir Claude Code oturumudur. Claude buradaki dosyaları okuyabilir${chat.permissionMode === 'default' || chat.permissionMode === 'plan' ? '' : ' ve düzenleyebilir'}.</div>`;
+  const readOnly = chat.permissionMode === 'default' || chat.permissionMode === 'plan';
+  const welcome = esc(t(readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit', { cwd: '\u0000' })).replace('\u0000', `<b>${esc(chat.cwd)}</b>`);
+  history.innerHTML = `<div class="welcome">${welcome}</div>`;
   for (const m of chat.messages) history.appendChild(renderMessage(m));
   scrollDown(true);
 }
 
 function renderChrome() {
-  setTitle(`${chat.name} - Sohbet`);
+  setTitle(t('chat.title', { name: chat.name }));
   $('#to-name').textContent = chat.name;
   $('#to-cwd').textContent = chat.cwd;
   $('#model').value = chat.model || '';
@@ -66,10 +68,12 @@ function renderChrome() {
 function renderStatus() {
   const s = $('#status');
   if (busy) {
-    s.innerHTML = `<span class="typing pulse">✏️ ${esc(chat.name)} bir ileti yazıyor…</span>`;
+    s.innerHTML = `<span class="typing pulse">${esc(t('chat.typing', { name: chat.name }))}</span>`;
   } else {
     const last = [...chat.messages].reverse().find((m) => m.from === 'claude');
-    s.textContent = last ? `Son ileti ${new Date(last.ts).toLocaleString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} tarihinde alındı.` : 'Claude ile konuşmaya başlamak için bir ileti yazın.';
+    s.textContent = last
+      ? t('chat.lastReceived', { date: new Date(last.ts).toLocaleString(LOCALE, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) })
+      : t('chat.startHint');
   }
   $('#send').disabled = busy;
   $('#stop').disabled = !busy;
@@ -108,7 +112,7 @@ $('#model').onchange = (e) => rm.updateChat(id, { model: e.target.value });
 $('#perm').onchange = (e) => rm.updateChat(id, { permissionMode: e.target.value });
 $('#btn-emo').onclick = (e) => {
   e.stopPropagation();
-  openGrid(e.currentTarget, EMOTICONS, 'İfadeler', (emo) => {
+  openGrid(e.currentTarget, EMOTICONS, t('emoticons'), (emo) => {
     const { selectionStart: a, selectionEnd: b, value } = input;
     input.value = value.slice(0, a) + emo + value.slice(b);
     input.focus();
@@ -117,7 +121,7 @@ $('#btn-emo').onclick = (e) => {
 };
 $('#dp-claude').onclick = (e) => {
   e.stopPropagation();
-  openGrid(e.currentTarget, AVATARS.map((a) => a[0]), 'Bu sohbetin resmi', (a) => rm.updateChat(id, { avatar: a }), 4);
+  openGrid(e.currentTarget, AVATARS.map((a) => a[0]), t('chatAvatar'), (a) => rm.updateChat(id, { avatar: a }), 4);
 };
 
 // ---------- Ana süreçten gelen olaylar ----------
@@ -140,7 +144,7 @@ rm.on('delta', (text) => {
   if (!live) {
     live = document.createElement('div');
     live.className = 'msg claude live';
-    live.innerHTML = `<div class="who">${esc(chat.name)} diyor ki:</div><div class="text"></div>`;
+    live.innerHTML = `<div class="who">${esc(t('says', { name: chat.name }))}</div><div class="text"></div>`;
     history.appendChild(live);
   }
   liveText += text;
@@ -170,6 +174,7 @@ rm.on('shake', () => {
 });
 
 (async () => {
+  applyI18n();
   initTitlebar();
   const res = await rm.getChat(id);
   chat = res.chat;

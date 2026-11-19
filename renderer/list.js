@@ -1,22 +1,15 @@
-/* global rm, $, $$, esc, LOGO_SVG, STATUS, buddySvg, AVATARS, avatarHtml, openGrid, Sounds, initTitlebar, applyShortcuts */
+/* global rm, t, I18N, LOCALE, $, $$, esc, LOGO_SVG, STATUS, buddySvg, AVATARS, avatarHtml, openGrid, Sounds, initTitlebar, applyShortcuts, applyI18n */
 
 let state = null;
 let selected = null;
 let renaming = null;
 const closedGroups = new Set();
 
-const TIPS = [
-  '<b>İpucu:</b> Bir sohbete çift tıklayarak açın. Sağ tıklayınca yeniden adlandırabilir veya sabitleyebilirsiniz.',
-  '<b>İpucu:</b> Claude yanıt verirken simgesi sarı yanıp söner; yanıt gelince turuncu olur.',
-  '<b>İpucu:</b> Sohbet penceresindeki titreşim düğmesi pencereyi sallar ve Claude\'un dikkatini çeker.',
-  '<b>İpucu:</b> :) (Y) &lt;3 gibi klasik ifadeler gönderirken emojiye dönüşür.',
-  '<b>İpucu:</b> Durumunuzu "Meşgul" yaparsanız sesler ve bildirimler susar.',
-  '<b>İpucu:</b> Her sohbet bir proje klasöründe çalışan gerçek bir Claude Code oturumudur.',
-];
+const TIPS = t('list.tips');
 let tipIndex = Math.floor(Math.random() * TIPS.length);
 
 function showTip() {
-  $('#tip').innerHTML = `<span style="font-size:22px">💡</span><span>${TIPS[tipIndex % TIPS.length]}</span>`;
+  $('#tip').innerHTML = `<span style="font-size:22px">💡</span><span><b>${t('list.tipLabel')}</b> ${TIPS[tipIndex % TIPS.length]}</span>`;
   tipIndex++;
 }
 
@@ -35,16 +28,16 @@ function renderSignin() {
   const note = $('#si-note');
   if (state.claudePath) {
     note.className = 'si-note';
-    note.textContent = `Claude Code bulundu: ${state.claudePath}`;
+    note.textContent = t('signin.claudeFound', { path: state.claudePath });
   } else {
     note.className = 'si-note bad';
-    note.textContent = 'Claude Code bulunamadı. Önce Claude Code\'u kurun; uygulama sizin kurulu `claude` komutunuzu kullanır.';
+    note.textContent = t('signin.claudeMissing');
   }
   setTimeout(() => $('#si-name').focus(), 50);
 }
 
 function pickAvatar(anchor, onPick) {
-  openGrid(anchor, AVATARS.map((a) => a[0]), 'Görünen resminizi seçin', onPick, 4);
+  openGrid(anchor, AVATARS.map((a) => a[0]), t('pickAvatar'), onPick, 4);
 }
 
 $('#si-avatar').onclick = $('#si-avatar-btn').onclick = (e) => {
@@ -56,7 +49,7 @@ $('#si-avatar').onclick = $('#si-avatar-btn').onclick = (e) => {
 };
 
 async function signIn() {
-  const name = $('#si-name').value.trim() || 'Ben';
+  const name = $('#si-name').value.trim() || t('signin.defaultName');
   $('#si-go').disabled = true;
   $('#si-progress').style.display = 'flex';
   await new Promise((r) => setTimeout(r, 1300));
@@ -98,11 +91,10 @@ function renderUsage() {
   if (util === null) { box.style.display = 'none'; return; }
   const pct = Math.round(util * 100);
   box.style.display = 'flex';
-  $('#usage-label').textContent = '5 saatlik kullanım';
   $('#usage-fill').style.width = `${Math.min(100, pct)}%`;
-  $('#usage-pct').textContent = `%${pct}`;
+  $('#usage-pct').textContent = `${pct}%`;
   const reset = win.resetsAt || rl.resetsAt;
-  box.title = reset ? `Sıfırlanma: ${new Date(reset * 1000).toLocaleString('tr-TR')}` : '';
+  box.title = reset ? `${t('list.usageTitle')} · ${t('list.resets', { time: new Date(reset * 1000).toLocaleString(LOCALE) })}` : t('list.usageTitle');
 }
 
 function contactIcon(c) {
@@ -116,26 +108,26 @@ function contactHtml(c) {
   if (renaming === c.id) {
     return `<div class="${cls}" data-id="${c.id}">${contactIcon(c)}<input type="text" class="rename" value="${esc(c.name)}" maxlength="60"></div>`;
   }
-  const sub = c.busy ? '(Yazıyor…)' : c.last ? `- ${c.last}` : `- ${c.cwd}`;
+  const sub = c.busy ? t('list.typing') : c.last ? `- ${c.last}` : `- ${c.cwd}`;
   return `<div class="${cls}" data-id="${c.id}" title="${esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span><span class="cm">${esc(sub)}</span></div>`;
 }
 
 function renderGroups() {
-  const q = $('#search').value.trim().toLocaleLowerCase('tr');
+  const q = $('#search').value.trim().toLocaleLowerCase(LOCALE);
   const chats = state.chats
-    .filter((c) => !q || c.name.toLocaleLowerCase('tr').includes(q) || c.cwd.toLocaleLowerCase('tr').includes(q))
+    .filter((c) => !q || c.name.toLocaleLowerCase(LOCALE).includes(q) || c.cwd.toLocaleLowerCase(LOCALE).includes(q))
     .sort((a, b) => b.updatedAt - a.updatedAt);
   const box = $('#groups');
 
   if (!state.chats.length) {
-    box.innerHTML = `<div class="empty">Henüz hiç sohbetiniz yok.<br><br><button class="xp-btn" id="empty-new">Yeni sohbet başlat</button><br><br>Her sohbet, seçtiğiniz bir proje klasöründe çalışan bir Claude Code oturumudur.</div>`;
+    box.innerHTML = `<div class="empty">${esc(t('list.empty'))}<br><br><button class="xp-btn" id="empty-new">${esc(t('list.newChat'))}</button><br><br>${esc(t('list.emptyHint'))}</div>`;
     $('#empty-new').onclick = newChat;
     return;
   }
 
   const groups = [
-    { key: 'pinned', title: 'Sabitlenenler', items: chats.filter((c) => c.pinned) },
-    { key: 'all', title: 'Sohbetler', items: chats.filter((c) => !c.pinned) },
+    { key: 'pinned', title: t('list.pinned'), items: chats.filter((c) => c.pinned) },
+    { key: 'all', title: t('list.chats'), items: chats.filter((c) => !c.pinned) },
   ];
   box.innerHTML = groups
     .filter((g) => g.items.length || (g.key === 'all' && !q))
@@ -145,7 +137,7 @@ function renderGroups() {
         ${g.items.map(contactHtml).join('')}
       </div>`;
     })
-    .join('') || '<div class="empty">Eşleşen sohbet yok.</div>';
+    .join('') || `<div class="empty">${esc(t('list.noMatch'))}</div>`;
 
   const input = $('.rename', box);
   if (input) {
@@ -221,7 +213,6 @@ $('#me-status').onchange = (e) => rm.updateProfile({ status: e.target.value });
 $('#me-personal').addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
 $('#me-personal').addEventListener('blur', (e) => rm.updateProfile({ personal: applyShortcuts(e.target.value.trim()) }));
 $('#me-name').ondblclick = () => rm.updateProfile({ signedIn: false });
-$('#me-name').title = 'Oturumu kapatmak için çift tıklayın';
 
 rm.on('state', (s) => {
   state = s;
@@ -231,9 +222,23 @@ rm.on('state', (s) => {
 rm.on('rename', (id) => { renaming = id; renderGroups(); });
 rm.on('delete', (id) => rm.deleteChat(id));
 
+// Durum seçeneklerinin parantezli hali (eski usul) ve dil seçimi
+$('#me-status').innerHTML = ['online', 'busy', 'away', 'hidden']
+  .map((k) => `<option value="${k}">(${esc(t(`status.${k}`))})</option>`)
+  .join('');
+const langOptions = [`<option value="auto">${esc(t('langAuto'))}</option>`]
+  .concat(I18N.LANGS.map((l) => `<option value="${l}">${esc(I18N.STRINGS[l].langName)}</option>`))
+  .join('');
+$$('.lang-select').forEach((sel) => {
+  sel.innerHTML = langOptions;
+  sel.onchange = () => rm.updateProfile({ lang: sel.value });
+});
+
 (async () => {
+  applyI18n();
   initTitlebar('Retro Messenger');
   state = await rm.getState();
+  $$('.lang-select').forEach((sel) => (sel.value = state.profile.lang || 'auto'));
   render();
   showTip();
   setInterval(showTip, 20000);

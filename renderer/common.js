@@ -1,6 +1,9 @@
 // Tüm pencerelerin paylaştığı yardımcılar: başlık çubuğu, sesler, görünen resimler, ifadeler, metin biçimlendirme.
 /* global rm */
 
+const t = I18N.makeT(rm.lang);
+const LOCALE = t('locale');
+
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -19,10 +22,10 @@ const LOGO_SVG = (size = 16) => `
 </svg>`;
 
 const STATUS = {
-  online: { label: 'Çevrimiçi', color: '#43b83a' },
-  busy: { label: 'Meşgul', color: '#e0412f' },
-  away: { label: 'Dışarıda', color: '#f0b000' },
-  hidden: { label: 'Çevrimdışı görün', color: '#a3a3a3' },
+  online: { color: '#43b83a' },
+  busy: { color: '#e0412f' },
+  away: { color: '#f0b000' },
+  hidden: { color: '#a3a3a3' },
 };
 
 const buddySvg = (color, cls = '') => `
@@ -82,7 +85,7 @@ function fmt(text) {
     .join('');
 }
 
-const timeStr = (ts) => new Date(ts).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+const timeStr = (ts) => new Date(ts).toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
 
 // Sesler WebAudio ile üretilir; harici ses dosyası yoktur.
 const Sounds = (() => {
@@ -116,7 +119,10 @@ function initTitlebar(title) {
   if (!tb) return;
   $('.tb-icon', tb).innerHTML = LOGO_SVG(16);
   if (title) setTitle(title);
-  $$('[data-win]', tb).forEach((b) => (b.onclick = () => rm.win(b.dataset.win)));
+  $$('[data-win]', tb).forEach((b) => {
+    b.title = t(`win.${b.dataset.win}`);
+    b.onclick = () => rm.win(b.dataset.win);
+  });
   tb.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) rm.win('max'); });
 }
 
@@ -149,6 +155,14 @@ function openGrid(anchor, items, title, onPick, cols = 8) {
   pop.style.top = `${top}px`;
   pop.style.left = `${Math.max(6, Math.min(r.left, innerWidth - pr.width - 6))}px`;
   setTimeout(() => document.addEventListener('click', closePopovers, { once: true }));
+}
+
+// data-i18n="anahtar" → metin, data-i18n-title → title, data-i18n-ph → placeholder
+function applyI18n(root = document) {
+  document.documentElement.lang = rm.lang;
+  $$('[data-i18n]', root).forEach((el) => (el.textContent = t(el.dataset.i18n)));
+  $$('[data-i18n-title]', root).forEach((el) => (el.title = t(el.dataset.i18nTitle)));
+  $$('[data-i18n-ph]', root).forEach((el) => (el.placeholder = t(el.dataset.i18nPh)));
 }
 
 rm.on('play-sound', (name) => Sounds.play(name));

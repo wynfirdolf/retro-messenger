@@ -1,7 +1,7 @@
 {
   "name": "retro-messenger",
-  "version": "0.1.0",
-  "description": "Claude Code için 2000'lerin anlık mesajlaşma havasında bir sohbet uygulaması",
+  "version": "0.2.0",
+  "description": "Chat with Claude Code like it's 2004: a retro instant-messenger desktop app",
   "main": "main.js",
   "author": "Wynfirdolf",
   "license": "MIT",
@@ -32,5 +32,9 @@
     "win": {
       "target": "nsis"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wynfirdolf/retro-messenger.git"
   }
 }

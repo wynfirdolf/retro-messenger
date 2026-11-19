@@ -1,7 +1,9 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell, screen } = require('electron');
 const path = require('path');
+const os = require('os');
 const store = require('./src/store');
 const { ClaudeSession, resolveEnvironment } = require('./src/claude-session');
+const I18N = require('./renderer/i18n');
 
 const isMac = process.platform === 'darwin';
 const PRELOAD = path.join(__dirname, 'preload.js');
@@ -17,6 +19,8 @@ const busy = new Set();
 const unread = new Set();
 
 const alive = (w) => w && !w.isDestroyed();
+const currentLang = () => I18N.resolveLang(store.profile().lang, app.getLocale());
+const t = (key, vars) => I18N.makeT(currentLang())(key, vars);
 
 function makeWindow(opts) {
   const win = new BrowserWindow({
@@ -43,7 +47,7 @@ function lastSnippet(chat) {
 function snapshot() {
   return {
     profile: store.profile(),
-    claudePath: env.claudePath,
+    claudePath: env.claudePath && env.claudePath.replace(os.homedir(), '~'),
     rateLimit,
     chats: store.chats().map((c) => ({
       id: c.id,
@@ -180,6 +184,7 @@ function getSession(chat) {
     sessionId: chat.sessionId,
     model: chat.model,
     permissionMode: chat.permissionMode,
+    t,
   });
   s.on('event', (ev) => handleEvent(chat.id, ev));
   sessions.set(chat.id, s);
@@ -232,7 +237,7 @@ function handleEvent(id, ev) {
       if (ev.denied) {
         addAndShow(id, {
           from: 'system',
-          text: `Claude ${ev.denied} işlem için izin alamadı. Gerekirse üstteki "Yetki" ayarını değiştirebilirsiniz.`,
+          text: t('sys.denied', { n: ev.denied }),
         });
       }
       sendToChat(id, 'busy', false);
@@ -250,7 +255,7 @@ function onReplyFinished(chat) {
   if (alive(win)) win.flashFrame(true);
   if (store.profile().status === 'busy') return;
   playSound('message', chat.id);
-  showToast(chat, lastSnippet(chat) || 'Yanıt hazır.');
+  showToast(chat, lastSnippet(chat) || t('sys.replyReady'));
   if (isMac && app.dock) app.dock.bounce('informational');
 }
 
@@ -271,16 +276,25 @@ function sendToClaude(id, text) {
 
 ipcMain.handle('state', () => snapshot());
 
+ipcMain.on('lang', (e) => {
+  e.returnValue = currentLang();
+});
+
 ipcMain.handle('profile:update', (_e, patch) => {
+  const langBefore = currentLang();
   store.updateProfile(patch);
+  if (currentLang() !== langBefore) {
+    for (const w of BrowserWindow.getAllWindows()) if (alive(w)) w.webContents.reload();
+    return;
+  }
   pushState();
   for (const w of chatWins.values()) if (alive(w)) w.webContents.send('profile', store.profile());
 });
 
 ipcMain.handle('folder:pick', async (e) => {
   const r = await dialog.showOpenDialog(BrowserWindow.fromWebContents(e.sender), {
-    title: 'Sohbet için bir proje klasörü seçin',
-    buttonLabel: 'Seç',
+    title: t('dlg.pickFolder'),
+    buttonLabel: t('dlg.choose'),
     properties: ['openDirectory', 'createDirectory'],
   });
   return r.canceled ? null : r.filePaths[0];
@@ -308,7 +322,7 @@ ipcMain.handle('chat:update', (_e, id, patch) => {
     const wasBusy = busy.has(id);
     resetSession(id);
     if (wasBusy) {
-      addAndShow(id, { from: 'system', text: 'Ayar değiştiği için devam eden yanıt durduruldu.' });
+      addAndShow(id, { from: 'system', text: t('sys.settingStopped') });
       sendToChat(id, 'busy', false);
     }
   }
@@ -321,11 +335,11 @@ ipcMain.handle('chat:delete', async (e, id) => {
   if (!chat) return;
   const { response } = await dialog.showMessageBox(BrowserWindow.fromWebContents(e.sender), {
     type: 'question',
-    buttons: ['Sil', 'Vazgeç'],
+    buttons: [t('dlg.delete'), t('dlg.cancel')],
     defaultId: 1,
     cancelId: 1,
-    message: `"${chat.name}" sohbeti listeden silinsin mi?`,
-    detail: 'Klasördeki dosyalarınıza dokunulmaz. Claude Code oturumu, terminalde `claude --resume` ile hâlâ açılabilir.',
+    message: t('dlg.deleteMsg', { name: chat.name }),
+    detail: t('dlg.deleteDetail'),
   });
   if (response !== 0) return;
   resetSession(id);
@@ -348,7 +362,7 @@ ipcMain.handle('chat:send', (_e, id, text) => {
 ipcMain.handle('chat:stop', (_e, id) => {
   if (!busy.has(id)) return;
   resetSession(id);
-  addAndShow(id, { from: 'system', text: 'Yanıtı durdurdunuz.' });
+  addAndShow(id, { from: 'system', text: t('sys.stopped') });
   sendToChat(id, 'busy', false);
   pushState();
 });
@@ -357,11 +371,8 @@ ipcMain.handle('chat:nudge', (e, id) => {
   shake(BrowserWindow.fromWebContents(e.sender));
   sendToChat(id, 'shake');
   playSound('nudge', id);
-  addAndShow(id, { from: 'system', text: 'Bir titreşim gönderdiniz.' });
-  sendToClaude(
-    id,
-    '[Kullanıcı sana eski usul bir "titreşim" (nudge) gönderdi; ekran salladı, dikkatini çekmek istiyor. Buna kısa ve neşeli bir cevap ver; yarım kalan bir işin varsa ne durumda olduğunu bir cümleyle söyle.]',
-  );
+  addAndShow(id, { from: 'system', text: t('sys.nudged') });
+  sendToClaude(id, t('nudgePrompt'));
 });
 
 ipcMain.handle('chat:reveal', (_e, id) => {
@@ -372,7 +383,7 @@ ipcMain.handle('chat:reveal', (_e, id) => {
 ipcMain.handle('chat:new-session', (_e, id) => {
   resetSession(id);
   store.updateChat(id, { sessionId: null });
-  addAndShow(id, { from: 'system', text: 'Yeni bir Claude Code oturumu başlatıldı. Claude önceki konuşmayı hatırlamayacak.' });
+  addAndShow(id, { from: 'system', text: t('sys.newSession') });
   sendToChat(id, 'busy', false);
   pushState();
 });
@@ -382,12 +393,12 @@ ipcMain.on('chat:context-menu', (e, id) => {
   if (!chat) return;
   const sender = e.sender;
   Menu.buildFromTemplate([
-    { label: 'Sohbeti aç', click: () => openChat(id) },
-    { label: 'Yeniden adlandır', click: () => sender.send('rename', id) },
-    { label: chat.pinned ? 'Sabitlemeyi kaldır' : 'Sabitle', click: () => { store.updateChat(id, { pinned: !chat.pinned }); pushState(); } },
-    { label: 'Klasörü göster', click: () => shell.openPath(chat.cwd) },
+    { label: t('menu.open'), click: () => openChat(id) },
+    { label: t('menu.rename'), click: () => sender.send('rename', id) },
+    { label: chat.pinned ? t('menu.unpin') : t('menu.pin'), click: () => { store.updateChat(id, { pinned: !chat.pinned }); pushState(); } },
+    { label: t('menu.reveal'), click: () => shell.openPath(chat.cwd) },
     { type: 'separator' },
-    { label: 'Sil…', click: () => sender.send('delete', id) },
+    { label: t('menu.delete'), click: () => sender.send('delete', id) },
   ]).popup({ window: BrowserWindow.fromWebContents(sender) });
 });
 

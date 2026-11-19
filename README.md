@@ -1,105 +1,107 @@
 <div align="center">
 
-<img src="build/icon.png" width="128" alt="Retro Messenger simgesi">
+<img src="build/icon.png" width="128" alt="Retro Messenger icon">
 
 # Retro Messenger
 
-**Claude Code ile, 2004'teymişiz gibi sohbet edin.**
+**Chat with Claude Code like it's 2004.**
 
-Kişi listesi, görünen resimler, ifadeler, titreşim ve "… diyor ki:" iletileri.<br>
-Her sohbet, bilgisayarınızda çalışan gerçek bir Claude Code oturumu.
+Contact list, display pictures, emoticons, nudges and "… says:" messages.<br>
+Every conversation is a real Claude Code session running on your machine.
 
-[![Lisans: MIT](https://img.shields.io/badge/lisans-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20(yak%C4%B1nda)-lightgrey)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20(soon)-lightgrey)
+![Languages](https://img.shields.io/badge/UI-English%20%7C%20T%C3%BCrk%C3%A7e-orange)
 ![Electron](https://img.shields.io/badge/Electron-45-47848F?logo=electron&logoColor=white)
 
-[**⬇️ macOS için indir**](../../releases/latest) · [Özellikler](#özellikler) · [Kurulum](#kurulum) · [Kaynaktan çalıştırma](#kaynaktan-çalıştırma) · [English](#english)
+[**⬇️ Download for macOS**](../../releases/latest) · [Features](#features) · [Install](#install) · [Run from source](#run-from-source) · [🇹🇷 Türkçe](README.tr.md)
 
 <br>
 
-<img src="docs/hero.png" alt="Retro Messenger: kişi listesi, sohbet penceresi ve bildirim kutusu" width="100%">
+<img src="docs/hero.png" alt="Retro Messenger: contact list, conversation window and notification toast" width="100%">
 
 </div>
 
 ---
 
-## Nedir?
+## What is it?
 
-Retro Messenger, [Claude Code](https://code.claude.com)'u 2000'lerin anlık mesajlaşma programlarını hatırlatan bir arayüzde kullanmanızı sağlayan bir masaüstü uygulamasıdır.
+Retro Messenger is a desktop app for using [Claude Code](https://code.claude.com) through an interface that brings back the instant messengers of the early 2000s.
 
-Bilgisayarınızda kurulu olan `claude` komutunu çalıştırır. Bu yüzden aboneliğiniz, ayarlarınız, eklentileriniz ve MCP sunucularınız olduğu gibi kullanılır. Claude dosyalarınızı okur, düzenler ve komut çalıştırır; siz de ona eski arkadaşlarınıza yazar gibi yazarsınız.
+It runs the `claude` command already installed on your computer, so your subscription, settings, plugins and MCP servers all work as usual. Claude reads and edits your files and runs commands. You just write to it the way you used to write to your friends.
 
-## Özellikler
+## Features
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 👥 Kişi listesi
-Her sohbet bir "kişi" ve her biri bir proje klasöründe çalışır. Simgenin rengi o sohbetin durumunu gösterir:
+### 👥 Contact list
+Each chat is a "contact" that works in one project folder. The icon color shows its state:
 
-- 🟢 boşta
-- 🟡 Claude çalışıyor ("Yazıyor…")
-- 🟠 okunmamış yanıt var
+- 🟢 idle
+- 🟡 Claude is working ("Typing…")
+- 🟠 unread reply
 
-Sohbetleri sabitleyebilir, yeniden adlandırabilir ve arayabilirsiniz. Kişisel ileti ve durum seçimi (Çevrimiçi, Meşgul, Dışarıda) da var.
+Pin, rename and search your chats. Set a personal message and a status (Online, Busy, Away).
 
 </td>
-<td width="50%"><img src="docs/list.png" alt="Kişi listesi"></td>
+<td width="50%"><img src="docs/list.png" alt="Contact list"></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/emoticons.png" alt="İfade seçici"></td>
+<td width="50%"><img src="docs/emoticons.png" alt="Emoticon picker"></td>
 <td width="50%" valign="top">
 
-### 💬 Sohbet penceresi
-- "… diyor ki:" biçiminde iletiler ve canlı akan yanıtlar.
-- Claude'un yaptığı işlemler (dosya okuma, düzenleme, komut çalıştırma) gri satırlarla görünür.
-- Kod blokları ayrı kutularda gösterilir.
-- İki tarafta büyük görünen resimler ve altta "… bir ileti yazıyor" durum çubuğu var.
-- `:)` `(Y)` `<3` `(H)` gibi klasik kısayollar emojiye dönüşür. Ayrıca bir ifade ızgarası var.
+### 💬 Conversation window
+- "… says:" messages, with replies that stream in live.
+- Claude's actions (reading, editing, running commands) appear as grey lines.
+- Code blocks are shown in their own boxes.
+- Big display pictures on the side and a "… is typing a message" status bar.
+- Classic shortcuts like `:)` `(Y)` `<3` `(H)` turn into emoji, and there's an emoticon grid too.
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-### 📳 Titreşim
-Titreşim düğmesi pencereyi sallar, ses çalar ve Claude'a dikkatini çekmek istediğinizi iletir. Claude kısa bir cevapla ne durumda olduğunu söyler; uzun işlerde hızlıca durum sormanın en eğlenceli yolu.
+### 📳 Nudge
+The Nudge button shakes the window, plays a sound and tells Claude you want its attention. Claude answers with a short note on where things stand, which makes it the most fun way to check on a long task.
 
-### 🔔 Bildirimler
-Pencere arka plandayken yanıt gelirse:
+### 🔔 Notifications
+When a reply arrives while the window is in the background:
 
-- ses çalar,
-- sağ altta bildirim kutusu açılır,
-- Dock simgesi zıplar ve rozet sayısı görünür.
+- a sound plays,
+- a toast pops up in the corner,
+- the Dock icon bounces and shows a badge.
 
-Durumunuz "Meşgul" ise hepsi susar.
+Set your status to "Busy" to silence all of it.
 
 </td>
-<td width="50%" align="center"><img src="docs/toast.png" alt="Bildirim kutusu" width="300"><br><br><img src="docs/signin.png" alt="Oturum açma ekranı" width="260"></td>
+<td width="50%" align="center"><img src="docs/toast.png" alt="Notification toast" width="300"><br><br><img src="docs/signin.png" alt="Sign-in screen" width="260"></td>
 </tr>
 </table>
 
-### ⚙️ Diğerleri
-- Her sohbet için **model** (Opus, Sonnet, Haiku) ve **yetki** seçimi: yalnızca okuma, plan, dosya düzenleme veya tam yetki.
-- Claude'un 5 saatlik kullanım sınırını gösteren **kullanım çubuğu**.
-- Uygulama kapanıp açılınca sohbetler ve Claude oturumları kaldığı yerden devam eder.
-- Seslerin hepsi uygulama içinde üretilir; harici ses dosyası yoktur.
+### ⚙️ And also
+- **Model** (Opus, Sonnet, Haiku) and **permission** choice for each chat: read only, plan, edit files or full access.
+- A **usage bar** that shows Claude's 5-hour usage limit.
+- **English and Turkish** UI. It follows your system language, and you can switch it from the contact list.
+- Chats and Claude sessions pick up where they left off after you restart the app.
+- All sounds are generated in the app; there are no external audio files.
 
-## Kurulum
+## Install
 
-### Hazır sürüm (macOS, Apple Silicon)
+### Prebuilt app (macOS, Apple Silicon)
 
-1. [Releases](../../releases/latest) sayfasından `.dmg` dosyasını indirin.
-2. Açın ve **Retro Messenger**'ı **Applications** klasörüne sürükleyin.
-3. Uygulama Apple tarafından imzalanmadığı için ilk açılışta macOS uyarı verir. **Sistem Ayarları → Gizlilik ve Güvenlik** bölümüne gidip **Yine de Aç**'a tıklayın. Bunun yerine terminalde şu komutu da çalıştırabilirsiniz:
+1. Download the `.dmg` from the [Releases](../../releases/latest) page.
+2. Open it and drag **Retro Messenger** into **Applications**.
+3. The app isn't notarized by Apple, so macOS warns you on first launch. Go to **System Settings → Privacy & Security** and click **Open Anyway**. Or run this in the terminal:
    ```bash
    xattr -dr com.apple.quarantine "/Applications/Retro Messenger.app"
    ```
 
-**Gereksinim:** [Claude Code](https://code.claude.com) kurulu olmalı ve terminalde en az bir kez `claude` çalıştırılarak oturum açılmış olmalı.
+**Requirement:** [Claude Code](https://code.claude.com) installed and signed in. Run `claude` in the terminal at least once.
 
-### Kaynaktan çalıştırma
+### Run from source
 
 ```bash
 git clone https://github.com/wynfirdolf/retro-messenger.git
@@ -108,67 +110,59 @@ npm install
 npm start
 ```
 
-npm 11 kurulum betiklerini varsayılan olarak çalıştırmayabilir. `npm start` "Electron failed to install correctly" derse bir kez `node node_modules/electron/install.js` çalıştırın.
+npm 11 may skip install scripts by default. If `npm start` says "Electron failed to install correctly", run `node node_modules/electron/install.js` once.
 
-### Paketleme
+### Packaging
 
-| Komut | Ne yapar |
+| Command | What it does |
 | --- | --- |
-| `npm run install:mac` | Uygulamayı derler, yerel imzayla imzalar ve `/Applications` klasörüne kurar |
-| `npm run dist:mac` | `dist/` içine `.dmg` üretir |
-| `npm run dist:win` | `dist/` içine Windows kurulum dosyası üretir |
+| `npm run install:mac` | Builds the app, signs it locally and installs it to `/Applications` |
+| `npm run dist:mac` | Produces a `.dmg` in `dist/` |
+| `npm run dist:win` | Produces a Windows installer in `dist/` |
 
-## Nasıl çalışır?
+## How it works
 
 ```
 ┌──────────────┐   IPC   ┌───────────────┐   stdin/stdout (stream-json)   ┌──────────────┐
-│  Arayüz      │ ◄─────► │  Electron     │ ◄────────────────────────────► │  claude -p   │
-│  (renderer/) │         │  ana süreç    │                                │  (her sohbet │
-└──────────────┘         └───────────────┘                                │   için bir)  │
+│  UI          │ ◄─────► │  Electron     │ ◄────────────────────────────► │  claude -p   │
+│  (renderer/) │         │  main process │                                │  (one per    │
+└──────────────┘         └───────────────┘                                │   chat)      │
                                                                           └──────────────┘
 ```
 
-Her sohbet için arka planda `claude -p --input-format stream-json --output-format stream-json` süreci çalışır. Yanıtlar parça parça akar. Oturum kimliği saklandığı için uygulama yeniden açıldığında `--resume` ile kaldığı yerden devam edilir.
+Each chat runs a `claude -p --input-format stream-json --output-format stream-json` process in the background. Replies stream in as they're written. The session ID is saved, so after a restart the conversation continues with `--resume`.
 
-| Dosya | Görev |
+| File | Role |
 | --- | --- |
-| `main.js` | Pencereler, IPC, bildirimler, Dock rozeti, titreşim |
-| `src/claude-session.js` | `claude` sürecini yönetir ve akan olayları sadeleştirir |
-| `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
-| `renderer/` | Arayüz: `list` kişi listesi, `chat` sohbet penceresi, `toast` bildirim kutusu, `common` ortak stil ve yardımcılar |
+| `main.js` | Windows, IPC, notifications, Dock badge, nudge |
+| `src/claude-session.js` | Runs the `claude` process and simplifies its event stream |
+| `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
+| `renderer/i18n.js` | English and Turkish strings |
+| `renderer/` | UI: `list` contact list, `chat` conversation window, `toast` notification, `common` shared styles and helpers |
 
-## Bilinen sınırlar
+### Adding a language
+Copy the `en` block in `renderer/i18n.js`, give it a new language code and translate the strings. The new language shows up in the language menu automatically.
 
-- `-p` modunda Claude izin soramaz. İzin gerektiren bir işlem reddedilirse sohbette bir not çıkar. Gerekirse üstteki **Yetki** ayarını değiştirin.
-- Windows sürümü aynı kodla çalışacak şekilde yazıldı ama henüz test edilmedi.
-- Hazır sürüm şimdilik yalnızca Apple Silicon Mac'ler içindir.
+## Known limitations
 
-## Yol haritası
+- In `-p` mode Claude can't ask for permission. If an action needs permission and gets denied, a note appears in the chat. Change the **Permissions** setting at the top if needed.
+- The Windows build uses the same code but hasn't been tested yet.
+- The prebuilt release is for Apple Silicon Macs only for now.
 
-- [ ] Windows sürümü
-- [ ] Uygulama içinden izin onayı (onay/ret penceresi)
-- [ ] Görünen resim olarak kendi fotoğrafını yükleme
-- [ ] Yazı tipi ve renk seçimi
-- [ ] Sohbet geçmişini dışa aktarma
+## Roadmap
 
-Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gönderebilirsiniz.
+- [ ] Windows build
+- [ ] In-app permission prompts (approve / deny window)
+- [ ] Upload your own photo as a display picture
+- [ ] Font and color choice
+- [ ] Export chat history
 
-## English
+Contributions are welcome. Open an issue or send a pull request.
 
-**Retro Messenger** lets you chat with [Claude Code](https://code.claude.com) through a nostalgic, early-2000s instant messenger interface. It has a contact list, display pictures, emoticons, nudges, sounds and toast notifications.
+## Legal
 
-Every conversation is a real Claude Code session that runs your own installed `claude` CLI in a project folder. Your subscription, settings, plugins and MCP servers work as usual.
+Retro Messenger is an independent fan project. It is not affiliated with or endorsed by Microsoft or Anthropic. "MSN" and "Windows Live Messenger" are trademarks of Microsoft; "Claude" is a trademark of Anthropic. The logo, icons and sounds in this app were made from scratch for this project. Display pictures and emoticons use your system's emoji font.
 
-- **Download:** grab the `.dmg` from [Releases](../../releases/latest) (macOS, Apple Silicon). The app is not notarized, so allow it under *System Settings → Privacy & Security* on first launch.
-- **From source:** `npm install && npm start`
-- **Requires:** Claude Code installed and signed in.
-
-The UI is currently in Turkish. Windows support is on the way.
-
-## Yasal not
-
-Retro Messenger bağımsız bir hayran projesidir. Microsoft veya Anthropic ile bir bağlantısı yoktur ve onlar tarafından onaylanmamıştır. "MSN" ve "Windows Live Messenger" Microsoft'un, "Claude" Anthropic'in ticari markalarıdır. Uygulamadaki logo, simgeler ve sesler bu proje için sıfırdan yapıldı. Görünen resimler ve ifadeler sistemin emoji yazı tipini kullanır.
-
-## Lisans
+## License
 
 [MIT](LICENSE) © 2026 Wynfirdolf

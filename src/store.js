@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const MAX_MESSAGES = 500;
-const DEFAULT_PROFILE = { name: '', personal: '', status: 'online', avatar: '🦊', signedIn: false };
+const DEFAULT_PROFILE = { name: '', personal: '', status: 'online', avatar: '🦊', signedIn: false, lang: 'auto' };
 
 let file = null;
 let data = { profile: { ...DEFAULT_PROFILE }, chats: [] };

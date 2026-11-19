@@ -67,61 +67,62 @@
 </style>
 </head>
 <body>
-  <div class="titlebar"><span class="tb-icon"></span><span class="tb-title">Sohbet</span>
-    <div class="tb-btns"><button data-win="min" title="Simge durumuna küçült">_</button><button data-win="max" title="Ekranı kapla">□</button><button data-win="close" title="Kapat">×</button></div>
+  <div class="titlebar"><span class="tb-icon"></span><span class="tb-title"></span>
+    <div class="tb-btns"><button data-win="min">_</button><button data-win="max">□</button><button data-win="close">×</button></div>
   </div>
 
   <div class="toolbar">
-    <button class="tool-btn" id="btn-folder" title="Proje klasörünü aç"><span class="ico">📁</span>Klasör</button>
-    <button class="tool-btn" id="btn-new" title="Önceki konuşmayı unutup yeni bir oturum başlat"><span class="ico">✨</span>Yeni oturum</button>
+    <button class="tool-btn" id="btn-folder" data-i18n-title="chat.folderTitle"><span class="ico">📁</span><span data-i18n="chat.folder"></span></button>
+    <button class="tool-btn" id="btn-new" data-i18n-title="chat.newSessionTitle"><span class="ico">✨</span><span data-i18n="chat.newSession"></span></button>
     <span class="sep"></span>
-    <label>Model:
+    <label><span data-i18n="chat.model"></span>
       <select id="model">
-        <option value="">Varsayılan</option>
+        <option value="" data-i18n="chat.modelDefault"></option>
         <option value="opus">Opus</option>
         <option value="sonnet">Sonnet</option>
         <option value="haiku">Haiku</option>
       </select>
     </label>
-    <label title="Claude'un sormadan neler yapabileceği">Yetki:
+    <label data-i18n-title="chat.permTitle"><span data-i18n="chat.perm"></span>
       <select id="perm">
-        <option value="default">Yalnızca okuma</option>
-        <option value="plan">Plan modu</option>
-        <option value="acceptEdits">Dosya düzenleyebilir</option>
-        <option value="bypassPermissions">Tam yetki (dikkat)</option>
+        <option value="default" data-i18n="perm.default"></option>
+        <option value="plan" data-i18n="perm.plan"></option>
+        <option value="acceptEdits" data-i18n="perm.acceptEdits"></option>
+        <option value="bypassPermissions" data-i18n="perm.bypassPermissions"></option>
       </select>
     </label>
   </div>
 
-  <div class="to">Kime: <b id="to-name"></b> <span class="path">&lt;<span id="to-cwd"></span>&gt;</span></div>
+  <div class="to"><span data-i18n="chat.to"></span> <b id="to-name"></b> <span class="path">&lt;<span id="to-cwd"></span>&gt;</span></div>
 
   <div class="frame">
     <div class="convo">
       <div id="history"></div>
       <div class="compose-tools">
-        <button class="tool-btn" id="btn-emo" title="İfade seçin"><span class="ico">😊</span></button>
-        <button class="tool-btn" id="btn-nudge" title="Titreşim gönder">
-          <svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-10 2 4h3" fill="none" stroke="#d04020" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>Titreşim
+        <button class="tool-btn" id="btn-emo" data-i18n-title="chat.emoTitle"><span class="ico">😊</span></button>
+        <button class="tool-btn" id="btn-nudge" data-i18n-title="chat.nudgeTitle">
+          <svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-10 2 4h3" fill="none" stroke="#d04020" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><span data-i18n="chat.nudge"></span>
         </button>
         <span class="spacer"></span>
-        <span id="hint" style="color:#7a8aa6">Enter: gönder · Shift+Enter: yeni satır</span>
+        <span id="hint" style="color:#7a8aa6" data-i18n="chat.hint"></span>
       </div>
       <div class="compose">
-        <textarea id="input" placeholder="Bir ileti yazın…"></textarea>
+        <textarea id="input" data-i18n-ph="chat.placeholder"></textarea>
         <div class="btns">
-          <button class="xp-btn" id="send">Gönder</button>
-          <button class="xp-btn" id="stop" disabled>Durdur</button>
+          <button class="xp-btn" id="send" data-i18n="chat.send"></button>
+          <button class="xp-btn" id="stop" data-i18n="chat.stop" disabled></button>
         </div>
       </div>
     </div>
     <div class="side">
-      <div class="slot"><span id="dp-claude" title="Bu sohbetin resmini değiştirin"></span><div class="who-label" id="lbl-claude"></div></div>
+      <div class="slot"><span id="dp-claude" data-i18n-title="chat.changePicture"></span><div class="who-label" id="lbl-claude"></div></div>
       <div class="slot"><span id="dp-me"></span><div class="who-label" id="lbl-me"></div></div>
     </div>
   </div>
 
   <div class="statusbar" id="status"></div>
 
+  <script src="i18n.js"></script>
   <script src="common.js"></script>
   <script src="chat.js"></script>
 </body>
