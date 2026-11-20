@@ -97,6 +97,25 @@ function applyShortcuts(text) {
 }
 
 // Basit ve güvenli markdown: önce kaçış, sonra kod blokları, satır içi kod, kalın ve italik.
+// Bare web addresses (https://… or www.…) become clickable links, without the trailing punctuation.
+function autolink(html) {
+  return html.replace(/(^|[\s(>*;\[])((?:https?:\/\/|www\.)[^\s<]+)/g, (m, pre, url) => {
+    let tail = '';
+    while (/[.,;:!?)\]'"*]$/.test(url) || /&(?:quot|#39|gt|lt);$/.test(url)) {
+      const t = url.match(/(&(?:quot|#39|gt|lt);|.)$/)[0];
+      // keep a closing bracket that belongs to the URL, e.g. …/Foo_(bar)
+      if (t === ')' && (url.match(/\(/g) || []).length >= (url.match(/\)/g) || []).length) break;
+      tail = t + tail;
+      url = url.slice(0, -t.length);
+    }
+    if (!/[a-z0-9]/i.test(url.replace(/^(https?:\/\/|www\.)/, ''))) return m;
+    const href = url.startsWith('www.') ? 'https://' + url : url;
+    return `${pre}<a class="link" data-url="${href}" title="${href}">${url}</a>${tail}`;
+  });
+}
+
+// Simple, safe markdown: escape first, then code blocks, inline code, links, bold and italic.
+// Inline code and links are set aside while the rest is formatted, so nothing inside them changes.
 function fmt(text) {
   const parts = String(text).split(/```[\w+-]*\n?([\s\S]*?)```/g);
   return parts
@@ -104,16 +123,21 @@ function fmt(text) {
       if (i % 2 === 1) return `<pre class="code">${esc(p.replace(/\n$/, ''))}</pre>`;
       if (i > 0) p = p.replace(/^\n/, '');
       if (i < parts.length - 1) p = p.replace(/\n$/, '');
-      return esc(p)
-        .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+      const kept = [];
+      const keep = (html) => `\u0001${kept.push(html) - 1}\u0001`;
+      let h = esc(p)
+        .replace(/`([^`\n]+)`/g, (m, code) => keep(`<code>${code}</code>`))
         // [label](target): local paths open the file, web links open in the browser
-        .replace(/\[([^\]\n]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)/g, (m, label, target) => (/^https?:/.test(target)
+        .replace(/\[([^\]\n]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)/g, (m, label, target) => keep(/^https?:/.test(target)
           ? `<a class="link" data-url="${target}" title="${target}">${label}</a>`
-          : `<a class="link" data-open="${target.replace(/#L?\d+.*$/, '')}" title="${target}">${label}</a>`))
+          : `<a class="link" data-open="${target.replace(/#L?\d+.*$/, '')}" title="${target}">${label}</a>`));
+      h = autolink(h).replace(/<a [^>]*>[\s\S]*?<\/a>/g, (a) => keep(a));
+      return h
         .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
         .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/g, '$1<i>$2</i>')
         .replace(/^#{1,6} (.+)$/gm, '<b>$1</b>')
-        .replace(/\n/g, '<br>');
+        .replace(/\n/g, '<br>')
+        .replace(/\u0001(\d+)\u0001/g, (m, n) => kept[n]);
     })
     .join('');
 }
