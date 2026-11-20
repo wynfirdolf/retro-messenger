@@ -103,9 +103,9 @@ function contactHtml(c) {
   if (renaming === c.id) {
     return `<div class="${cls}" data-id="${c.id}">${contactIcon(c)}<input type="text" class="rename" value="${esc(c.name)}" maxlength="60"></div>`;
   }
-  const sub = c.waiting ? t('list.waiting') : c.busy ? t('list.typing') : c.last ? `- ${c.last}` : c.provider === 'claude-chat' ? '' : `- ${c.cwd}`;
-  const badge = c.provider === 'codex' ? `<span class="prov codex">${esc(t('prov.codex'))}</span>` : '';
-  return `<div class="${cls}" data-id="${c.id}" title="${c.provider === 'claude-chat' ? '' : esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span>${badge}<span class="cm">${esc(sub)}</span></div>`;
+  const sub = c.waiting ? t('list.waiting') : c.busy ? t('list.typing') : c.last ? `- ${c.last}` : c.provider === 'claude-chat' || c.provider === 'codex-chat' ? '' : `- ${c.cwd}`;
+  const badge = String(c.provider).startsWith('codex') ? `<span class="prov codex">${esc(t('prov.codex'))}</span>` : '';
+  return `<div class="${cls}" data-id="${c.id}" title="${c.provider === 'claude-chat' || c.provider === 'codex-chat' ? '' : esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span>${badge}<span class="cm">${esc(sub)}</span></div>`;
 }
 
 function renderGroups() {
@@ -198,6 +198,7 @@ document.addEventListener('keydown', (e) => {
 // "New chat" menu in the app's own XP style: icon, title and a short line per option.
 const NEW_CHAT_OPTIONS = [
   { provider: 'claude-chat', icon: '✨', needs: 'claude', title: 'newmenu.chat', desc: 'newmenu.chatDesc' },
+  { provider: 'codex-chat', icon: '💬', needs: 'codex', title: 'newmenu.gpt', desc: 'newmenu.gptDesc' },
   { provider: 'claude', icon: '🤖', needs: 'claude', title: 'newmenu.code', desc: 'newmenu.codeDesc' },
   { provider: 'codex', icon: '🧠', needs: 'codex', title: 'newmenu.codex', desc: 'newmenu.codexDesc' },
 ];

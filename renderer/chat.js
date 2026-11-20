@@ -57,7 +57,7 @@ function renderMessage(m) {
 function renderAll() {
   lastDay = '';
   const readOnly = ['default', 'manual', 'plan'].includes(chat.permissionMode);
-  const key = isChatOnly() ? 'chat.welcomeChat' : isCodex() ? 'chat.welcomeCodex' : readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit';
+  const key = isChatOnly() ? (isCodex() ? 'chat.welcomeGptChat' : 'chat.welcomeChat') : isCodex() ? 'chat.welcomeCodex' : readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit';
   const welcome = esc(t(key, { cwd: '\u0000' })).replace('\u0000', `<b>${esc(chat.cwd)}</b>`);
   history.innerHTML = `<div class="welcome">${welcome}</div>`;
   for (const m of chat.messages) history.appendChild(renderMessage(m));
@@ -361,8 +361,8 @@ $('#btn-font').onclick = (e) => {
 
 // ---------- Model, sürüm ve efor ----------
 
-const isCodex = () => chat.provider === 'codex';
-const isChatOnly = () => chat.provider === 'claude-chat';
+const isCodex = () => String(chat.provider).startsWith('codex');
+const isChatOnly = () => chat.provider === 'claude-chat' || chat.provider === 'codex-chat';
 let codexModels = [];
 
 const PERM_OPTIONS = {

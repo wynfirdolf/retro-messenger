@@ -93,9 +93,10 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </table>
 
 ### 🤖 Claude ve ChatGPT
-**Yeni sohbet başlat**'a tıklayıp üç seçenekten birini seçin:
+**Yeni sohbet başlat**'a tıklayıp dört seçenekten birini seçin:
 
 - **Claude sohbeti:** Claude uygulamasındaki gibi sıradan bir sohbet, proje klasörü yok. Bilgisayarınızda giriş yapılmış Claude'u kullanır; Claude internette arama yapabilir ve gönderdiğiniz dosyaları okuyabilir.
+- **ChatGPT sohbeti:** Aynısı ChatGPT için; bilgisayarınızda giriş yapılmış ChatGPT hesabını kullanır, internette arama yapabilir.
 - **Claude Code**, kod yazmak için bir proje klasöründe.
 - **ChatGPT (Codex)**, bir proje klasöründe.
 

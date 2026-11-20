@@ -87,7 +87,7 @@ function buildContent(text, files, provider = 'claude') {
   const inline = new Set();
   for (const f of files) {
     if (f.kind === 'image' && f.size <= MAX_INLINE_IMAGE) {
-      blocks.push(provider === 'codex'
+      blocks.push(String(provider).startsWith('codex')
         ? { type: 'image', path: f.path }
         : { type: 'image', source: { type: 'base64', media_type: f.mime, data: fs.readFileSync(f.path).toString('base64') } });
       inline.add(f.path);
@@ -277,9 +277,10 @@ function codexEfforts(model) {
 function getSession(chat) {
   let s = sessions.get(chat.id);
   if (s) return s;
-  if (chat.provider === 'claude-chat') fs.mkdirSync(chat.cwd, { recursive: true });
-  const common = { env, cwd: chat.cwd, sessionId: chat.sessionId, model: chat.model, permissionMode: chat.permissionMode, chatMode: chat.provider === 'claude-chat', t };
-  s = chat.provider === 'codex'
+  const chatOnly = chat.provider === 'claude-chat' || chat.provider === 'codex-chat';
+  if (chatOnly) fs.mkdirSync(chat.cwd, { recursive: true });
+  const common = { env, cwd: chat.cwd, sessionId: chat.sessionId, model: chat.model, permissionMode: chat.permissionMode, chatMode: chatOnly, t };
+  s = String(chat.provider).startsWith('codex')
     ? new CodexSession({ ...common, codexPath: env.codexPath, effort: codexEfforts(chat.model).includes(chat.effort) ? chat.effort : '' })
     : new ClaudeSession({ ...common, effort: MODELS.efforts(chat.model).includes(chat.effort) ? chat.effort : '' });
   s.on('event', (ev) => handleEvent(chat.id, ev));
@@ -448,13 +449,15 @@ ipcMain.handle('chat:new', async (e, provider) => {
     openChat(chat.id);
   };
   // A plain Claude chat needs no folder: it gets a private, empty one inside the app's data folder.
-  const createClaudeChat = () => {
+  const createClaudeChat = (kind = 'claude-chat') => {
     const id = crypto.randomUUID();
-    const chat = store.createChat({ cwd: path.join(claudeChatsDir(), id), name: t('list.claudeChatName'), provider: 'claude-chat' });
+    const name = t(kind === 'codex-chat' ? 'list.gptChatName' : 'list.claudeChatName');
+    const chat = store.createChat({ cwd: path.join(claudeChatsDir(), id), name, provider: kind });
     pushState();
     openChat(chat.id);
   };
   if (provider === 'claude-chat' && env.claudePath) return createClaudeChat();
+  if (provider === 'codex-chat' && env.codexPath) return createClaudeChat('codex-chat');
   if (provider === 'claude' && env.claudePath) return pickFolderAndCreate('claude');
   if (provider === 'codex' && env.codexPath) return pickFolderAndCreate('codex');
 });
@@ -462,7 +465,7 @@ ipcMain.handle('chat:new', async (e, provider) => {
 ipcMain.handle('codex:models', () => codexModels());
 
 ipcMain.handle('chat:get', (_e, id) => ({
-  codexModels: store.getChat(id)?.provider === 'codex' ? codexModels() : [],
+  codexModels: String(store.getChat(id)?.provider).startsWith('codex') ? codexModels() : [],
   chat: store.getChat(id),
   busy: busy.has(id),
   profile: store.profile(),

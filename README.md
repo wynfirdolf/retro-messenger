@@ -93,9 +93,10 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </table>
 
 ### 🤖 Claude and ChatGPT
-Click **Start a new chat** and choose one of three:
+Click **Start a new chat** and choose one of four:
 
 - **Claude chat:** a regular Claude conversation, like the Claude app, with no project folder. It uses the Claude already signed in on your computer; Claude can search the web and read files you send.
+- **ChatGPT chat:** the same for ChatGPT, using the ChatGPT account already signed in on your computer, with web search.
 - **Claude Code** in a project folder, for coding.
 - **ChatGPT (Codex)** in a project folder.
 

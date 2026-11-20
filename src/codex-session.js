@@ -63,9 +63,17 @@ function plainCommand(cmd) {
   return m ? m[2].replace(/\\"/g, '"') : s;
 }
 
+const CHAT_INSTRUCTIONS = [
+  'You are ChatGPT, chatting with the user in Retro Messenger, a nostalgic instant-messenger app.',
+  'This is an ordinary conversation, not a coding task: there is no project to work on, so do not run shell commands unless the user asks you to read a file they attached.',
+  'Reply in the language the user writes in. Be warm and natural; keep replies as short as the question allows, but give full answers when asked for detail.',
+  'Markdown is rendered. Use web search when current or specific information would help.',
+].join(' ');
+
 class CodexSession extends EventEmitter {
-  constructor({ env, codexPath, cwd, sessionId, model, effort, permissionMode, t }) {
+  constructor({ env, codexPath, cwd, sessionId, model, effort, permissionMode, chatMode, t }) {
     super();
+    this.chatMode = !!chatMode;
     this.env = env;
     this.codexPath = codexPath;
     this.cwd = cwd;
@@ -93,10 +101,13 @@ class CodexSession extends EventEmitter {
       return false;
     }
     const { prompt, images } = this.flatten(content);
-    const args = ['exec'];
+    // A plain ChatGPT chat: web search on, read-only, and told it's a conversation rather than a coding task.
+    const args = this.chatMode ? ['--search', 'exec'] : ['exec'];
     if (this.threadId) args.push('resume', this.threadId);
     // -c values that are not valid TOML are taken as plain strings, so no quotes are needed (and none reach cmd.exe).
-    args.push('--json', '--skip-git-repo-check', '-c', `sandbox_mode=${this.sandbox}`, '-c', 'approval_policy=never');
+    const sandbox = this.chatMode ? 'read-only' : this.sandbox;
+    args.push('--json', '--skip-git-repo-check', '-c', `sandbox_mode=${sandbox}`, '-c', 'approval_policy=never');
+    if (this.chatMode) args.push('-c', `developer_instructions=${CHAT_INSTRUCTIONS}`);
     if (this.model) args.push('-m', this.model);
     if (this.effort) args.push('-c', `model_reasoning_effort=${this.effort}`);
     for (const img of images) args.push('-i', img);
@@ -198,7 +209,7 @@ class CodexSession extends EventEmitter {
         }
         return;
       case 'web_search':
-        this.emitEvent({ kind: 'tool', text: this.t('tool.WebSearch', { x: short(item.query) }) });
+        if (item.query) this.emitEvent({ kind: 'tool', text: this.t('tool.WebSearch', { x: short(item.query) }) });
         return;
       case 'mcp_tool_call':
         this.emitEvent({ kind: 'tool', text: this.t('tool.other', { x: `${item.server || ''}/${item.tool || ''}` }) });

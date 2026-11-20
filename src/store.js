@@ -46,14 +46,14 @@ const chats = () => data.chats;
 const getChat = (id) => data.chats.find((c) => c.id === id) || null;
 
 function createChat({ name, cwd, avatar, provider = 'claude' }) {
-  const codex = provider === 'codex';
-  const chatOnly = provider === 'claude-chat';
+  const codex = provider === 'codex' || provider === 'codex-chat';
+  const chatOnly = provider === 'claude-chat' || provider === 'codex-chat';
   const chat = {
     id: crypto.randomUUID(),
     provider,
     name,
     cwd,
-    avatar: avatar || (codex ? '🧠' : chatOnly ? '✨' : '🤖'),
+    avatar: avatar || (provider === 'codex-chat' ? '💬' : codex ? '🧠' : chatOnly ? '✨' : '🤖'),
     sessionId: null,
     model: '',
     effort: '',
