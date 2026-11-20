@@ -213,6 +213,14 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 - ChatGPT (Codex) sohbetleri Windows'ta henüz test edilmedi.
 - Hazır sürümler Apple Silicon Mac'ler ve 64 bit Windows içindir. Intel Mac'lerde kaynaktan çalıştırılabilir.
 
+### 👍 claude.ai ve chatgpt.com ile eşitleme için destek ver
+Retro Messenger'daki sohbetler Claude ve ChatGPT uygulamalarında ya da sitelerinde görünmüyor; oradaki mevcut sohbetlerin de burada açılamıyor. Bunun sebebi, resmi komut satırı araçlarında bunu yapmanın henüz bir yolu olmaması. Bunun için istek açtık:
+
+- **Claude:** [anthropics/claude-code#111354](https://github.com/anthropics/claude-code/issues/111354)
+- **ChatGPT:** [openai/codex#62754](https://github.com/openai/codex/issues/62754)
+
+Sen de istiyorsan bağlantılara girip 👍 ver. Ne kadar çok kişi isterse yapılma ihtimali o kadar artar.
+
 ## Yol haritası
 
 - [x] ~~*Windows sürümü*~~

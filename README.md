@@ -213,6 +213,14 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 - ChatGPT (Codex) chats haven't been tested on Windows yet.
 - Prebuilt releases are for Apple Silicon Macs and 64-bit Windows. Intel Macs can run it from source.
 
+### 👍 Help us sync with claude.ai and chatgpt.com
+Chats in Retro Messenger don't show up in the Claude or ChatGPT apps or websites, and your existing chats there can't be opened here. That's because the official command-line tools have no way to do it yet. We've asked for one:
+
+- **Claude:** [anthropics/claude-code#111354](https://github.com/anthropics/claude-code/issues/111354)
+- **ChatGPT:** [openai/codex#62754](https://github.com/openai/codex/issues/62754)
+
+If you'd like this too, open the issues and add a 👍. The more people ask, the more likely it gets built.
+
 ## Roadmap
 
 - [x] ~~*Windows build*~~
