@@ -195,8 +195,62 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Main shows a Claude / ChatGPT menu when both are installed, then asks for the folder.
-async function newChat() {
-  await rm.newChat();
+// "New chat" menu in the app's own XP style: icon, title and a short line per option.
+const NEW_CHAT_OPTIONS = [
+  { provider: 'claude-chat', icon: '✨', needs: 'claude', title: 'newmenu.chat', desc: 'newmenu.chatDesc' },
+  { provider: 'claude', icon: '🤖', needs: 'claude', title: 'newmenu.code', desc: 'newmenu.codeDesc' },
+  { provider: 'codex', icon: '🧠', needs: 'codex', title: 'newmenu.codex', desc: 'newmenu.codexDesc' },
+];
+
+function closeNewMenu() {
+  $('#newmenu')?.remove();
+  document.removeEventListener('mousedown', newMenuAway, true);
+  document.removeEventListener('keydown', newMenuKeys, true);
+}
+function newMenuAway(e) {
+  if (!e.target.closest('#newmenu') && !e.target.closest('#add, #new-chat, #empty-new')) closeNewMenu();
+}
+function newMenuKeys(e) {
+  const items = $$('#newmenu .nm-item:not(.off)');
+  const i = items.indexOf(document.activeElement);
+  if (e.key === 'Escape') { e.preventDefault(); closeNewMenu(); }
+  else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const n = items.length;
+    items[(i + (e.key === 'ArrowDown' ? 1 : n - 1) + (i < 0 ? 1 : 0)) % n]?.focus();
+  }
+}
+
+function newChat(e) {
+  if ($('#newmenu')) return closeNewMenu();
+  const have = state.providers || { claude: !!state.claudePath, codex: false };
+  const menu = document.createElement('div');
+  menu.id = 'newmenu';
+  menu.innerHTML = `<div class="nm-head">${esc(t('newmenu.title'))}</div>` + NEW_CHAT_OPTIONS.map((o) => {
+    const ok = have[o.needs];
+    return `<button class="nm-item${ok ? '' : ' off'}" data-p="${o.provider}" ${ok ? '' : 'disabled'}>
+      <span class="nm-ico">${o.icon}</span>
+      <span class="nm-txt"><b>${esc(t(o.title))}</b><small>${esc(ok ? t(o.desc) : t('newmenu.missing'))}</small></span>
+    </button>`;
+  }).join('');
+  document.body.appendChild(menu);
+  const anchor = (e && e.currentTarget) || $('#new-chat');
+  const r = anchor.getBoundingClientRect();
+  const h = menu.offsetHeight;
+  const w = menu.offsetWidth;
+  const below = r.bottom + 4 + h < innerHeight;
+  menu.style.top = `${below ? r.bottom + 4 : Math.max(6, r.top - h - 4)}px`;
+  menu.style.left = `${Math.max(6, Math.min(r.left, innerWidth - w - 6))}px`;
+  menu.classList.add(below ? 'down' : 'up');
+  menu.addEventListener('click', (ev) => {
+    const b = ev.target.closest('.nm-item:not(.off)');
+    if (!b) return;
+    closeNewMenu();
+    rm.newChat(b.dataset.p);
+  });
+  document.addEventListener('mousedown', newMenuAway, true);
+  document.addEventListener('keydown', newMenuKeys, true);
+  menu.querySelector('.nm-item:not(.off)')?.focus();
 }
 $('#add').onclick = newChat;
 $('#new-chat').onclick = newChat;

@@ -7,7 +7,7 @@ contextBridge.exposeInMainWorld('rm', {
   updateProfile: (patch) => ipcRenderer.invoke('profile:update', patch),
   pickFolder: () => ipcRenderer.invoke('folder:pick'),
   createChat: (opts) => ipcRenderer.invoke('chat:create', opts),
-  newChat: () => ipcRenderer.invoke('chat:new'),
+  newChat: (provider) => ipcRenderer.invoke('chat:new', provider),
   getChat: (id) => ipcRenderer.invoke('chat:get', id),
   updateChat: (id, patch) => ipcRenderer.invoke('chat:update', id, patch),
   deleteChat: (id) => ipcRenderer.invoke('chat:delete', id),

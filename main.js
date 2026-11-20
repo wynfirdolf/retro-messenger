@@ -436,7 +436,8 @@ ipcMain.handle('chat:create', (_e, { cwd, name, avatar, provider }) => {
 });
 
 // "New chat": pick who to talk to (when more than one is installed), then a folder.
-ipcMain.handle('chat:new', async (e) => {
+// provider: 'claude-chat' (no folder), 'claude' or 'codex' (asks for a folder). The renderer shows the menu.
+ipcMain.handle('chat:new', async (e, provider) => {
   const win = BrowserWindow.fromWebContents(e.sender);
   const pickFolderAndCreate = async (provider) => {
     const r = await dialog.showOpenDialog(win, { title: t('dlg.pickFolder'), buttonLabel: t('dlg.choose'), properties: ['openDirectory', 'createDirectory'] });
@@ -453,11 +454,9 @@ ipcMain.handle('chat:new', async (e) => {
     pushState();
     openChat(chat.id);
   };
-  Menu.buildFromTemplate([
-    { label: t('list.newClaudeChat'), enabled: !!env.claudePath, click: createClaudeChat },
-    { label: t('list.newClaude'), enabled: !!env.claudePath, click: () => pickFolderAndCreate('claude') },
-    ...(env.codexPath ? [{ label: t('list.newCodex'), click: () => pickFolderAndCreate('codex') }] : []),
-  ]).popup({ window: win });
+  if (provider === 'claude-chat' && env.claudePath) return createClaudeChat();
+  if (provider === 'claude' && env.claudePath) return pickFolderAndCreate('claude');
+  if (provider === 'codex' && env.codexPath) return pickFolderAndCreate('codex');
 });
 
 ipcMain.handle('codex:models', () => codexModels());
