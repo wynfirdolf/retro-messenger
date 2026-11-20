@@ -104,6 +104,9 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 
 <img src="docs/tr/chatgpt.png" alt="Bir ChatGPT sohbeti" width="70%">
 
+### 💾 Sohbeti dışa aktarma
+Bir sohbette **💾 Dışa aktar**'a tıklayın (ya da kişi listesinde sağ tıklayıp **Dışa aktar…**'ı seçin) ve **Markdown** ya da tek dosyalık bir **HTML** sayfası olarak kaydedin. Dosyada tüm konuşma saatleriyle, yazı rengin, ek adları ve kısa bir başlıkla yer alır; HTML açık ve koyu moda uyum sağlar.
+
 ### 📎 Dosya ve resim gönderme
 **📎 Dosya gönder** düğmesine tıklayın, dosyaları sohbete sürükleyin ya da ⌘V / Ctrl+V ile yapıştırın (ekran görüntüleri dahil). Dosyalar, siz Gönder'e basana kadar mesaj kutusunun üstündeki tepside bekler. Claude resimleri açmasına gerek kalmadan hemen görür. Diğer dosya ve klasörlerin yolunu alır ve onları kendisi açar; proje klasörünün dışındaysa önce bir izin kartı çıkar. Geçmişte resimler küçük resim, dosyalar kart olarak görünür; tıklayınca açılırlar.
 
@@ -197,6 +200,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 | `src/codex-session.js` | ChatGPT sohbetleri için `codex exec --json` çalıştırır ve olaylarını aynı biçime çevirir |
 | `src/claude-session.js` | `claude` sürecini yönetir ve akan olayları sadeleştirir |
 | `src/store.js` | Profil ve sohbet geçmişi (kullanıcı veri klasöründe `data.json`) |
+| `src/export.js` | Bir konuşmayı Markdown ya da HTML'e çevirir |
 | `src/history.js` | Claude Code'un kaydettiği konuşmaları (`~/.claude/projects`) içe aktarmak için okur |
 | `renderer/i18n.js` | Türkçe ve İngilizce metinler |
 | `renderer/fonts/` | Google Fonts'tan alınan ileti yazı tipleri ve lisansları (`npm run fonts` ile yeniden indirilir) |
@@ -227,7 +231,7 @@ Sen de istiyorsan bağlantılara girip 👍 ver. Ne kadar çok kişi isterse yap
 - [x] ~~*Uygulama içinden izin onayı*~~
 - [ ] Görünen resim olarak kendi fotoğrafını yükleme
 - [x] ~~*Yazı tipi ve renk seçimi*~~
-- [ ] Sohbet geçmişini dışa aktarma
+- [x] ~~*Sohbet geçmişini dışa aktarma*~~
 
 Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gönderebilirsiniz.
 

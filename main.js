@@ -7,6 +7,7 @@ const store = require('./src/store');
 const { ClaudeSession, resolveEnvironment, describeTool } = require('./src/claude-session');
 const { CodexSession, findCodex, listModels: codexModels } = require('./src/codex-session');
 const history = require('./src/history');
+const exporter = require('./src/export');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
 
@@ -668,6 +669,30 @@ ipcMain.handle('chat:nudge', (e, id) => {
   sendToClaude(id, t('nudgePrompt'));
 });
 
+// Save a chat as Markdown or HTML. The format follows the file extension picked in the dialog.
+async function exportChat(id, win) {
+  const chat = store.getChat(id);
+  if (!chat) return false;
+  const r = await dialog.showSaveDialog(win, {
+    title: t('export.title'),
+    buttonLabel: t('export.save'),
+    defaultPath: path.join(app.getPath('documents'), exporter.defaultFileName(chat, 'md')),
+    filters: [{ name: 'Markdown', extensions: ['md'] }, { name: 'HTML', extensions: ['html'] }],
+  });
+  if (r.canceled || !r.filePath) return false;
+  const html = /\.html?$/i.test(r.filePath);
+  const text = html ? exporter.toHtml(chat, store.profile(), t) : exporter.toMarkdown(chat, store.profile(), t);
+  try {
+    fs.writeFileSync(r.filePath, text);
+  } catch (err) {
+    dialog.showErrorBox(t('export.title'), String(err.message || err));
+    return false;
+  }
+  shell.showItemInFolder(r.filePath);
+  return true;
+}
+ipcMain.handle('chat:export', (e, id) => exportChat(id, BrowserWindow.fromWebContents(e.sender)));
+
 ipcMain.handle('chat:reveal', (_e, id) => {
   const chat = store.getChat(id);
   if (chat) shell.openPath(chat.cwd);
@@ -689,7 +714,8 @@ ipcMain.on('chat:context-menu', (e, id) => {
     { label: t('menu.open'), click: () => openChat(id) },
     { label: t('menu.rename'), click: () => sender.send('rename', id) },
     { label: chat.pinned ? t('menu.unpin') : t('menu.pin'), click: () => { store.updateChat(id, { pinned: !chat.pinned }); pushState(); } },
-    { label: t('menu.reveal'), click: () => shell.openPath(chat.cwd) },
+    { label: t('menu.reveal'), enabled: !String(chat.provider).endsWith('-chat'), click: () => shell.openPath(chat.cwd) },
+    { label: t('menu.export'), click: () => exportChat(id, BrowserWindow.fromWebContents(sender)) },
     { type: 'separator' },
     { label: t('menu.delete'), click: () => sender.send('delete', id) },
   ]).popup({ window: BrowserWindow.fromWebContents(sender) });

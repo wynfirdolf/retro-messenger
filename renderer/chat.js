@@ -220,6 +220,7 @@ $('#stop').onclick = () => rm.stop(id);
 $('#btn-nudge').onclick = () => rm.nudge(id);
 $('#btn-folder').onclick = () => rm.reveal(id);
 $('#btn-new').onclick = () => rm.newSession(id);
+$('#btn-export').onclick = () => rm.exportChat(id);
 // ---------- İzin istekleri ----------
 
 const permissions = new Map(); // istek id -> kart elemanı

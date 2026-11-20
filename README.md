@@ -104,6 +104,9 @@ Click **Start a new chat** and choose one of four:
 
 <img src="docs/chatgpt.png" alt="A ChatGPT chat" width="70%">
 
+### 💾 Export a conversation
+Click **💾 Export** in a conversation (or right-click it in the contact list and choose **Export…**) and save it as **Markdown** or a self-contained **HTML** page. The file has the whole conversation with times, your font colors, attachment names and a short header; the HTML adapts to light and dark mode.
+
 ### 📎 Send files and images
 Click **📎 Send files**, drag files onto the conversation, or paste with ⌘V / Ctrl+V (screenshots too). They wait in a tray above the message box until you hit Send. Claude sees images right away, without opening them. For other files and folders it gets the path and opens them itself; if they're outside the project folder, you'll get a permission card first. In the history, images show as thumbnails and files as chips; click one to open it.
 
@@ -197,6 +200,7 @@ Each chat runs a `claude -p --input-format stream-json --output-format stream-js
 | `src/claude-session.js` | Runs the `claude` process and simplifies its event stream |
 | `src/codex-session.js` | Runs `codex exec --json` for ChatGPT chats and maps its events to the same shape |
 | `src/store.js` | Profile and chat history (`data.json` in the user data folder) |
+| `src/export.js` | Turns a conversation into Markdown or HTML |
 | `src/history.js` | Reads Claude Code's saved conversations (`~/.claude/projects`) so they can be imported |
 | `renderer/i18n.js` | English and Turkish strings |
 | `renderer/fonts/` | Message fonts from Google Fonts with their licenses (regenerate with `npm run fonts`) |
@@ -227,7 +231,7 @@ If you'd like this too, open the issues and add a 👍. The more people ask, the
 - [x] ~~*In-app permission prompts*~~
 - [ ] Upload your own photo as a display picture
 - [x] ~~*Font and color choice*~~
-- [ ] Export chat history
+- [x] ~~*Export chat history*~~
 
 Contributions are welcome. Open an issue or send a pull request.
 
