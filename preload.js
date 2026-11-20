@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('rm', {
   deleteChat: (id) => ipcRenderer.invoke('chat:delete', id),
   openChat: (id) => ipcRenderer.invoke('chat:open', id),
   openImport: () => ipcRenderer.invoke('history:open'),
+  openSettings: () => ipcRenderer.invoke('settings:open'),
   listSessions: () => ipcRenderer.invoke('history:list'),
   importSession: (sessionId) => ipcRenderer.invoke('history:import', sessionId),
   send: (id, text, style, files) => ipcRenderer.invoke('chat:send', id, text, style, files),

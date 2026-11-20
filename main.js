@@ -18,6 +18,7 @@ let env = { env: process.env, claudePath: null };
 let listWin = null;
 let toastWin = null;
 let importWin = null;
+let settingsWin = null;
 let rateLimit = null;
 const chatWins = new Map(); // sohbet id -> pencere
 const sessions = new Map(); // sohbet id -> ClaudeSession
@@ -103,6 +104,8 @@ function snapshot() {
   return {
     profile: store.profile(),
     claudePath: env.claudePath && env.claudePath.replace(os.homedir(), '~'),
+    codexPath: env.codexPath && env.codexPath.replace(os.homedir(), '~'),
+    appVersion: require('./package.json').version,
     providers: { claude: !!env.claudePath, codex: !!env.codexPath },
     rateLimit,
     chats: store.chats().map((c) => ({
@@ -123,6 +126,7 @@ function snapshot() {
 
 function pushState() {
   if (alive(listWin)) listWin.webContents.send('state', snapshot());
+  if (alive(settingsWin)) settingsWin.webContents.send('state', snapshot());
 }
 
 function sendToChat(id, channel, payload) {
@@ -208,6 +212,13 @@ function openChat(id) {
   win.on('closed', () => chatWins.delete(id));
   chatWins.set(id, win);
   markRead(id);
+}
+
+function openSettingsWindow() {
+  if (alive(settingsWin)) return settingsWin.focus();
+  settingsWin = makeWindow({ width: 620, height: 520, minWidth: 520, minHeight: 420, title: t('set.title') });
+  settingsWin.loadFile(page('settings.html'));
+  settingsWin.on('closed', () => { settingsWin = null; });
 }
 
 function openImportWindow(parent) {
@@ -528,6 +539,7 @@ ipcMain.handle('chat:open', (_e, id) => openChat(id));
 // ---------- Terminalde başlatılmış konuşmaları içe aktarma ----------
 
 ipcMain.handle('history:open', (e) => openImportWindow(BrowserWindow.fromWebContents(e.sender)));
+ipcMain.handle('settings:open', () => openSettingsWindow());
 
 ipcMain.handle('history:list', () => {
   const known = new Set(store.chats().map((c) => c.sessionId).filter(Boolean));
