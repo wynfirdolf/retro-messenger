@@ -57,7 +57,7 @@ function renderMessage(m) {
 function renderAll() {
   lastDay = '';
   const readOnly = ['default', 'manual', 'plan'].includes(chat.permissionMode);
-  const key = isCodex() ? 'chat.welcomeCodex' : readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit';
+  const key = isChatOnly() ? 'chat.welcomeChat' : isCodex() ? 'chat.welcomeCodex' : readOnly ? 'chat.welcomeRead' : 'chat.welcomeEdit';
   const welcome = esc(t(key, { cwd: '\u0000' })).replace('\u0000', `<b>${esc(chat.cwd)}</b>`);
   history.innerHTML = `<div class="welcome">${welcome}</div>`;
   for (const m of chat.messages) history.appendChild(renderMessage(m));
@@ -68,8 +68,10 @@ function renderChrome() {
   setTitle(t('chat.title', { name: chat.name }));
   $('#to-name').textContent = chat.name;
   $('#to-cwd').textContent = chat.cwd;
+  $('#to-cwd').parentElement.style.display = isChatOnly() ? 'none' : '';
   $('#to-prov').textContent = t(isCodex() ? 'prov.codex' : 'prov.claude');
   $('#to-prov').className = `prov-tag${isCodex() ? ' codex' : ''}`;
+  $('#to-prov').style.display = isChatOnly() ? 'none' : '';
   renderModelPickers();
   $('#dp-claude').innerHTML = avatarHtml(chat.avatar, 'xl', busy ? 'busy-ring' : '');
   $('#lbl-claude').textContent = chat.name;
@@ -360,6 +362,7 @@ $('#btn-font').onclick = (e) => {
 // ---------- Model, sürüm ve efor ----------
 
 const isCodex = () => chat.provider === 'codex';
+const isChatOnly = () => chat.provider === 'claude-chat';
 let codexModels = [];
 
 const PERM_OPTIONS = {
@@ -392,6 +395,9 @@ function renderCodexPickers() {
 
 function renderModelPickers() {
   renderPermPicker();
+  // A plain chat has no folder and no permission modes.
+  $('#perm').closest('label').style.display = isChatOnly() ? 'none' : '';
+  $('#btn-folder').style.display = isChatOnly() ? 'none' : '';
   if (isCodex()) return renderCodexPickers();
   $('#family').style.display = '';
   const { family, version } = MODELS.parse(chat.model);

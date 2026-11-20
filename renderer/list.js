@@ -103,9 +103,9 @@ function contactHtml(c) {
   if (renaming === c.id) {
     return `<div class="${cls}" data-id="${c.id}">${contactIcon(c)}<input type="text" class="rename" value="${esc(c.name)}" maxlength="60"></div>`;
   }
-  const sub = c.waiting ? t('list.waiting') : c.busy ? t('list.typing') : c.last ? `- ${c.last}` : `- ${c.cwd}`;
+  const sub = c.waiting ? t('list.waiting') : c.busy ? t('list.typing') : c.last ? `- ${c.last}` : c.provider === 'claude-chat' ? '' : `- ${c.cwd}`;
   const badge = c.provider === 'codex' ? `<span class="prov codex">${esc(t('prov.codex'))}</span>` : '';
-  return `<div class="${cls}" data-id="${c.id}" title="${esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span>${badge}<span class="cm">${esc(sub)}</span></div>`;
+  return `<div class="${cls}" data-id="${c.id}" title="${c.provider === 'claude-chat' ? '' : esc(c.cwd)}">${contactIcon(c)}<span class="cn">${esc(c.name)}</span>${badge}<span class="cm">${esc(sub)}</span></div>`;
 }
 
 function renderGroups() {

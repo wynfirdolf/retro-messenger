@@ -93,7 +93,13 @@ Terminalde `claude` ile bir şey mi başlattınız? Kişi listesinin altındaki 
 </table>
 
 ### 🤖 Claude ve ChatGPT
-**Yeni sohbet başlat**'a tıklayıp **Claude Code** ya da **ChatGPT (Codex)** seçin. ChatGPT sohbetleri, ChatGPT uygulamasıyla gelen Codex CLI'ı (ya da PATH'teki Codex'i) ve bilgisayarınızda zaten giriş yapılmış ChatGPT hesabını kullanır; Retro Messenger'da giriş yapmanız gerekmez. Modeli hesabınızdaki listeden (GPT-6.2-Sol, Astra…), düşünme eforunu ve ne kadar yetkisi olacağını (yalnızca okuma, proje klasörünü düzenleme ya da tam yetki) seçersiniz. ChatGPT sohbetleri kişi listesinde yeşil bir etiketle görünür.
+**Yeni sohbet başlat**'a tıklayıp üç seçenekten birini seçin:
+
+- **Claude sohbeti:** Claude uygulamasındaki gibi sıradan bir sohbet, proje klasörü yok. Bilgisayarınızda giriş yapılmış Claude'u kullanır; Claude internette arama yapabilir ve gönderdiğiniz dosyaları okuyabilir.
+- **Claude Code**, kod yazmak için bir proje klasöründe.
+- **ChatGPT (Codex)**, bir proje klasöründe.
+
+ ChatGPT sohbetleri, ChatGPT uygulamasıyla gelen Codex CLI'ı (ya da PATH'teki Codex'i) ve bilgisayarınızda zaten giriş yapılmış ChatGPT hesabını kullanır; Retro Messenger'da giriş yapmanız gerekmez. Modeli hesabınızdaki listeden (GPT-6.2-Sol, Astra…), düşünme eforunu ve ne kadar yetkisi olacağını (yalnızca okuma, proje klasörünü düzenleme ya da tam yetki) seçersiniz. ChatGPT sohbetleri kişi listesinde yeşil bir etiketle görünür.
 
 <img src="docs/tr/chatgpt.png" alt="Bir ChatGPT sohbeti" width="70%">
 

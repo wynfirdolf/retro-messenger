@@ -112,9 +112,18 @@ function describeTool({ name, input = {} }, t) {
   return t(entry[0], { x: entry[1](input || {}) });
 }
 
+const CHAT_SYSTEM_PROMPT = [
+  'You are Claude, made by Anthropic, chatting with the user in Retro Messenger, a nostalgic instant-messenger app.',
+  'This is an ordinary conversation, not a coding project: there is no project folder to work in.',
+  'Reply in the language the user writes in. Be warm and natural; keep replies as short as the question allows, but give full answers when asked for detail.',
+  'Markdown (bold, lists, code blocks) is rendered.',
+  'You can search the web and open web pages when current or specific information would help, and read files the user attaches.',
+].join(' ');
+
 class ClaudeSession extends EventEmitter {
-  constructor({ env, cwd, sessionId, model, effort, permissionMode, t }) {
+  constructor({ env, cwd, sessionId, model, effort, permissionMode, chatMode, t }) {
     super();
+    this.chatMode = !!chatMode;
     this.t = t;
     this.env = env;
     this.cwd = cwd;
@@ -149,12 +158,25 @@ class ClaudeSession extends EventEmitter {
       '--output-format', 'stream-json',
       '--verbose',
       '--include-partial-messages',
-      '--permission-mode', this.permissionMode,
       // Permission prompts come to us as control_request messages on stdout; we answer on stdin.
       '--permission-prompt-tool', 'stdio',
-      // Multiple-choice questions would need their own UI; Claude asks in plain text instead.
-      '--disallowedTools', 'AskUserQuestion',
     ];
+    if (this.chatMode) {
+      // A plain Claude conversation: no coding project, only web search, web pages and reading files the user sends.
+      args.push(
+        '--permission-mode', 'default',
+        '--tools', 'WebSearch,WebFetch,Read',
+        '--allowedTools', 'WebSearch,WebFetch',
+        '--strict-mcp-config',
+        '--system-prompt', CHAT_SYSTEM_PROMPT,
+      );
+    } else {
+      args.push(
+        '--permission-mode', this.permissionMode,
+        // Multiple-choice questions would need their own UI; Claude asks in plain text instead.
+        '--disallowedTools', 'AskUserQuestion',
+      );
+    }
     if (this.model) args.push('--model', this.model);
     if (this.effort) args.push('--effort', this.effort);
     if (this.sessionId) args.push('--resume', this.sessionId);

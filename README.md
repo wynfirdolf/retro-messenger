@@ -93,7 +93,13 @@ Started something in the terminal with `claude`? Click **Open a past conversatio
 </table>
 
 ### 🤖 Claude and ChatGPT
-Click **Start a new chat** and choose **Claude Code** or **ChatGPT (Codex)**. ChatGPT chats use the Codex CLI that comes with the ChatGPT app (or one on your PATH) and the ChatGPT account already signed in on your computer, so there's no login in Retro Messenger. You pick the model from your account's list (GPT-6.2-Sol, Astra…), the reasoning effort, and how much it may touch: read only, edit the project folder, or full access. ChatGPT chats get a green badge in your contact list.
+Click **Start a new chat** and choose one of three:
+
+- **Claude chat:** a regular Claude conversation, like the Claude app, with no project folder. It uses the Claude already signed in on your computer; Claude can search the web and read files you send.
+- **Claude Code** in a project folder, for coding.
+- **ChatGPT (Codex)** in a project folder.
+
+ ChatGPT chats use the Codex CLI that comes with the ChatGPT app (or one on your PATH) and the ChatGPT account already signed in on your computer, so there's no login in Retro Messenger. You pick the model from your account's list (GPT-6.2-Sol, Astra…), the reasoning effort, and how much it may touch: read only, edit the project folder, or full access. ChatGPT chats get a green badge in your contact list.
 
 <img src="docs/chatgpt.png" alt="A ChatGPT chat" width="70%">
 

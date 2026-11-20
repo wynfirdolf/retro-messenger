@@ -217,6 +217,8 @@ function openImportWindow(parent) {
   importWin.on('closed', () => { importWin = null; });
 }
 
+const claudeChatsDir = () => path.join(app.getPath('userData'), 'claude-chats');
+
 const homeLabel = (p) => (p.startsWith(os.homedir()) ? '~' + p.slice(os.homedir().length) : p);
 
 function showToast(chat, text) {
@@ -275,7 +277,8 @@ function codexEfforts(model) {
 function getSession(chat) {
   let s = sessions.get(chat.id);
   if (s) return s;
-  const common = { env, cwd: chat.cwd, sessionId: chat.sessionId, model: chat.model, permissionMode: chat.permissionMode, t };
+  if (chat.provider === 'claude-chat') fs.mkdirSync(chat.cwd, { recursive: true });
+  const common = { env, cwd: chat.cwd, sessionId: chat.sessionId, model: chat.model, permissionMode: chat.permissionMode, chatMode: chat.provider === 'claude-chat', t };
   s = chat.provider === 'codex'
     ? new CodexSession({ ...common, codexPath: env.codexPath, effort: codexEfforts(chat.model).includes(chat.effort) ? chat.effort : '' })
     : new ClaudeSession({ ...common, effort: MODELS.efforts(chat.model).includes(chat.effort) ? chat.effort : '' });
@@ -443,10 +446,17 @@ ipcMain.handle('chat:new', async (e) => {
     pushState();
     openChat(chat.id);
   };
-  if (!env.codexPath) return pickFolderAndCreate('claude');
+  // A plain Claude chat needs no folder: it gets a private, empty one inside the app's data folder.
+  const createClaudeChat = () => {
+    const id = crypto.randomUUID();
+    const chat = store.createChat({ cwd: path.join(claudeChatsDir(), id), name: t('list.claudeChatName'), provider: 'claude-chat' });
+    pushState();
+    openChat(chat.id);
+  };
   Menu.buildFromTemplate([
+    { label: t('list.newClaudeChat'), enabled: !!env.claudePath, click: createClaudeChat },
     { label: t('list.newClaude'), enabled: !!env.claudePath, click: () => pickFolderAndCreate('claude') },
-    { label: t('list.newCodex'), click: () => pickFolderAndCreate('codex') },
+    ...(env.codexPath ? [{ label: t('list.newCodex'), click: () => pickFolderAndCreate('codex') }] : []),
   ]).popup({ window: win });
 });
 
@@ -519,7 +529,7 @@ ipcMain.handle('history:open', (e) => openImportWindow(BrowserWindow.fromWebCont
 
 ipcMain.handle('history:list', () => {
   const known = new Set(store.chats().map((c) => c.sessionId).filter(Boolean));
-  return history.listSessions(known).map((s) => ({
+  return history.listSessions(known).filter((s) => !s.cwd.startsWith(claudeChatsDir())).map((s) => ({
     ...s,
     file: undefined,
     cwdLabel: homeLabel(s.cwd),
