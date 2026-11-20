@@ -58,7 +58,7 @@
   .compose .btns .xp-btn { flex: 1; min-width: 0; padding: 0; }
   #send { font-weight: bold; }
 
-  .side { flex: none; width: 116px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding-top: 2px; }
+  .side { flex: none; width: 138px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding-top: 2px; }
   .side .who-label { margin-top: 4px; color: var(--label); text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .side .slot { display: flex; flex-direction: column; align-items: center; }
   #dp-claude { cursor: pointer; }
@@ -120,7 +120,19 @@
   .fontpop .sw.auto { background: linear-gradient(135deg, var(--surface) 50%, var(--ink) 50%); }
   .fontpop input[type="color"] { width: 26px; height: 22px; padding: 0; border: 1px solid var(--line); background: none; }
   .fontpop .preview { padding: 8px; border: 1px dashed var(--line); background: var(--surface); font: 13px var(--chat-font); min-height: 38px; overflow: hidden; }
+  /* Usage panel between the two display pictures */
+  .stats { width: 100%; margin: 10px 0; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; min-height: 0; }
+  .stats .box { padding: 6px 7px; border: 1px solid var(--soft-line); border-radius: 4px; background: color-mix(in srgb, var(--surface) 55%, transparent); }
+  .stats .hd { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; color: var(--label); font-size: 10px; }
+  .stats .hd b { color: var(--ink); font-size: 11px; }
+  .stats .bar { height: 9px; margin-top: 4px; border: 1px solid var(--line); border-radius: 2px; background: var(--field); padding: 1px; }
+  .stats .fill { height: 100%; border-radius: 1px; background: repeating-linear-gradient(90deg, var(--c) 0 6px, transparent 6px 8px); --c: #37b532; }
+  .stats .fill.warn { --c: #e2a200; }
+  .stats .fill.hot { --c: #e0412f; }
+  .stats .sub { margin-top: 3px; color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stats .empty { color: var(--muted); font-size: 10px; line-height: 1.4; text-align: center; }
   @media (max-width: 560px) { .side { display: none; } }
+  @media (max-height: 520px) { .stats { display: none; } }
 </style>
 </head>
 <body>
@@ -170,6 +182,7 @@
     </div>
     <div class="side">
       <div class="slot"><span id="dp-claude" data-i18n-title="chat.changePicture"></span><div class="who-label" id="lbl-claude"></div></div>
+      <div class="stats" id="stats"></div>
       <div class="slot"><span id="dp-me"></span><div class="who-label" id="lbl-me"></div></div>
     </div>
   </div>

@@ -136,10 +136,33 @@ class ClaudeSession extends EventEmitter {
     this.busy = false;
     this.stderr = '';
     this.seenBlocks = new Set();
+    this.costSoFar = 0;
   }
 
   emitEvent(ev) {
     this.emit('event', ev);
+  }
+
+  // total_cost_usd and modelUsage are cumulative for this process; `usage` is this turn only.
+  emitUsage(m) {
+    const u = m.usage || {};
+    const turn = (u.input_tokens || 0) + (u.output_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0);
+    if (!turn) return;
+    const models = Object.values(m.modelUsage || {});
+    const cost = typeof m.total_cost_usd === 'number' ? m.total_cost_usd : 0;
+    const costDelta = Math.max(0, cost - this.costSoFar);
+    this.costSoFar = cost;
+    this.emitEvent({
+      kind: 'usage',
+      turnTokens: turn,
+      costDelta,
+      usage: {
+        context: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0),
+        contextWindow: models.length ? models[models.length - 1].contextWindow || 0 : 0,
+        model: Object.keys(m.modelUsage || {}).pop() || '',
+        at: Date.now(),
+      },
+    });
   }
 
   start() {
@@ -316,6 +339,7 @@ class ClaudeSession extends EventEmitter {
   finish(m) {
     this.busy = false;
     this.seenBlocks.clear();
+    this.emitUsage(m);
     const errors = Array.isArray(m.errors) ? m.errors.join('\n') : '';
     this.emitEvent({
       kind: 'done',

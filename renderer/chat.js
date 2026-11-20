@@ -377,6 +377,65 @@ $('#btn-font').onclick = (e) => {
 
 // ---------- Model, sürüm ve efor ----------
 
+// ---------- Kullanım paneli ----------
+
+let stats = null;
+
+// Turkish writes %27, English 27%.
+const pctText = (p) => t('stats.pct', { n: p > 0 && p < 9.95 ? p.toFixed(1) : Math.round(p) });
+const kFmt = (n) => (n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : n >= 1000 ? (n / 1000).toFixed(n >= 1e5 ? 0 : 1) + 'k' : String(n));
+
+function untilText(seconds) {
+  const m = Math.max(0, Math.round(seconds / 60));
+  if (m < 60) return t('stats.min', { n: m });
+  const h = Math.floor(m / 60);
+  if (h < 24) return m % 60 ? t('stats.hourMin', { h, m: m % 60 }) : t('stats.hour', { n: h });
+  return t('stats.day', { n: Math.round(h / 24) });
+}
+
+function statBox(label, pct, value, sub) {
+  const p = Math.max(0, Math.min(100, Math.round(pct)));
+  const cls = p >= 90 ? 'hot' : p >= 70 ? 'warn' : '';
+  return `<div class="box">
+    <div class="hd"><span>${esc(label)}</span><b>${esc(value)}</b></div>
+    ${pct === null ? '' : `<div class="bar"><div class="fill ${cls}" style="width:${p}%"></div></div>`}
+    ${sub ? `<div class="sub" title="${esc(sub)}">${esc(sub)}</div>` : ''}
+  </div>`;
+}
+
+function renderStats() {
+  const box = $('#stats');
+  if (!box) return;
+  const rl = stats?.rateLimit;
+  const u = stats?.usage;
+  const out = [];
+
+  for (const [key, label] of [['five_hour', t('stats.fiveHour')], ['seven_day', t('stats.sevenDay')]]) {
+    const w = rl?.unifiedWindows?.[key];
+    if (!w || typeof w.utilization !== 'number') continue;
+    const pct = w.utilization * 100;
+    const sub = w.resetsAt ? t('stats.resets', { t: untilText(w.resetsAt - Date.now() / 1000) }) : '';
+    out.push(statBox(label, pct, pctText(pct), sub));
+  }
+
+  if (u?.context) {
+    const win = u.contextWindow || 0;
+    const pct = win ? (u.context / win) * 100 : null;
+    out.push(statBox(t('stats.context'), pct, kFmt(u.context), win ? `${pctText(pct)} · ${kFmt(win)}` : ''));
+  }
+
+  if (u?.totalTokens) {
+    // Below a cent the figure says nothing, so it is left out.
+    const cost = u.totalCost >= 0.01 ? t('stats.cost', { c: '$' + u.totalCost.toFixed(u.totalCost < 10 ? 2 : 1) }) : '';
+    out.push(statBox(t('stats.chat'), null, t('stats.tokens', { n: kFmt(u.totalTokens) }), cost));
+  }
+
+  box.innerHTML = out.length ? out.join('') : `<div class="empty">${esc(t('stats.empty'))}</div>`;
+}
+
+rm.on('stats', (s) => { stats = s; renderStats(); });
+setInterval(renderStats, 60000);
+
 const isCodex = () => String(chat.provider).startsWith('codex');
 const isChatOnly = () => chat.provider === 'claude-chat' || chat.provider === 'codex-chat';
 let codexModels = [];
@@ -523,12 +582,14 @@ rm.on('shake', () => {
   profile = res.profile;
   busy = res.busy;
   codexModels = res.codexModels || [];
+  stats = res.stats || null;
   if (!chat) return window.close();
   renderChrome();
   renderAll();
   renderStatus();
   applyInputFont();
   applyLinkMode();
+  renderStats();
   input.focus();
   (res.pending || []).forEach(addPermission);
 })();

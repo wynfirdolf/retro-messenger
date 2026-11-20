@@ -179,11 +179,22 @@ class CodexSession extends EventEmitter {
       case 'item.completed':
         this.onItem(m.item || {});
         return;
-      case 'turn.completed':
+      case 'turn.completed': {
+        const u = m.usage || {};
+        const turn = (u.input_tokens || 0) + (u.output_tokens || 0);
+        if (turn) {
+          this.emitEvent({
+            kind: 'usage',
+            turnTokens: turn,
+            costDelta: 0,
+            usage: { context: u.input_tokens || 0, contextWindow: 0, model: this.model || '', at: Date.now() },
+          });
+        }
         this.finished = true;
         this.busy = false;
         this.emitEvent({ kind: 'done', isError: false, errorText: null, denied: 0 });
         return;
+      }
       case 'turn.failed':
       case 'error': {
         if (this.finished) return;

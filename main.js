@@ -129,6 +129,20 @@ function pushState() {
   if (alive(settingsWin)) settingsWin.webContents.send('state', snapshot());
 }
 
+// The stats panel in a conversation: account limits (Claude only) and this chat's usage.
+function statsFor(id) {
+  const chat = store.getChat(id);
+  if (!chat) return null;
+  return {
+    rateLimit: String(chat.provider).startsWith('codex') ? null : rateLimit,
+    usage: chat.usage || null,
+  };
+}
+
+function sendStats(id) {
+  sendToChat(id, 'stats', statsFor(id));
+}
+
 function sendToChat(id, channel, payload) {
   const w = chatWins.get(id);
   if (alive(w)) w.webContents.send(channel, payload);
@@ -332,8 +346,20 @@ function handleEvent(id, ev) {
       return;
     case 'rate':
       rateLimit = ev.info;
+      for (const c of store.chats()) sendStats(c.id);
       pushState();
       return;
+    case 'usage': {
+      const old = chat.usage || {};
+      store.updateChat(id, { usage: {
+        ...old,
+        ...ev.usage,
+        totalTokens: (old.totalTokens || 0) + (ev.turnTokens || 0),
+        totalCost: (old.totalCost || 0) + (ev.costDelta || 0),
+      } });
+      sendStats(id);
+      return;
+    }
     case 'text':
       addAndShow(id, { from: 'claude', text: ev.text });
       break;
@@ -476,6 +502,7 @@ ipcMain.handle('chat:new', async (e, provider) => {
 ipcMain.handle('codex:models', () => codexModels());
 
 ipcMain.handle('chat:get', (_e, id) => ({
+  stats: statsFor(id),
   codexModels: String(store.getChat(id)?.provider).startsWith('codex') ? codexModels() : [],
   chat: store.getChat(id),
   busy: busy.has(id),
