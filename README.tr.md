@@ -216,7 +216,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 ### 👍 claude.ai ve chatgpt.com ile eşitleme için destek ver
 Retro Messenger'daki sohbetler Claude ve ChatGPT uygulamalarında ya da sitelerinde görünmüyor; oradaki mevcut sohbetlerin de burada açılamıyor. Bunun sebebi, resmi komut satırı araçlarında bunu yapmanın henüz bir yolu olmaması. Bunun için istek açtık:
 
-- **Claude:** [anthropics/claude-code#111354](https://github.com/anthropics/claude-code/issues/111354)
+- **Claude:** [anthropics/claude-code#13843](https://github.com/anthropics/claude-code/issues/13843)
 - **ChatGPT:** [openai/codex#62754](https://github.com/openai/codex/issues/62754)
 
 Sen de istiyorsan bağlantılara girip 👍 ver. Ne kadar çok kişi isterse yapılma ihtimali o kadar artar.
