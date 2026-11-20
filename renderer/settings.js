@@ -34,12 +34,35 @@ function render() {
     ['mod', t(mac ? 'set.linkModMac' : 'set.linkModWin'), t('set.linkModDesc')],
   ], p.linkClick || 'click', (v) => rm.updateProfile({ linkClick: v }));
 
+  renderUpdate();
   $('#version').textContent = t('set.version', { v: state.appVersion || '' });
   const tool = (name, found, where) => `<span>${esc(name)}</span><span>${found
     ? `<span class="ok">✓ ${esc(t('set.found'))}</span><br><code>${esc(where)}</code>`
     : `<span class="no">✗ ${esc(t('set.notFound'))}</span>`}</span>`;
   $('#tools').innerHTML = tool('Claude Code', state.providers?.claude, state.claudePath)
     + tool('ChatGPT (Codex)', state.providers?.codex, state.codexPath);
+}
+
+function renderUpdate() {
+  const u = state.update || { status: 'idle' };
+  const win = rm.platform === 'win32';
+  $('#autoupdate').checked = state.profile.autoUpdate !== false;
+  const text = {
+    dev: t('upd.dev'),
+    idle: '',
+    checking: t('upd.checking'),
+    uptodate: t('upd.uptodate'),
+    available: t('upd.available', { v: u.version }),
+    downloading: t('upd.downloading', { v: u.version, p: u.percent || 0 }),
+    ready: t('upd.ready', { v: u.version }),
+    error: t('upd.error', { e: u.error || '' }),
+  }[u.status] || '';
+  $('#upd-status').textContent = text;
+  const btn = $('#upd-btn');
+  btn.disabled = ['checking', 'downloading', 'dev'].includes(u.status);
+  if (u.status === 'ready' && win) { btn.textContent = t('upd.install'); btn.onclick = () => rm.installUpdate(); }
+  else if (u.status === 'available') { btn.textContent = t('upd.download'); btn.onclick = () => rm.openUrl(u.url); }
+  else { btn.textContent = t('upd.check'); btn.onclick = () => rm.checkUpdate(); }
 }
 
 // Fixed parts: titles, option lists, handlers
@@ -49,6 +72,7 @@ $('#lang').innerHTML = [`<option value="auto">${esc(t('langAuto'))}</option>`]
 $('#logo').innerHTML = LOGO_SVG(48);
 
 $('#nav').onclick = (e) => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); };
+$('#autoupdate').onchange = (e) => rm.updateProfile({ autoUpdate: e.target.checked });
 $('#status').onchange = (e) => rm.updateProfile({ status: e.target.value });
 $('#lang').onchange = (e) => rm.updateProfile({ lang: e.target.value });
 for (const [id, key, fix] of [['name', 'name', (v) => v || t('signin.defaultName')], ['personal', 'personal', applyShortcuts]]) {

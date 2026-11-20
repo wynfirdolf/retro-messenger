@@ -8,6 +8,7 @@ const { ClaudeSession, resolveEnvironment, describeTool } = require('./src/claud
 const { CodexSession, findCodex, listModels: codexModels } = require('./src/codex-session');
 const history = require('./src/history');
 const exporter = require('./src/export');
+const updater = require('./src/updater');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
 
@@ -107,6 +108,7 @@ function snapshot() {
     claudePath: env.claudePath && env.claudePath.replace(os.homedir(), '~'),
     codexPath: env.codexPath && env.codexPath.replace(os.homedir(), '~'),
     appVersion: require('./package.json').version,
+    update: updater.state,
     providers: { claude: !!env.claudePath, codex: !!env.codexPath },
     rateLimit,
     chats: store.chats().map((c) => ({
@@ -571,7 +573,10 @@ ipcMain.handle('settings:open', () => openSettingsWindow());
 
 ipcMain.handle('history:list', () => {
   const known = new Set(store.chats().map((c) => c.sessionId).filter(Boolean));
-  return history.listSessions(known).filter((s) => !s.cwd.startsWith(claudeChatsDir())).map((s) => ({
+  // Windows paths are case-insensitive and may use either slash.
+  const norm = (p) => (process.platform === 'win32' ? path.resolve(p).toLowerCase() : p);
+  const chatsDir = norm(claudeChatsDir());
+  return history.listSessions(known).filter((s) => !norm(s.cwd).startsWith(chatsDir)).map((s) => ({
     ...s,
     file: undefined,
     cwdLabel: homeLabel(s.cwd),
@@ -644,6 +649,9 @@ ipcMain.handle('file:save-pasted', (_e, name, bytes) => {
   fs.writeFileSync(p, bytes);
   return describeFile(p);
 });
+
+ipcMain.handle('update:check', () => updater.check());
+ipcMain.handle('update:install', () => updater.installNow());
 
 ipcMain.handle('url:open', (_e, u) => {
   if (typeof u === 'string' && /^https?:\/\//.test(u)) shell.openExternal(u);
@@ -745,6 +753,8 @@ app.whenReady().then(() => {
   applyTheme();
   env = resolveEnvironment();
   env.codexPath = findCodex(env.env);
+  updater.on('change', pushState);
+  updater.start(() => store.profile().autoUpdate !== false);
   createListWindow();
   app.on('activate', () => {
     if (!alive(listWin)) createListWindow();

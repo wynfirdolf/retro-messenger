@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld('rm', {
   describeFiles: (paths) => ipcRenderer.invoke('file:describe', paths),
   savePasted: (name, bytes) => ipcRenderer.invoke('file:save-pasted', name, bytes),
   openFile: (p) => ipcRenderer.invoke('file:open', p),
+  checkUpdate: () => ipcRenderer.invoke('update:check'),
+  installUpdate: () => ipcRenderer.invoke('update:install'),
   openUrl: (u) => ipcRenderer.invoke('url:open', u),
   // Dropped and pasted File objects only reveal their path through webUtils.
   pathForFile: (file) => { try { return webUtils.getPathForFile(file) || ''; } catch { return ''; } },

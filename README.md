@@ -158,6 +158,7 @@ For late-night coding. Choose **Automatic** (follows your system), **Light** or 
 1. Download `Retro-Messenger-Setup-X.Y.Z-x64.exe` from the [Releases](../../releases/latest) page.
 2. Run it. It installs for your user only (no admin rights needed) and opens the app.
 3. The installer isn't code-signed, so Windows SmartScreen may say "Windows protected your PC". Click **More info → Run anyway**.
+4. **Updates are automatic.** The app checks GitHub for a newer release, downloads it in the background and installs it when you quit (or right away with **Settings → About → Restart and install**). You can turn this off in the same place.
 
 **Requirement:** at least one of these, installed and signed in:
 - [Claude Code](https://code.claude.com): run `claude` in the terminal once.
@@ -214,7 +215,7 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 
 - ChatGPT (Codex) chats run in a sandbox instead of asking for permission, and replies arrive whole rather than streaming.
 - Google Antigravity isn't supported: it has no command-line tool that works outside the Antigravity app.
-- ChatGPT (Codex) chats haven't been tested on Windows yet.
+- On macOS the app can't update itself: it isn't signed with an Apple Developer ID, so it only tells you a newer version exists (**Settings → About → Updates**) and opens the download page.
 - Prebuilt releases are for Apple Silicon Macs and 64-bit Windows. Intel Macs can run it from source.
 
 ### 👍 Help us sync with claude.ai and chatgpt.com
@@ -232,6 +233,7 @@ If you'd like this too, open the issues and add a 👍. The more people ask, the
 - [ ] Upload your own photo as a display picture
 - [x] ~~*Font and color choice*~~
 - [x] ~~*Export chat history*~~
+- [x] ~~*Auto-update*~~ (Windows installs it; macOS points to the download)
 
 Contributions are welcome. Open an issue or send a pull request.
 

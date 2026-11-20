@@ -2,6 +2,7 @@
 // It uses the ChatGPT sign-in already on this computer (~/.codex); the app never asks for a login.
 // Each message is one `codex exec --json` run; later messages resume the same thread.
 const { EventEmitter } = require('events');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -16,6 +17,23 @@ const BUNDLED = isWin
     '/Applications/Codex.app/Contents/Resources/codex-cli/bin/codex',
   ];
 
+// On Windows the Codex and ChatGPT desktop apps are Store (MSIX) packages under C:\Program Files\WindowsApps,
+// a folder that can't be listed and whose name changes with every update, so we ask Windows where they are.
+// Their bundled codex.exe can be run directly from there.
+function findStoreCodex() {
+  try {
+    const out = execFileSync('powershell.exe', [
+      '-NoProfile', '-NonInteractive', '-Command',
+      "Get-AppxPackage | Where-Object { $_.Name -like 'OpenAI.*' } | Sort-Object { $_.Name -ne 'OpenAI.Codex' } | ForEach-Object { $_.InstallLocation }",
+    ], { encoding: 'utf8', timeout: 8000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] });
+    for (const dir of out.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)) {
+      const p = path.join(dir, 'app', 'resources', 'codex.exe');
+      if (fs.existsSync(p)) return p;
+    }
+  } catch { /* PowerShell missing or blocked */ }
+  return null;
+}
+
 function findCodex(env) {
   const dirs = String(env.Path || env.PATH || '').split(path.delimiter).filter(Boolean);
   for (const name of isWin ? ['codex.exe', 'codex.cmd'] : ['codex']) {
@@ -24,7 +42,7 @@ function findCodex(env) {
       if (fs.existsSync(p)) return p;
     }
   }
-  return BUNDLED.find((p) => fs.existsSync(p)) || null;
+  return BUNDLED.find((p) => fs.existsSync(p)) || (isWin ? findStoreCodex() : null);
 }
 
 const codexHome = () => process.env.CODEX_HOME || path.join(os.homedir(), '.codex');

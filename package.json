@@ -1,6 +1,6 @@
 {
   "name": "retro-messenger",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Chat with Claude Code and ChatGPT like it's 2004: a retro instant-messenger desktop app",
   "main": "main.js",
   "author": "Wynfirdolf",
@@ -33,10 +33,18 @@
     "win": {
       "target": "nsis",
       "artifactName": "Retro-Messenger-Setup-${version}-${arch}.exe"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "wynfirdolf",
+      "repo": "retro-messenger"
     }
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/wynfirdolf/retro-messenger.git"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
   }
 }
