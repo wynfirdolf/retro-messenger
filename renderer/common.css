@@ -19,6 +19,7 @@
   --faint: #9a9a9a;
   --heading: #1d3f84;
   --link: #0b4bb5;
+  --msg-link: #0645ad;
   --label: #4a5d7e;
   --line: #7f9db9;
   --soft-line: #b8cbe8;
@@ -81,7 +82,8 @@
     --muted: #8d9ab0;
     --faint: #6f7b90;
     --heading: #9dbdff;
-    --link: #82aeff;
+    --link: #9cc2ff;
+    --msg-link: #8fd6ff;
     --label: #9aaac4;
     --line: #3e4d68;
     --soft-line: #2e3a50;
@@ -219,6 +221,12 @@ input[type="text"]:focus, textarea:focus { border-color: #3a75d4; }
 
 .link { color: var(--link); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 .link:hover { text-decoration: underline; }
+/* Links inside messages: underlined and a brighter color, so they stand out from the message text. */
+.msg .text a.link { color: var(--msg-link); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--msg-link) 55%, transparent); text-underline-offset: 2px; }
+.msg .text a.link:hover { text-decoration-color: currentColor; }
+/* With "hold ⌘/Ctrl to open", links only look clickable while the key is down. */
+body.links-mod .msg .text a.link { cursor: text; }
+body.links-mod.mod-down .msg .text a.link { cursor: pointer; }
 
 /* ---------- Display picture ---------- */
 .dp {

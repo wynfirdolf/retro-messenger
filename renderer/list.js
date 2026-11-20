@@ -290,6 +290,10 @@ $('#theme').innerHTML = ['system', 'light', 'dark']
   .map((k) => `<option value="${k}">${esc(t(`theme.${k}`))}</option>`)
   .join('');
 $('#theme').onchange = (e) => rm.updateProfile({ theme: e.target.value });
+$('#linkclick').innerHTML = [['click', 'links.click'], ['mod', rm.platform === 'darwin' ? 'links.modMac' : 'links.modWin']]
+  .map(([v, k]) => `<option value="${v}">${esc(t(k))}</option>`)
+  .join('');
+$('#linkclick').onchange = (e) => rm.updateProfile({ linkClick: e.target.value });
 
 (async () => {
   applyI18n();
@@ -297,6 +301,7 @@ $('#theme').onchange = (e) => rm.updateProfile({ theme: e.target.value });
   state = await rm.getState();
   $$('.lang-select').forEach((sel) => (sel.value = state.profile.lang || 'auto'));
   $('#theme').value = state.profile.theme || 'system';
+  $('#linkclick').value = state.profile.linkClick || 'click';
   render();
   showTip();
   setInterval(showTip, 20000);

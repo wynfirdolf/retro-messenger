@@ -153,7 +153,23 @@ $('#tray').addEventListener('click', (e) => {
   renderTray();
 });
 $('#btn-file').onclick = async () => addAttachments(await rm.pickFiles());
+// Links in message text open on a plain click, or only with ⌘ (Ctrl on Windows) held, depending on the setting.
+// File chips and image thumbnails always open on click.
+const linksNeedMod = () => profile.linkClick === 'mod';
+const modHeld = (e) => (rm.platform === 'darwin' ? e.metaKey : e.ctrlKey);
+function applyLinkMode() {
+  document.body.classList.toggle('links-mod', linksNeedMod());
+  const hint = linksNeedMod() ? t(rm.platform === 'darwin' ? 'links.hintMac' : 'links.hintWin') : '';
+  $$('#history .msg .text a.link').forEach((a) => (a.title = hint ? `${a.dataset.url || a.dataset.open}\n${hint}` : a.dataset.url || a.dataset.open));
+}
+for (const ev of ['keydown', 'keyup']) {
+  window.addEventListener(ev, (e) => document.body.classList.toggle('mod-down', modHeld(e)));
+}
+window.addEventListener('blur', () => document.body.classList.remove('mod-down'));
+
 history.addEventListener('click', (e) => {
+  const link = e.target.closest('.msg .text a.link');
+  if (link && linksNeedMod() && !modHeld(e)) return;
   const url = e.target.closest('[data-url]');
   if (url) return rm.openUrl(url.dataset.url);
   const el = e.target.closest('[data-open]');
@@ -453,6 +469,7 @@ rm.on('message', (m) => {
   }
   const stick = nearBottom() || m.from === 'me';
   history.appendChild(renderMessage(m));
+  applyLinkMode();
   scrollDown(stick);
   if (m.from === 'claude' || m.from === 'me') renderStatus();
 });
@@ -489,6 +506,7 @@ rm.on('profile', (p) => {
   cards.forEach((card) => history.appendChild(card));
   applyInputFont();
   renderFontPanel();
+  applyLinkMode();
 });
 
 rm.on('shake', () => {
@@ -510,6 +528,7 @@ rm.on('shake', () => {
   renderAll();
   renderStatus();
   applyInputFont();
+  applyLinkMode();
   input.focus();
   (res.pending || []).forEach(addPermission);
 })();
