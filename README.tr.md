@@ -134,6 +134,9 @@ Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomati
 
 <img src="docs/tr/dark.png" alt="Karanlık modda Retro Messenger" width="100%">
 
+### 🔊 Kendi seslerin
+Her ses (uygulama açılırken, kapanırken, oturum açma, oturum kapatma, yeni ileti, titreşim) değiştirilebilir: olayın adını taşıyan bir `mp3`, `wav` ya da `ogg` dosyasını (`nudge.mp3`, `login.wav`, …) `sounds` klasörüne at. **Ayarlar → Sesler** hangilerinin özel olduğunu gösterir ve klasörü açar. Eksik ya da bozuk dosya yerleşik sese döner. Klasörde bir `README.txt` bulunur; rehber [docs/SOUNDS.md](docs/SOUNDS.md) dosyasında: dosya adları, her ses için en uzun süre (0,5 ile 5 sn), biçimler (MP3 128 kbps CBR / 44,1 kHz, WAV 16 bit 44,1 kHz) ve boyut (2 MB).
+
 ### ⚙️ Diğerleri
 - Her sohbet için **model, sürüm ve efor** seçimi. Önce aileyi (Fable, Opus, Sonnet, Haiku), sonra sürümü (örneğin Opus 5.5, 5 veya 4.8) ya da "En yeni"yi seçin. Efor Düşük'ten Maksimum'a kadar ayarlanabilir; modelin desteklemediği seviyeler listede görünmez.
 - Claude'un 5 saatlik kullanım sınırını gösteren **kullanım çubuğu**.

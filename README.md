@@ -134,6 +134,9 @@ For late-night coding. Choose **Automatic** (follows your system), **Light** or 
 
 <img src="docs/dark.png" alt="Retro Messenger in dark mode" width="100%">
 
+### 🔊 Your own sounds
+Every sound (app opens, app quits, sign in, sign out, new message, nudge) can be replaced: drop an `mp3`, `wav` or `ogg` named after the event (`nudge.mp3`, `login.wav`, …) into the `sounds` folder. **Settings → Sounds** shows what is custom and opens the folder. A file that is missing or broken just falls back to the built-in sound. The folder holds a `README.txt`, and [docs/SOUNDS.md](docs/SOUNDS.md) is the guide: file names, maximum length per sound (0.5 to 5 s), formats (MP3 128 kbps CBR / 44.1 kHz, WAV 16-bit 44.1 kHz) and size (2 MB).
+
 ### ⚙️ And also
 - **Model, version and effort** for each chat. Pick a family (Fable, Opus, Sonnet, Haiku), then a version (for example Opus 5.5, 5 or 4.8) or "Latest". Effort runs from Low to Max; levels a model doesn't support are hidden.
 - A **usage bar** that shows Claude's 5-hour usage limit.

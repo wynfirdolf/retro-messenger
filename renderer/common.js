@@ -144,33 +144,6 @@ function fmt(text) {
 
 const timeStr = (ts) => new Date(ts).toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
 
-// Sesler WebAudio ile üretilir; harici ses dosyası yoktur.
-const Sounds = (() => {
-  let ctx = null;
-  const ac = () => (ctx ||= new AudioContext());
-  function tone(freq, at, dur, type = 'sine', gain = 0.16) {
-    const a = ac();
-    const t = a.currentTime + at;
-    const o = a.createOscillator();
-    const g = a.createGain();
-    o.type = type;
-    o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(gain, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(a.destination);
-    o.start(t);
-    o.stop(t + dur + 0.05);
-  }
-  return {
-    message() { tone(784, 0, 0.16, 'triangle'); tone(1175, 0.1, 0.34, 'triangle'); },
-    nudge() { for (let i = 0; i < 10; i++) tone(i % 2 ? 130 : 175, i * 0.045, 0.055, 'square', 0.07); },
-    online() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.085, 0.3, 'sine', 0.12)); },
-    send() { tone(1400, 0, 0.05, 'sine', 0.05); },
-    play(name) { try { this[name]?.(); } catch {} },
-  };
-})();
-
 function initTitlebar(title) {
   const tb = $('.titlebar');
   if (!tb) return;

@@ -105,7 +105,10 @@ class Updater extends EventEmitter {
 
   // Windows: quit, run the installer, start again.
   installNow() {
-    if (this.native && this.state.status === 'ready') this.native.quitAndInstall(false, true);
+    if (this.native && this.state.status === 'ready') {
+      this.installing = true;
+      this.native.quitAndInstall(false, true);
+    }
   }
 }
 

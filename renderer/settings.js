@@ -35,12 +35,22 @@ function render() {
   ], p.linkClick || 'click', (v) => rm.updateProfile({ linkClick: v }));
 
   renderUpdate();
+  renderSounds();
   $('#version').textContent = t('set.version', { v: state.appVersion || '' });
   const tool = (name, found, where) => `<span>${esc(name)}</span><span>${found
     ? `<span class="ok">✓ ${esc(t('set.found'))}</span><br><code>${esc(where)}</code>`
     : `<span class="no">✗ ${esc(t('set.notFound'))}</span>`}</span>`;
   $('#tools').innerHTML = tool('Claude Code', state.providers?.claude, state.claudePath)
     + tool('ChatGPT (Codex)', state.providers?.codex, state.codexPath);
+}
+
+async function renderSounds() {
+  let info;
+  try { info = await rm.listSounds(); } catch { return; }
+  $('#snd-list').innerHTML = info.sounds.map((s) => `<div class="snd"><span class="nm">${esc(t('snd.name.' + s.name))}
+    <small>${esc(s.name)}.mp3 / .wav · ${esc(t('snd.max', { s: s.max }))} · <span class="${s.file ? 'custom' : ''}">${esc(s.file ? t('snd.custom', { f: s.file }) : t('snd.default'))}</span></small></span>
+    <button class="xp-btn" data-play="${s.name}">▶</button></div>`).join('');
+  $('#snd-dir').textContent = t('snd.dir', { d: info.dir || '' });
 }
 
 function renderUpdate() {
@@ -64,6 +74,10 @@ function renderUpdate() {
   else if (u.status === 'available') { btn.textContent = t('upd.download'); btn.onclick = () => rm.openUrl(u.url); }
   else { btn.textContent = t('upd.check'); btn.onclick = () => rm.checkUpdate(); }
 }
+
+$('#snd-list').onclick = (e) => { const b = e.target.closest('button[data-play]'); if (b) rm.playSound(b.dataset.play); };
+$('#snd-open').onclick = () => rm.openSoundsFolder();
+window.addEventListener('focus', renderSounds);
 
 // Fixed parts: titles, option lists, handlers
 $('#status').innerHTML = ['online', 'busy', 'away', 'hidden'].map((k) => `<option value="${k}">${esc(t(`status.${k}`))}</option>`).join('');

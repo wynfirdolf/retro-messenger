@@ -54,7 +54,7 @@ async function signIn() {
   $('#si-progress').style.display = 'flex';
   await new Promise((r) => setTimeout(r, 1300));
   await rm.updateProfile({ name, status: $('#si-status').value, avatar: draftAvatar, signedIn: true });
-  Sounds.online();
+  Sounds.play('login');
   $('#si-go').disabled = false;
   $('#si-progress').style.display = 'none';
   state = await rm.getState();

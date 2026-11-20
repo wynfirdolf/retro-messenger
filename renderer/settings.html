@@ -36,6 +36,12 @@
   .radio label { display: flex; align-items: flex-start; gap: 7px; color: var(--ink); }
   .radio small { display: block; color: var(--muted); margin-top: 1px; }
   .chk { display: flex; align-items: center; gap: 7px; color: var(--ink); margin-top: 6px; }
+  .snd { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--soft-line); }
+  .snd:last-child { border-bottom: 0; }
+  .snd .xp-btn { flex: none; width: 44px; min-width: 0; padding: 3px 0; }
+  .snd .nm { flex: 1; min-width: 0; }
+  .snd .nm small { display: block; color: var(--muted); }
+  .snd .custom { color: #1a7f37; }
   .hint { color: var(--muted); margin: 6px 0 0; line-height: 1.45; }
   .me-dp { cursor: pointer; }
   .tools { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin-top: 6px; }
@@ -57,6 +63,7 @@
     <nav id="nav">
       <button data-go="personal"><span class="ico">👤</span><span data-i18n="set.personal"></span></button>
       <button data-go="look"><span class="ico">🎨</span><span data-i18n="set.look"></span></button>
+      <button data-go="sounds"><span class="ico">🔊</span><span data-i18n="set.sounds"></span></button>
       <button data-go="messages"><span class="ico">💬</span><span data-i18n="set.messages"></span></button>
       <button data-go="about"><span class="ico">ℹ️</span><span data-i18n="set.about"></span></button>
     </nav>
@@ -86,6 +93,17 @@
         <fieldset>
           <legend data-i18n="set.language"></legend>
           <div class="row"><label class="k" for="lang" data-i18n="language"></label><select id="lang"></select></div>
+        </fieldset>
+      </section>
+
+      <section data-page="sounds">
+        <h2>🔊 <span data-i18n="set.sounds"></span></h2>
+        <p class="hint" data-i18n="snd.hint"></p>
+        <fieldset>
+          <legend data-i18n="snd.title"></legend>
+          <div id="snd-list"></div>
+          <div class="row"><button class="xp-btn" id="snd-open" data-i18n="snd.open"></button></div>
+          <p class="hint" id="snd-dir"></p>
         </fieldset>
       </section>
 
@@ -120,6 +138,7 @@
   </div>
   <div class="foot"><button class="xp-btn" id="close" data-i18n="set.close"></button></div>
   <script src="i18n.js"></script>
+  <script src="sounds.js"></script>
   <script src="common.js"></script>
   <script src="settings.js"></script>
 </body>

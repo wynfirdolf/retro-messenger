@@ -23,6 +23,11 @@ contextBridge.exposeInMainWorld('rm', {
   openFile: (p) => ipcRenderer.invoke('file:open', p),
   checkUpdate: () => ipcRenderer.invoke('update:check'),
   installUpdate: () => ipcRenderer.invoke('update:install'),
+  getSound: (name) => ipcRenderer.invoke('sound:get', name),
+  listSounds: () => ipcRenderer.invoke('sound:list'),
+  openSoundsFolder: () => ipcRenderer.invoke('sound:open-folder'),
+  playSound: (name) => ipcRenderer.invoke('sound:play', name),
+  soundDone: () => ipcRenderer.send('sound:done'),
   openUrl: (u) => ipcRenderer.invoke('url:open', u),
   // Dropped and pasted File objects only reveal their path through webUtils.
   pathForFile: (file) => { try { return webUtils.getPathForFile(file) || ''; } catch { return ''; } },

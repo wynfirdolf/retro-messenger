@@ -9,6 +9,7 @@ const { CodexSession, findCodex, listModels: codexModels } = require('./src/code
 const history = require('./src/history');
 const exporter = require('./src/export');
 const updater = require('./src/updater');
+const sounds = require('./src/sounds');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
 
@@ -187,6 +188,29 @@ function markRead(id) {
   }
   const w = chatWins.get(id);
   if (alive(w)) w.flashFrame(false);
+}
+
+// Sounds without a visible window of their own (start up, quit, sign out) play in a short-lived hidden window.
+const globalSounds = new Map(); // webContents id -> finish()
+function playGlobal(name) {
+  return new Promise((resolve) => {
+    const w = new BrowserWindow({ show: false, skipTaskbar: true, webPreferences: { preload: PRELOAD, autoplayPolicy: 'no-user-gesture-required', backgroundThrottling: false } });
+    const wcId = w.webContents.id;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      globalSounds.delete(wcId);
+      if (!w.isDestroyed()) w.destroy();
+      resolve();
+    };
+    const timer = setTimeout(finish, (sounds.maxOf(name) + 2) * 1000);
+    globalSounds.set(wcId, finish);
+    w.webContents.once('did-finish-load', () => { if (!w.isDestroyed()) w.webContents.send('play-global', name); });
+    w.webContents.once('did-fail-load', finish);
+    w.loadFile(page('audio.html'));
+  });
 }
 
 function playSound(name, id) {
@@ -449,7 +473,9 @@ ipcMain.on('lang', (e) => {
 
 ipcMain.handle('profile:update', (_e, patch) => {
   const langBefore = currentLang();
+  const wasSignedIn = store.profile().signedIn;
   store.updateProfile(patch);
+  if (wasSignedIn && patch.signedIn === false) playGlobal('logoff');
   if ('theme' in patch) applyTheme();
   if (currentLang() !== langBefore) {
     for (const w of BrowserWindow.getAllWindows()) if (alive(w)) w.webContents.reload();
@@ -650,6 +676,12 @@ ipcMain.handle('file:save-pasted', (_e, name, bytes) => {
   return describeFile(p);
 });
 
+ipcMain.handle('sound:get', (_e, name) => sounds.read(String(name)));
+ipcMain.handle('sound:list', () => ({ dir: String(sounds.dirPath() || '').replace(os.homedir(), '~'), sounds: sounds.list() }));
+ipcMain.handle('sound:open-folder', () => { sounds.ensure(app); return shell.openPath(sounds.dirPath()); });
+ipcMain.handle('sound:play', (e, name) => { if (sounds.SOUNDS.some((s) => s.name === String(name))) e.sender.send('play-sound', String(name)); });
+ipcMain.on('sound:done', (e) => globalSounds.get(e.sender.id)?.());
+
 ipcMain.handle('update:check', () => updater.check());
 ipcMain.handle('update:install', () => updater.installNow());
 
@@ -753,9 +785,11 @@ app.whenReady().then(() => {
   applyTheme();
   env = resolveEnvironment();
   env.codexPath = findCodex(env.env);
+  sounds.ensure(app);
   updater.on('change', pushState);
   updater.start(() => store.profile().autoUpdate !== false);
   createListWindow();
+  playGlobal('startup');
   app.on('activate', () => {
     if (!alive(listWin)) createListWindow();
     else listWin.show();
@@ -766,7 +800,14 @@ app.on('window-all-closed', () => {
   if (!isMac) app.quit();
 });
 
-app.on('before-quit', () => {
+let shutdownSoundDone = false;
+app.on('before-quit', (e) => {
   for (const s of sessions.values()) s.kill();
   store.flush();
+  // Let the quit sound finish first (not when an update is about to be installed).
+  if (!shutdownSoundDone && !updater.installing && app.isReady()) {
+    shutdownSoundDone = true;
+    e.preventDefault();
+    playGlobal('shutdown').then(() => app.quit());
+  }
 });
