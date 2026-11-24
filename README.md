@@ -125,7 +125,7 @@ When Claude wants to run a command, edit a file or start on a plan, a yellow car
 <img src="docs/permission.png" alt="Permission card" width="70%">
 
 ### 🎨 Your own font and color
-Just like the old days: click **A Font** under the conversation and pick a font, **B** / *I* / U / S, and a color. Your messages, and even the box you type in, show up in that style. Choose from classics like Tahoma and Georgia or 14 Google Fonts, from Comic Neue to Press Start 2P. The fonts ship with the app, so they work offline. On the dark theme, dark colors are lifted automatically so they stay readable.
+Just like the old days: click **A Font** under the conversation and pick a font, **B** / *I* / U / S, and a color. Your messages, and even the box you type in, show up in that style. Choose from classics like Tahoma and Georgia or 14 Google Fonts, from Comic Neue to Press Start 2P, or upload your own **.ttf / .otf / .woff / .woff2** file in **Settings → Fonts** and it shows up right there too. The bundled fonts ship with the app, so they work offline. On the dark theme, dark colors are lifted automatically so they stay readable.
 
 <img src="docs/fonts.png" alt="Font and color picker" width="70%">
 

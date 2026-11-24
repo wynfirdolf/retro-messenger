@@ -12,6 +12,7 @@ const updater = require('./src/updater');
 // Update checks run on macOS and Windows (the only platforms this app ships for).
 const UPDATES = process.platform === 'darwin' || process.platform === 'win32';
 const sounds = require('./src/sounds');
+const customFonts = require('./src/customfonts');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
 
@@ -696,6 +697,22 @@ ipcMain.handle('sound:open-folder', () => { sounds.ensure(app); return shell.ope
 ipcMain.handle('sound:play', (e, name) => { if (sounds.SOUNDS.some((s) => s.name === String(name))) e.sender.send('play-sound', String(name)); });
 ipcMain.on('sound:done', (e) => globalSounds.get(e.sender.id)?.());
 
+ipcMain.handle('font:list', () => ({ dir: String(customFonts.dirPath() || '').replace(os.homedir(), '~'), fonts: customFonts.list() }));
+ipcMain.handle('font:data', (_e, id) => customFonts.read(String(id)));
+ipcMain.handle('font:open-folder', () => { customFonts.ensure(app); return shell.openPath(customFonts.dirPath()); });
+ipcMain.handle('font:remove', (_e, id) => { customFonts.remove(String(id)); return customFonts.list(); });
+ipcMain.handle('font:pick', async (e) => {
+  const r = await dialog.showOpenDialog(BrowserWindow.fromWebContents(e.sender), {
+    title: t('font.pickTitle'),
+    buttonLabel: t('font.pickButton'),
+    properties: ['openFile', 'multiSelections'],
+    filters: [{ name: t('font.pickTitle'), extensions: ['ttf', 'otf', 'woff', 'woff2'] }],
+  });
+  if (r.canceled) return customFonts.list();
+  for (const p of r.filePaths) customFonts.importFile(p);
+  return customFonts.list();
+});
+
 ipcMain.handle('update:check', () => (UPDATES ? updater.check() : undefined));
 ipcMain.handle('update:install', () => (UPDATES ? updater.installNow() : undefined));
 
@@ -800,6 +817,7 @@ app.whenReady().then(() => {
   env = resolveEnvironment();
   env.codexPath = findCodex(env.env);
   sounds.ensure(app);
+  customFonts.ensure(app);
   updater.on('change', pushState);
   if (UPDATES) updater.start(() => store.profile().autoUpdate !== false);
   createListWindow();

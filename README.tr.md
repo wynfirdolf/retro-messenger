@@ -125,7 +125,7 @@ Claude bir komut çalıştırmak, bir dosyayı düzenlemek ya da bir plana başl
 <img src="docs/tr/permission.png" alt="İzin kartı" width="70%">
 
 ### 🎨 Kendi yazı tipin ve rengin
-Tıpkı eskisi gibi: sohbetin altındaki **A Yazı tipi** düğmesine tıklayın; bir yazı tipi, **K** / *İ* / altı çizili / üstü çizili ve bir renk seçin. İletileriniz, hatta yazdığınız kutu bile o stilde görünür. Tahoma ve Georgia gibi klasiklerden ya da Comic Neue'dan Press Start 2P'ye 14 Google Fonts yazı tipinden seçebilirsiniz. Yazı tipleri uygulamayla birlikte gelir, internet olmadan da çalışır. Koyu temada koyu renkler okunabilsin diye otomatik olarak açılır.
+Tıpkı eskisi gibi: sohbetin altındaki **A Yazı tipi** düğmesine tıklayın; bir yazı tipi, **K** / *İ* / altı çizili / üstü çizili ve bir renk seçin. İletileriniz, hatta yazdığınız kutu bile o stilde görünür. Tahoma ve Georgia gibi klasiklerden ya da Comic Neue'dan Press Start 2P'ye 14 Google Fonts yazı tipinden seçebilirsiniz; ya da **Ayarlar → Yazı Tipleri**'nden kendi **.ttf / .otf / .woff / .woff2** dosyanızı yükleyin, aynı panelde görünsün. Yazı tipleri uygulamayla birlikte gelir, internet olmadan da çalışır. Koyu temada koyu renkler okunabilsin diye otomatik olarak açılır.
 
 <img src="docs/tr/fonts.png" alt="Yazı tipi ve renk seçici" width="70%">
 

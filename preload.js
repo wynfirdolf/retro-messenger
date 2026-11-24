@@ -28,6 +28,11 @@ contextBridge.exposeInMainWorld('rm', {
   openSoundsFolder: () => ipcRenderer.invoke('sound:open-folder'),
   playSound: (name) => ipcRenderer.invoke('sound:play', name),
   soundDone: () => ipcRenderer.send('sound:done'),
+  listCustomFonts: () => ipcRenderer.invoke('font:list'),
+  getCustomFontData: (id) => ipcRenderer.invoke('font:data', id),
+  pickCustomFonts: () => ipcRenderer.invoke('font:pick'),
+  removeCustomFont: (id) => ipcRenderer.invoke('font:remove', id),
+  openCustomFontsFolder: () => ipcRenderer.invoke('font:open-folder'),
   openUrl: (u) => ipcRenderer.invoke('url:open', u),
   // Dropped and pasted File objects only reveal their path through webUtils.
   pathForFile: (file) => { try { return webUtils.getPathForFile(file) || ''; } catch { return ''; } },

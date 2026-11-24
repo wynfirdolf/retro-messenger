@@ -1,6 +1,6 @@
 {
   "name": "retro-messenger",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "Chat with Claude Code and ChatGPT like it's 2004: a retro instant-messenger desktop app",
   "main": "main.js",
   "author": "Wynfirdolf",

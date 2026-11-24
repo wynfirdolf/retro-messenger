@@ -80,7 +80,9 @@ function msgStyle(s, baseSize = 13) {
   if (!s) return '';
   const parts = [];
   const f = FONTS.find((x) => x[0] && x[0] === s.family);
+  const cf = !f && customFamily(s.family);
   if (f) parts.push(`font-family:'${f[0]}', var(--chat-font)`, `font-size:${(baseSize * f[1]).toFixed(1)}px`);
+  else if (cf) parts.push(`font-family:'${cf.family}', var(--chat-font)`, `font-size:${baseSize}px`);
   if (/^#[0-9a-f]{6}$/i.test(s.color || '')) parts.push(`--mc:${s.color}`);
   if (s.bold) parts.push('font-weight:700');
   if (s.italic) parts.push('font-style:italic');
@@ -89,6 +91,27 @@ function msgStyle(s, baseSize = 13) {
   return parts.join(';');
 }
 const hasColor = (s) => !!s && /^#[0-9a-f]{6}$/i.test(s.color || '');
+
+// Custom, user-uploaded fonts (renderer/i18n.js has no part in these; labels are derived from the file name).
+// Loaded once per window: fetches the list from the main process, then loads each file's bytes into
+// document.fonts via the FontFace API, since a page can't just point an @font-face at an arbitrary file.
+let customFonts = [];
+async function loadCustomFonts() {
+  let list = [];
+  try { list = (await rm.listCustomFonts()).fonts || []; } catch { return []; }
+  customFonts = list;
+  await Promise.all(list.map(async (f) => {
+    try {
+      const data = await rm.getCustomFontData(f.id);
+      if (!data) return;
+      const face = new FontFace(f.family, data.bytes.buffer.slice(data.bytes.byteOffset, data.bytes.byteOffset + data.bytes.byteLength));
+      await face.load();
+      document.fonts.add(face);
+    } catch { /* unreadable or unsupported file: it stays listed, just doesn't render as itself */ }
+  }));
+  return customFonts;
+}
+const customFamily = (family) => customFonts.find((f) => f.family === family);
 
 function applyShortcuts(text) {
   let out = text;

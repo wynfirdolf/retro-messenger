@@ -1,4 +1,4 @@
-/* global rm, t, I18N, $, $$, esc, LOGO_SVG, AVATARS, avatarHtml, openGrid, initTitlebar, applyI18n, applyShortcuts */
+/* global rm, t, I18N, $, $$, esc, LOGO_SVG, AVATARS, avatarHtml, openGrid, initTitlebar, applyI18n, applyShortcuts, sizeStr, loadCustomFonts */
 
 let state = null;
 
@@ -40,6 +40,7 @@ function render() {
   $('#snd-app-row').style.opacity = p.sounds === false ? '0.5' : '';
   renderUpdate();
   renderSounds();
+  renderFonts();
   $('#version').textContent = t('set.version', { v: state.appVersion || '' });
   const tool = (name, found, where) => `<span>${esc(name)}</span><span>${found
     ? `<span class="ok">✓ ${esc(t('set.found'))}</span><br><code>${esc(where)}</code>`
@@ -81,6 +82,29 @@ function renderUpdate() {
 
 $('#snd-list').onclick = (e) => { const b = e.target.closest('button[data-play]'); if (b) rm.playSound(b.dataset.play); };
 $('#snd-open').onclick = () => rm.openSoundsFolder();
+
+async function renderFonts() {
+  let info;
+  try { info = await rm.listCustomFonts(); } catch { return; }
+  const fonts = info.fonts || [];
+  $('#fnt-list').innerHTML = fonts.length
+    ? fonts.map((f) => `<div class="fnt">
+        <span class="nm" style="font-family:'${esc(f.family)}'">${esc(f.label)}<small>${esc(f.id)} · ${esc(sizeStr(f.size))}</small></span>
+        <button class="rm" data-remove="${esc(f.id)}" title="${esc(t('fnt.remove'))}">✕</button></div>`).join('')
+    : `<p class="hint">${esc(t('fnt.empty'))}</p>`;
+  $('#fnt-dir').textContent = t('snd.dir', { d: info.dir || '' });
+  await loadCustomFonts(); // so the names above preview in their own font
+  $('#fnt-list').innerHTML = $('#fnt-list').innerHTML; // re-trigger layout now the faces are loaded
+}
+
+$('#fnt-list').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-remove]');
+  if (!b) return;
+  await rm.removeCustomFont(b.dataset.remove);
+  renderFonts();
+});
+$('#fnt-add').onclick = async () => { await rm.pickCustomFonts(); renderFonts(); };
+$('#fnt-open').onclick = () => rm.openCustomFontsFolder();
 $('#snd-on').onchange = (e) => rm.updateProfile({ sounds: e.target.checked });
 $('#snd-app').onchange = (e) => rm.updateProfile({ appSounds: e.target.checked });
 window.addEventListener('focus', renderSounds);

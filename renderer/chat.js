@@ -1,4 +1,4 @@
-/* global rm, t, LOCALE, MODELS, sizeStr, fileIcon, fileUrl, FONTS, FONT_COLORS, msgStyle, hasColor, closePopovers, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
+/* global rm, t, LOCALE, MODELS, sizeStr, fileIcon, fileUrl, FONTS, FONT_COLORS, msgStyle, hasColor, closePopovers, loadCustomFonts, customFonts, $, esc, fmt, timeStr, avatarHtml, AVATARS, EMOTICONS, applyShortcuts, openGrid, initTitlebar, setTitle, applyI18n */
 
 const id = new URLSearchParams(location.search).get('id');
 let chat = null;
@@ -309,6 +309,12 @@ function saveFont(patch) {
   rm.updateProfile({ font: profile.font });
 }
 
+async function uploadFont() {
+  await rm.pickCustomFonts();
+  await loadCustomFonts();
+  renderFontPanel();
+}
+
 function renderFontPanel() {
   const pop = $('.fontpop');
   if (!pop) return;
@@ -325,6 +331,11 @@ function renderFontPanel() {
     const css = family ? `font-family:'${family}', var(--chat-font)` : '';
     list += `<button data-family="${esc(family)}" class="${f.family === family ? 'on' : ''}" style="${css}">${esc(label)}</button>`;
   }
+  list += `<div class="grp">${esc(t('font.customGroup'))}</div>`;
+  for (const cf of customFonts) {
+    list += `<button data-family="${esc(cf.family)}" class="${f.family === cf.family ? 'on' : ''}" style="font-family:'${esc(cf.family)}', var(--chat-font)">${esc(cf.label)}</button>`;
+  }
+  list += `<button class="upload" data-upload="1">➕ ${esc(t('font.upload'))}</button>`;
   const tog = (k, label, css) => `<button class="xp-btn tog ${f[k] ? 'on' : ''}" data-tog="${k}" title="${esc(t(`font.${k}`))}" style="${css}">${label}</button>`;
   const swatches = [`<button class="sw auto ${f.color ? '' : 'on'}" data-color="" title="${esc(t('font.auto'))}"></button>`]
     .concat(FONT_COLORS.map((c) => `<button class="sw ${f.color === c ? 'on' : ''}" data-color="${c}" style="background:${c}"></button>`))
@@ -355,6 +366,7 @@ function openFontPanel(anchor) {
     e.stopPropagation();
     const b = e.target.closest('button');
     if (!b) return;
+    if (b.dataset.upload) { uploadFont(); return; }
     if ('family' in b.dataset) saveFont({ family: b.dataset.family });
     else if (b.dataset.tog) saveFont({ [b.dataset.tog]: !myFont()[b.dataset.tog] });
     else if ('color' in b.dataset) saveFont({ color: b.dataset.color });
@@ -585,6 +597,7 @@ rm.on('shake', () => {
   codexModels = res.codexModels || [];
   stats = res.stats || null;
   if (!chat) return window.close();
+  await loadCustomFonts();
   renderChrome();
   renderAll();
   renderStatus();
