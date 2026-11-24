@@ -161,7 +161,7 @@ Her ses (uygulama açılırken, kapanırken, oturum açma, oturum kapatma, yeni 
 1. [Releases](../../releases/latest) sayfasından `Retro-Messenger-Setup-X.Y.Z-x64.exe` dosyasını indirin.
 2. Çalıştırın. Yalnızca sizin kullanıcınız için kurulur (yönetici izni gerekmez) ve uygulamayı açar.
 3. Kurulum dosyası imzalı olmadığı için Windows SmartScreen "Windows kişisel bilgisayarınızı korudu" diyebilir. **Ek bilgi → Yine de çalıştır**'a tıklayın.
-4. **Güncellemeler otomatiktir.** Uygulama GitHub'da yeni sürüm olup olmadığına bakar, arka planda indirir ve uygulamayı kapattığınızda kurar (ya da **Ayarlar → Hakkında → Yeniden başlat ve kur** ile hemen). Aynı yerden kapatabilirsiniz.
+4. **Güncellemeler otomatiktir.** Uygulama GitHub'da yeni sürüm olup olmadığına bakar ve arka planda indirir. Windows'ta uygulamayı kapattığınızda kurulur (ya da **Ayarlar → Hakkında → Yeniden başlat ve kur** ile hemen); macOS'ta, uygulama Apple Developer kimliğiyle imzalı olmadığı için **Yeniden başlat ve kur**'a tıklayınca yeni sürüm yerine kopyalanır ve yeniden açılır. Denetlemeyi aynı yerden kapatabilirsiniz.
 
 **Gereksinim:** aşağıdakilerden en az biri kurulu ve giriş yapılmış olmalı:
 - [Claude Code](https://code.claude.com): terminalde bir kez `claude` çalıştırın.
@@ -218,7 +218,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 
 - ChatGPT (Codex) sohbetleri izin sormak yerine bir korumalı alanda çalışır; yanıtlar akarak değil, bütün olarak gelir.
 - Google Antigravity desteklenmiyor: Antigravity uygulamasının dışında çalışan bir komut satırı aracı yok.
-- macOS'ta otomatik güncelleme yok: yeni sürümleri [Releases](../../releases/latest) sayfasından kurun.
+- macOS'taki güncelleme kurulumu Apple tarafından imzalı değildir (Apple Developer kimliği yok); bu yüzden düz bir dosya kopyalamadır, Apple'ın imza denetiminden geçmez. Yine de tek tıkla **Ayarlar → Hakkında → Yeniden başlat ve kur**.
 - Hazır sürümler Apple Silicon Mac'ler ve 64 bit Windows içindir. Intel Mac'lerde kaynaktan çalıştırılabilir.
 
 ### 👍 claude.ai ve chatgpt.com ile eşitleme için destek ver
@@ -236,7 +236,7 @@ Sen de istiyorsan bağlantılara girip 👍 ver. Ne kadar çok kişi isterse yap
 - [ ] Görünen resim olarak kendi fotoğrafını yükleme
 - [x] ~~*Yazı tipi ve renk seçimi*~~
 - [x] ~~*Sohbet geçmişini dışa aktarma*~~
-- [x] ~~*Otomatik güncelleme*~~ (yalnızca Windows)
+- [x] ~~*Otomatik güncelleme*~~
 
 Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gönderebilirsiniz.
 

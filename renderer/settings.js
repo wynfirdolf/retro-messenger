@@ -58,10 +58,8 @@ async function renderSounds() {
 }
 
 function renderUpdate() {
-  // Auto-update exists on Windows only.
   $('#upd-box').style.display = state.updatesEnabled === false ? 'none' : '';
   const u = state.update || { status: 'idle' };
-  const win = rm.platform === 'win32';
   $('#autoupdate').checked = state.profile.autoUpdate !== false;
   const text = {
     dev: t('upd.dev'),
@@ -70,13 +68,13 @@ function renderUpdate() {
     uptodate: t('upd.uptodate'),
     available: t('upd.available', { v: u.version }),
     downloading: t('upd.downloading', { v: u.version, p: u.percent || 0 }),
-    ready: t('upd.ready', { v: u.version }),
+    ready: t(rm.platform === 'win32' ? 'upd.readyWin' : 'upd.readyMac', { v: u.version }),
     error: t('upd.error', { e: u.error || '' }),
   }[u.status] || '';
   $('#upd-status').textContent = text;
   const btn = $('#upd-btn');
   btn.disabled = ['checking', 'downloading', 'dev'].includes(u.status);
-  if (u.status === 'ready' && win) { btn.textContent = t('upd.install'); btn.onclick = () => rm.installUpdate(); }
+  if (u.status === 'ready') { btn.textContent = t('upd.install'); btn.onclick = () => rm.installUpdate(); }
   else if (u.status === 'available') { btn.textContent = t('upd.download'); btn.onclick = () => rm.openUrl(u.url); }
   else { btn.textContent = t('upd.check'); btn.onclick = () => rm.checkUpdate(); }
 }

@@ -9,8 +9,8 @@ const { CodexSession, findCodex, listModels: codexModels } = require('./src/code
 const history = require('./src/history');
 const exporter = require('./src/export');
 const updater = require('./src/updater');
-// Auto-update is Windows only; on macOS the app never checks for updates.
-const UPDATES = process.platform !== 'darwin';
+// Update checks run on macOS and Windows (the only platforms this app ships for).
+const UPDATES = process.platform === 'darwin' || process.platform === 'win32';
 const sounds = require('./src/sounds');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
