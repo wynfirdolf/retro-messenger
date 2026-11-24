@@ -23,11 +23,11 @@
   nav button.on { background: var(--sel); border-color: var(--sel-border); font-weight: bold; }
 
   main {
-    flex: 1; min-width: 0; overflow-y: auto; padding: 14px 16px;
+    flex: 1; min-width: 0; overflow-y: auto; overflow-x: hidden; padding: 14px 16px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 3px;
   }
   h2 { margin: 0 0 12px; font-size: 14px; color: var(--heading); display: flex; align-items: center; gap: 8px; }
-  fieldset { margin: 0 0 14px; padding: 8px 12px 12px; border: 1px solid var(--soft-line); border-radius: 4px; }
+  fieldset { min-width: 0; margin: 0 0 14px; padding: 8px 12px 12px; border: 1px solid var(--soft-line); border-radius: 4px; }
   legend { padding: 0 4px; color: var(--heading); font-weight: bold; }
   .row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
   .row label.k { width: 120px; flex: none; color: var(--ink-2); }
@@ -98,6 +98,12 @@
 
       <section data-page="sounds">
         <h2>🔊 <span data-i18n="set.sounds"></span></h2>
+        <fieldset>
+          <legend data-i18n="snd.switches"></legend>
+          <label class="chk"><input type="checkbox" id="snd-on"><span data-i18n="snd.on"></span></label>
+          <label class="chk" id="snd-app-row" style="margin-left:22px"><input type="checkbox" id="snd-app"><span data-i18n="snd.app"></span></label>
+          <p class="hint" data-i18n="snd.appHint"></p>
+        </fieldset>
         <p class="hint" data-i18n="snd.hint"></p>
         <fieldset>
           <legend data-i18n="snd.title"></legend>
@@ -126,7 +132,7 @@
           <legend data-i18n="set.tools"></legend>
           <div class="tools" id="tools"></div>
         </fieldset>
-        <fieldset>
+        <fieldset id="upd-box">
           <legend data-i18n="upd.title"></legend>
           <label class="chk"><input type="checkbox" id="autoupdate"><span data-i18n="upd.auto"></span></label>
           <div class="row"><span id="upd-status" class="hint"></span></div>

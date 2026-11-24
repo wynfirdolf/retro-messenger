@@ -135,7 +135,7 @@ Gece kod yazanlar için. Kişi listesinin altındaki 🌓 menüsünden **Otomati
 <img src="docs/tr/dark.png" alt="Karanlık modda Retro Messenger" width="100%">
 
 ### 🔊 Kendi seslerin
-Her ses (uygulama açılırken, kapanırken, oturum açma, oturum kapatma, yeni ileti, titreşim) değiştirilebilir: olayın adını taşıyan bir `mp3`, `wav` ya da `ogg` dosyasını (`nudge.mp3`, `login.wav`, …) `sounds` klasörüne at. **Ayarlar → Sesler** hangilerinin özel olduğunu gösterir ve klasörü açar. Eksik ya da bozuk dosya yerleşik sese döner. Klasörde bir `README.txt` bulunur; rehber [docs/SOUNDS.md](docs/SOUNDS.md) dosyasında: dosya adları, her ses için en uzun süre (0,5 ile 5 sn), biçimler (MP3 128 kbps CBR / 44,1 kHz, WAV 16 bit 44,1 kHz) ve boyut (2 MB).
+Her ses (uygulama açılırken, kapanırken, oturum açma, oturum kapatma, yeni ileti, titreşim) değiştirilebilir: olayın adını taşıyan bir `mp3`, `wav` ya da `ogg` dosyasını (`nudge.mp3`, `login.wav`, …) `sounds` klasörüne at. **Ayarlar → Sesler**'de tüm sesleri ya da sadece açılış ve kapanış seslerini kapatan anahtarlar vardır; ayrıca hangilerinin özel olduğunu gösterir ve klasörü açar. Eksik ya da bozuk dosya yerleşik sese döner. Klasörde bir `README.txt` bulunur; rehber [docs/SOUNDS.md](docs/SOUNDS.md) dosyasında: dosya adları, her ses için en uzun süre (0,5 ile 5 sn), biçimler (MP3 128 kbps CBR / 44,1 kHz, WAV 16 bit 44,1 kHz) ve boyut (2 MB).
 
 ### ⚙️ Diğerleri
 - Her sohbet için **model, sürüm ve efor** seçimi. Önce aileyi (Fable, Opus, Sonnet, Haiku), sonra sürümü (örneğin Opus 5.5, 5 veya 4.8) ya da "En yeni"yi seçin. Efor Düşük'ten Maksimum'a kadar ayarlanabilir; modelin desteklemediği seviyeler listede görünmez.
@@ -218,7 +218,7 @@ Her sohbet için arka planda `claude -p --input-format stream-json --output-form
 
 - ChatGPT (Codex) sohbetleri izin sormak yerine bir korumalı alanda çalışır; yanıtlar akarak değil, bütün olarak gelir.
 - Google Antigravity desteklenmiyor: Antigravity uygulamasının dışında çalışan bir komut satırı aracı yok.
-- macOS'ta uygulama kendini güncelleyemez: Apple Developer kimliğiyle imzalı olmadığı için yalnızca yeni bir sürüm olduğunu söyler (**Ayarlar → Hakkında → Güncellemeler**) ve indirme sayfasını açar.
+- macOS'ta otomatik güncelleme yok: yeni sürümleri [Releases](../../releases/latest) sayfasından kurun.
 - Hazır sürümler Apple Silicon Mac'ler ve 64 bit Windows içindir. Intel Mac'lerde kaynaktan çalıştırılabilir.
 
 ### 👍 claude.ai ve chatgpt.com ile eşitleme için destek ver
@@ -236,7 +236,7 @@ Sen de istiyorsan bağlantılara girip 👍 ver. Ne kadar çok kişi isterse yap
 - [ ] Görünen resim olarak kendi fotoğrafını yükleme
 - [x] ~~*Yazı tipi ve renk seçimi*~~
 - [x] ~~*Sohbet geçmişini dışa aktarma*~~
-- [x] ~~*Otomatik güncelleme*~~ (Windows kurar; macOS indirme sayfasını açar)
+- [x] ~~*Otomatik güncelleme*~~ (yalnızca Windows)
 
 Katkılar memnuniyetle karşılanır. Bir issue açabilir veya pull request gönderebilirsiniz.
 

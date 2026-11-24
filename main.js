@@ -9,6 +9,8 @@ const { CodexSession, findCodex, listModels: codexModels } = require('./src/code
 const history = require('./src/history');
 const exporter = require('./src/export');
 const updater = require('./src/updater');
+// Auto-update is Windows only; on macOS the app never checks for updates.
+const UPDATES = process.platform !== 'darwin';
 const sounds = require('./src/sounds');
 const I18N = require('./renderer/i18n');
 const MODELS = require('./renderer/models');
@@ -109,7 +111,8 @@ function snapshot() {
     claudePath: env.claudePath && env.claudePath.replace(os.homedir(), '~'),
     codexPath: env.codexPath && env.codexPath.replace(os.homedir(), '~'),
     appVersion: require('./package.json').version,
-    update: updater.state,
+    update: UPDATES ? updater.state : null,
+    updatesEnabled: UPDATES,
     providers: { claude: !!env.claudePath, codex: !!env.codexPath },
     rateLimit,
     chats: store.chats().map((c) => ({
@@ -192,7 +195,17 @@ function markRead(id) {
 
 // Sounds without a visible window of their own (start up, quit, sign out) play in a short-lived hidden window.
 const globalSounds = new Map(); // webContents id -> finish()
+// Settings → Sounds: everything can be switched off, and the start / quit sounds have their own switch.
+// (The ▶ preview buttons in Settings bypass this on purpose.)
+function soundOn(name) {
+  const p = store.profile();
+  if (p.sounds === false) return false;
+  if ((name === 'startup' || name === 'shutdown') && p.appSounds === false) return false;
+  return true;
+}
+
 function playGlobal(name) {
+  if (!soundOn(name)) return Promise.resolve();
   return new Promise((resolve) => {
     const w = new BrowserWindow({ show: false, skipTaskbar: true, webPreferences: { preload: PRELOAD, autoplayPolicy: 'no-user-gesture-required', backgroundThrottling: false } });
     const wcId = w.webContents.id;
@@ -214,6 +227,7 @@ function playGlobal(name) {
 }
 
 function playSound(name, id) {
+  if (!soundOn(name)) return;
   if (store.profile().status === 'busy' && name !== 'nudge') return;
   const target = alive(chatWins.get(id)) ? chatWins.get(id) : listWin;
   if (alive(target)) target.webContents.send('play-sound', name);
@@ -682,8 +696,8 @@ ipcMain.handle('sound:open-folder', () => { sounds.ensure(app); return shell.ope
 ipcMain.handle('sound:play', (e, name) => { if (sounds.SOUNDS.some((s) => s.name === String(name))) e.sender.send('play-sound', String(name)); });
 ipcMain.on('sound:done', (e) => globalSounds.get(e.sender.id)?.());
 
-ipcMain.handle('update:check', () => updater.check());
-ipcMain.handle('update:install', () => updater.installNow());
+ipcMain.handle('update:check', () => (UPDATES ? updater.check() : undefined));
+ipcMain.handle('update:install', () => (UPDATES ? updater.installNow() : undefined));
 
 ipcMain.handle('url:open', (_e, u) => {
   if (typeof u === 'string' && /^https?:\/\//.test(u)) shell.openExternal(u);
@@ -787,7 +801,7 @@ app.whenReady().then(() => {
   env.codexPath = findCodex(env.env);
   sounds.ensure(app);
   updater.on('change', pushState);
-  updater.start(() => store.profile().autoUpdate !== false);
+  if (UPDATES) updater.start(() => store.profile().autoUpdate !== false);
   createListWindow();
   playGlobal('startup');
   app.on('activate', () => {

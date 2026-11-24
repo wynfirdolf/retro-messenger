@@ -135,7 +135,7 @@ For late-night coding. Choose **Automatic** (follows your system), **Light** or 
 <img src="docs/dark.png" alt="Retro Messenger in dark mode" width="100%">
 
 ### 🔊 Your own sounds
-Every sound (app opens, app quits, sign in, sign out, new message, nudge) can be replaced: drop an `mp3`, `wav` or `ogg` named after the event (`nudge.mp3`, `login.wav`, …) into the `sounds` folder. **Settings → Sounds** shows what is custom and opens the folder. A file that is missing or broken just falls back to the built-in sound. The folder holds a `README.txt`, and [docs/SOUNDS.md](docs/SOUNDS.md) is the guide: file names, maximum length per sound (0.5 to 5 s), formats (MP3 128 kbps CBR / 44.1 kHz, WAV 16-bit 44.1 kHz) and size (2 MB).
+Every sound (app opens, app quits, sign in, sign out, new message, nudge) can be replaced: drop an `mp3`, `wav` or `ogg` named after the event (`nudge.mp3`, `login.wav`, …) into the `sounds` folder. **Settings → Sounds** has switches to turn all sounds off, or just the start and quit sounds, and shows what is custom and opens the folder. A file that is missing or broken just falls back to the built-in sound. The folder holds a `README.txt`, and [docs/SOUNDS.md](docs/SOUNDS.md) is the guide: file names, maximum length per sound (0.5 to 5 s), formats (MP3 128 kbps CBR / 44.1 kHz, WAV 16-bit 44.1 kHz) and size (2 MB).
 
 ### ⚙️ And also
 - **Model, version and effort** for each chat. Pick a family (Fable, Opus, Sonnet, Haiku), then a version (for example Opus 5.5, 5 or 4.8) or "Latest". Effort runs from Low to Max; levels a model doesn't support are hidden.
@@ -218,7 +218,7 @@ Copy the `en` block in `renderer/i18n.js`, give it a new language code and trans
 
 - ChatGPT (Codex) chats run in a sandbox instead of asking for permission, and replies arrive whole rather than streaming.
 - Google Antigravity isn't supported: it has no command-line tool that works outside the Antigravity app.
-- On macOS the app can't update itself: it isn't signed with an Apple Developer ID, so it only tells you a newer version exists (**Settings → About → Updates**) and opens the download page.
+- On macOS there is no auto-update: install new versions from the [Releases](../../releases/latest) page.
 - Prebuilt releases are for Apple Silicon Macs and 64-bit Windows. Intel Macs can run it from source.
 
 ### 👍 Help us sync with claude.ai and chatgpt.com
@@ -236,7 +236,7 @@ If you'd like this too, open the issues and add a 👍. The more people ask, the
 - [ ] Upload your own photo as a display picture
 - [x] ~~*Font and color choice*~~
 - [x] ~~*Export chat history*~~
-- [x] ~~*Auto-update*~~ (Windows installs it; macOS points to the download)
+- [x] ~~*Auto-update*~~ (Windows only)
 
 Contributions are welcome. Open an issue or send a pull request.
 

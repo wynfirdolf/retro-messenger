@@ -34,6 +34,10 @@ function render() {
     ['mod', t(mac ? 'set.linkModMac' : 'set.linkModWin'), t('set.linkModDesc')],
   ], p.linkClick || 'click', (v) => rm.updateProfile({ linkClick: v }));
 
+  $('#snd-on').checked = p.sounds !== false;
+  $('#snd-app').checked = p.appSounds !== false;
+  $('#snd-app').disabled = p.sounds === false;
+  $('#snd-app-row').style.opacity = p.sounds === false ? '0.5' : '';
   renderUpdate();
   renderSounds();
   $('#version').textContent = t('set.version', { v: state.appVersion || '' });
@@ -54,6 +58,8 @@ async function renderSounds() {
 }
 
 function renderUpdate() {
+  // Auto-update exists on Windows only.
+  $('#upd-box').style.display = state.updatesEnabled === false ? 'none' : '';
   const u = state.update || { status: 'idle' };
   const win = rm.platform === 'win32';
   $('#autoupdate').checked = state.profile.autoUpdate !== false;
@@ -77,6 +83,8 @@ function renderUpdate() {
 
 $('#snd-list').onclick = (e) => { const b = e.target.closest('button[data-play]'); if (b) rm.playSound(b.dataset.play); };
 $('#snd-open').onclick = () => rm.openSoundsFolder();
+$('#snd-on').onchange = (e) => rm.updateProfile({ sounds: e.target.checked });
+$('#snd-app').onchange = (e) => rm.updateProfile({ appSounds: e.target.checked });
 window.addEventListener('focus', renderSounds);
 
 // Fixed parts: titles, option lists, handlers
